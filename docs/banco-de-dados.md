@@ -11,12 +11,16 @@ que devolve JSON como texto (o helper `json()` trata os dois casos).
 | Arquivo | Conteúdo | Rodada na Hostinger? |
 |---|---|---|
 | `001_sistema.sql` | `system_config` (configurações), `cron_jobs` (agenda: estado e trava de cada tarefa), `cron_runs` (histórico) | ✅ 2026-11-12 (automática no primeiro deploy) |
+| `002_contato.sql` | `contact_messages`: mensagens dos formulários de Contato e Faça parte (guarda o hash do IP, não o IP) | automática no deploy |
 
 - **Produção:** são aplicadas automaticamente quando o app inicia (`db/migrate.mjs`), registradas em
   `schema_migrations`. O MySQL da Hostinger só aceita conexão local.
 - **Local:** `npm run db:migrate`.
 - **No chat:** toda migration nova é colada no chat quando criada (combinado com o dono).
 - **Imutáveis:** uma migration já aplicada nunca é editada. Correção é sempre uma migration nova.
+- **Sempre em UTC:** toda conexão (app, migrations e testes) roda `SET time_zone = '+00:00'`. Sem isso, o
+  `CURRENT_TIMESTAMP` das colunas sai no fuso do servidor MySQL. O teste de contato pegou esse erro com o MySQL no
+  fuso de Brasília.
 
 ## Do PostgreSQL para o MySQL
 

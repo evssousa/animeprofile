@@ -3,15 +3,27 @@
 // Na Hostinger o banco fica no mesmo servidor do site: conectar em 127.0.0.1:3306
 // (não em "localhost", que pode resolver para IPv6, nem no host srvNNNN.hstgr.io).
 import { randomBytes } from "node:crypto";
-import mysql, { type Pool, type PoolConnection, type ResultSetHeader, type RowDataPacket } from "mysql2/promise";
+import mysql, { type Pool, type PoolConnection, type PoolOptions, type ResultSetHeader, type RowDataPacket } from "mysql2/promise";
 
 export const hasDatabase = () => Boolean(process.env.DB_NAME && process.env.DB_USER);
 
 let pool: Pool | undefined;
 
+/**
+ * Pool com a sessão sempre em UTC. Sem isso, CURRENT_TIMESTAMP (padrão das colunas de data) sai no fuso do
+ * servidor MySQL, e as comparações com UTC_TIMESTAMP() erram por horas.
+ */
+export function createPool(options: PoolOptions): Pool {
+  const p = mysql.createPool({ charset: "utf8mb4", timezone: "Z", dateStrings: true, ...options });
+  p.pool.on("connection", (conn) => {
+    conn.query("SET time_zone = '+00:00'");
+  });
+  return p;
+}
+
 export function db(): Pool {
   if (!pool) {
-    pool = mysql.createPool({
+    pool = createPool({
       host: process.env.DB_HOST || "127.0.0.1",
       port: Number(process.env.DB_PORT || 3306),
       user: process.env.DB_USER,

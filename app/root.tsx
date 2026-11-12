@@ -2,6 +2,11 @@ import { isRouteErrorResponse, Link, Links, Meta, Outlet, Scripts, ScrollRestora
 
 import type { Route } from "./+types/root";
 import "./app.css";
+import { Footer } from "./components/layout/Footer";
+import { Header } from "./components/layout/Header";
+import { Sidebar } from "./components/layout/Sidebar";
+import { themeBootstrap } from "./components/layout/ThemeToggle";
+import { PageHeader } from "./components/PageHeader";
 import { SITE } from "./lib/site";
 
 export const links: Route.LinksFunction = () => [
@@ -9,21 +14,37 @@ export const links: Route.LinksFunction = () => [
   { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-  { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" },
+  { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=M+PLUS+2:wght@400;500;600;700;800&display=swap" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#bb0000" />
+        <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <Meta />
         <Links />
       </head>
-      <body className="min-h-screen antialiased">
-        {children}
+      <body className="min-h-dvh antialiased">
+        <a
+          href="#conteudo"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-50 focus:rounded-full focus:bg-hanko focus:px-4 focus:py-2 focus:text-hanko-ink"
+        >
+          Pular para o conteúdo
+        </a>
+        <div className="flex min-h-dvh">
+          <Sidebar />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <Header />
+            <main id="conteudo" className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </div>
         <ScrollRestoration />
         <Scripts />
       </body>
@@ -37,22 +58,24 @@ export default function App() {
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   const notFound = isRouteErrorResponse(error) && error.status === 404;
-  let details = notFound ? "A página que você procura não existe ou foi removida." : "Algo deu errado do nosso lado. Tente de novo em instantes.";
+  let details = notFound
+    ? "Este endereço não existe ou foi removido. Confira se digitou certo, ou volte para o início."
+    : "O servidor não conseguiu montar esta página. Tente de novo em alguns instantes.";
   let stack: string | undefined;
   if (!notFound && import.meta.env.DEV && error instanceof Error) {
     details = error.message;
     stack = error.stack;
   }
   return (
-    <main className="mx-auto max-w-2xl px-4 py-20">
+    <>
       <title>{`${notFound ? "Página não encontrada" : "Erro"} | ${SITE.name}`}</title>
-      <p className="text-sm font-semibold text-brand">{notFound ? "Erro 404" : "Erro"}</p>
-      <h1 className="mt-3 text-4xl font-extrabold">{notFound ? "Página não encontrada" : "Algo deu errado"}</h1>
-      <p className="mt-4 text-muted">{details}</p>
-      <Link to="/" className="mt-8 inline-block rounded-xl bg-brand px-5 py-3 font-semibold text-white">
-        Voltar para o início
-      </Link>
-      {stack && <pre className="mt-8 overflow-x-auto rounded-xl bg-card p-4 text-xs">{stack}</pre>}
-    </main>
+      <PageHeader title={notFound ? "Página não encontrada" : "Algo deu errado"} intro={details} />
+      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
+        <Link to="/" className="inline-block rounded-full bg-hanko px-5 py-3 font-semibold text-hanko-ink hover:brightness-110">
+          Voltar para o início
+        </Link>
+        {stack && <pre className="mt-8 overflow-x-auto rounded-xl bg-sunken p-4 text-xs">{stack}</pre>}
+      </div>
+    </>
   );
 }

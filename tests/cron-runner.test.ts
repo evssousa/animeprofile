@@ -1,9 +1,9 @@
 // Executor do cron contra um MySQL de verdade (descartável): migrations, reserva sem duplicar e histórico.
 import { createDB } from "mysql-memory-server";
-import mysql from "mysql2/promise";
+import type mysql from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { migrate } from "../db/migrate.mjs";
-import { query, setPool } from "~/server/db.server";
+import { createPool, query, setPool } from "~/server/db.server";
 import { runNow, status, tick } from "~/server/cron/runner.server";
 
 let server: Awaited<ReturnType<typeof createDB>>;
@@ -13,7 +13,7 @@ beforeAll(async () => {
   server = await createDB({ version: "8.4.x", logLevel: "ERROR" });
   const config = { host: "127.0.0.1", port: server.port, user: server.username, database: server.dbName, charset: "utf8mb4", timezone: "Z" };
   await migrate(config, () => {});
-  pool = mysql.createPool({ ...config, dateStrings: true, connectionLimit: 5 });
+  pool = createPool({ ...config, connectionLimit: 5 });
   setPool(pool);
 });
 

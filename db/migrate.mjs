@@ -24,6 +24,7 @@ export function dbConfigFromEnv(env = process.env) {
 export async function migrate(config, log = console.log) {
   const conn = await mysql.createConnection({ ...config, multipleStatements: true });
   try {
+    await conn.query("SET time_zone = '+00:00'"); // datas sempre em UTC, como no app
     await conn.query(
       "CREATE TABLE IF NOT EXISTS schema_migrations (version VARCHAR(50) NOT NULL PRIMARY KEY, applied_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci",
     );

@@ -2,6 +2,32 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-12 — Contas por último; visual novo com a mesma marca
+
+- **Decisão:**
+  - **Ordem:** primeiro tudo o que não precisa de conta (layout, páginas institucionais, notícias, artigos,
+    animes, quiz). Cadastro, login e o que depende deles ficam por último.
+  - **Visual:** a marca continua (logo e vermelho `#bb0000`), com acabamento novo, no nível do respawnou: "página de
+    mangá carimbada" (ver [design.md](design.md)).
+  - **Fontes:** Dela Gothic One nos títulos e M PLUS 2 no texto, no lugar de Outfit e Inter.
+  - **Páginas de texto:** escritas em Markdown (`app/content/paginas/`). Mudar um texto legal não exige mexer em
+    código.
+  - **Textos legais atualizados para o site novo:**
+    - **Operadores:** Hostinger no lugar de Lovable, Supabase, Cloudflare e Resend. Google Gemini no lugar do gateway
+      do Lovable. Entraram o Firebase, o Turnstile e o Mercado Pago, que já eram usados e não estavam listados.
+    - **Removidos:** Stripe e assinaturas legadas, eventos e os cookies antigos de sessão (`sb-*`) e de telemetria
+      (`ap_pv_*`).
+  - **Contato:** a página ganhou formulário (antes era só o e-mail). As mensagens ficam no banco, e o painel admin
+    vai listá-las.
+- **Por quê:**
+  - **Ordem:** o dono quer deixar as contas para o fim.
+  - **Visual:** o pedido foi melhorar o layout sem que os usuários estranhem.
+  - **Textos legais:** precisam dizer a verdade sobre quem trata os dados.
+- **Pendente antes da virada:**
+  - **Datas de atualização:** conferir as datas e a versão dos Termos e da Privacidade (a mudança de operadores é
+    material: pede novo aceite no login).
+  - **Banner de cookies:** fazer, antes de ligar Analytics ou AdSense.
+
 ## 2026-11-12 — Arquitetura do site novo
 
 - **Decisão:**

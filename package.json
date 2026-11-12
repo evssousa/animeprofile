@@ -19,6 +19,8 @@
     "compression": "^1.8.2",
     "express": "^5.3.0",
     "isbot": "^5.1.36",
+    "lucide-react": "^1.72.0",
+    "marked": "^18.2.0",
     "mysql2": "^3.24.6",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

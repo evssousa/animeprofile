@@ -1,29 +1,182 @@
 @import "tailwindcss";
 
-/* Identidade do Anime Profile: vermelho #bb0000, Outfit nos títulos e Inter no texto.
-   Tema escuro no esqueleto; o tema claro/escuro completo vem com o layout (fase 2). */
-@theme {
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-display: "Outfit", system-ui, sans-serif;
-  --color-bg: oklch(0.16 0 0);
-  --color-card: oklch(0.21 0 0);
-  --color-fg: oklch(0.97 0 0);
-  --color-muted: oklch(0.72 0 0);
-  --color-line: oklch(0.3 0 0 / 60%);
-  --color-brand: oklch(0.62 0.16 27);
+/*
+ * Identidade visual do Anime Profile (docs/design.md).
+ * Ideia central: página de mangá carimbada. Papel e tinta, o vermelho do hanko (a marca, #bb0000),
+ * o índigo japonês (ai-iro) como cor secundária e a retícula de mangá como textura, usada só no
+ * cabeçalho das páginas. Títulos em Dela Gothic One; texto em M PLUS 2.
+ */
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+:root {
+  --paper: #fbfbfc;
+  --surface: #ffffff;
+  --sunken: #f2f2f5;
+  --ink: #1a1820;
+  --ink-soft: #57545f;
+  --line: #e3e2e9;
+  --hanko: #bb0000;
+  --hanko-ink: #ffffff;
+  --ai: #23407a;
+  --tone: #1a1820;
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --paper: #121117;
+  --surface: #1b1a21;
+  --sunken: #17161c;
+  --ink: #f1f0f4;
+  --ink-soft: #a7a4b0;
+  --line: #2d2b35;
+  --hanko: #e5413a;
+  --hanko-ink: #ffffff;
+  --ai: #93b0ee;
+  --tone: #f1f0f4;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --font-sans: "M PLUS 2", system-ui, sans-serif;
+  --font-display: "Dela Gothic One", "M PLUS 2", system-ui, sans-serif;
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-sunken: var(--sunken);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-line: var(--line);
+  --color-hanko: var(--hanko);
+  --color-hanko-ink: var(--hanko-ink);
+  --color-ai: var(--ai);
 }
 
 @layer base {
-  html,
-  body {
-    background: var(--color-bg);
-    color: var(--color-fg);
+  html {
+    background: var(--paper);
+    color: var(--ink);
     font-family: var(--font-sans);
+    -webkit-tap-highlight-color: transparent;
   }
-  h1,
-  h2,
-  h3 {
-    font-family: var(--font-display);
-    letter-spacing: -0.02em;
+  body {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ai);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--hanko) 22%, transparent);
+  }
+}
+
+/* Retícula de mangá: pontos de tinta que se dissolvem na diagonal. Só no cabeçalho das páginas. */
+.screentone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(var(--tone) 1.1px, transparent 1.5px);
+  background-size: 8px 8px;
+  opacity: 0.22;
+  -webkit-mask-image: linear-gradient(115deg, transparent 38%, #000 92%);
+  mask-image: linear-gradient(115deg, transparent 38%, #000 92%);
+}
+
+/* Texto longo (páginas institucionais, matérias). */
+.prose-ap {
+  max-width: 68ch;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+.prose-ap > * + * {
+  margin-top: 1.1em;
+}
+.prose-ap h2 {
+  margin-top: 2.4em;
+  font-family: var(--font-display);
+  font-size: 1.45rem;
+  line-height: 1.25;
+  font-weight: 400;
+  scroll-margin-top: 6rem;
+}
+.prose-ap h3 {
+  margin-top: 1.8em;
+  font-size: 1.1rem;
+  font-weight: 700;
+  scroll-margin-top: 6rem;
+}
+.prose-ap h2 + *,
+.prose-ap h3 + * {
+  margin-top: 0.6em;
+}
+.prose-ap a {
+  color: var(--ai);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose-ap a:hover {
+  text-decoration-thickness: 2px;
+}
+.prose-ap strong {
+  font-weight: 700;
+}
+.prose-ap ul,
+.prose-ap ol {
+  padding-left: 1.3em;
+}
+.prose-ap ul {
+  list-style: disc;
+}
+.prose-ap ol {
+  list-style: decimal;
+}
+.prose-ap li + li {
+  margin-top: 0.4em;
+}
+.prose-ap li::marker {
+  color: var(--hanko);
+}
+.prose-ap blockquote {
+  border-left: 3px solid var(--hanko);
+  padding-left: 1em;
+  color: var(--ink-soft);
+}
+.prose-ap .table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.prose-ap table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.prose-ap th,
+.prose-ap td {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--line);
+}
+.prose-ap th {
+  background: var(--sunken);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.prose-ap tr:last-child td {
+  border-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
