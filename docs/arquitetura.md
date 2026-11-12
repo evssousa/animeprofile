@@ -194,7 +194,8 @@ Tarefas previstas, vindas do site antigo, sem as dos recursos que saem:
 | `MERCADO_PAGO_ACCESS_TOKEN` `MERCADO_PAGO_WEBHOOK_SECRET` | Compra de Rubis e Premium |
 | `FIREBASE_SERVICE_ACCOUNT_JSON` + `VITE_FIREBASE_*` | Push |
 | `GEMINI_API_KEY` | Notícias por IA e traduções |
-| `FIRECRAWL_API_KEY` `KLIPY_API_KEY` | Leitura de fontes e GIFs |
+| `KLIPY_API_KEY` | GIFs |
+| `FIRECRAWL_API_KEY` | Leitura de fontes do robô, se continuar necessário (decidido na fase 5) |
 | `INSTAGRAM_*` | Postagem nas redes (detalhado na fase 5) |
 | `MEDIA_DIR` | Opcional: pasta das imagens (padrão `~/animeprofile-media`) |
 

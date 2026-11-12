@@ -56,8 +56,20 @@ Status: ⏳ o app ainda não existe. Este é o plano; vira registro do que foi f
   4. apontar o DNS;
   5. conferir.
 
-## O que o dono precisa fazer (na fase 2)
+## Contas e chaves externas
 
-- **Google Cloud:** criar o cliente OAuth do login com Google. É gratuito, e o passo a passo vem na hora.
-- **Chaves novas:** gerar novas chaves do Mercado Pago, do Gemini, do Turnstile, do Firebase, do Firecrawl e do
-  Klipy, e cadastrá-las nas variáveis do app.
+O dono gera as chaves e as guarda fora do repositório e fora do chat. Elas vão para as variáveis do app no hPanel
+quando o app existir.
+
+**Regra da troca:** as chaves e os apps do site antigo **não são apagados nem renovados** até a virada. O site
+antigo continua no ar usando-os. Depois de 30 dias com o site novo estável, as chaves antigas são revogadas.
+
+| Serviço | O que é criado | Status |
+|---|---|---|
+| Google Cloud (login) | Cliente OAuth "Aplicativo da Web" no projeto do Firebase. Retorno em `/auth/google/callback` nos endereços final, de teste e local (`http://localhost:5173`) | ⏳ dono |
+| Mercado Pago | **Aplicação nova** no painel de desenvolvedores (não renovar as credenciais da antiga) | ⏳ dono |
+| Gemini | Chave nova no AI Studio, num projeto sem cobrança (plano gratuito) | ⏳ dono |
+| Turnstile | Widget novo para `animeprofile.com.br` e `novo.animeprofile.com.br` | ⏳ dono |
+| Firebase | **Mesmo projeto** (as notificações dos celulares continuam). Só uma chave nova da conta de serviço; o par de chaves Web Push continua o mesmo | ⏳ dono |
+| Klipy | Conta própria de parceiro e chave (antes vinha pelo gateway do Lovable) | ⏳ dono |
+| Firecrawl | Adiado: na fase 5 avaliamos se o robô precisa dele (o respawnou funciona sem) | 💤 |
