@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+/* Identidade do Anime Profile: vermelho #bb0000, Outfit nos títulos e Inter no texto.
+   Tema escuro no esqueleto; o tema claro/escuro completo vem com o layout (fase 2). */
+@theme {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Outfit", system-ui, sans-serif;
+  --color-bg: oklch(0.16 0 0);
+  --color-card: oklch(0.21 0 0);
+  --color-fg: oklch(0.97 0 0);
+  --color-muted: oklch(0.72 0 0);
+  --color-line: oklch(0.3 0 0 / 60%);
+  --color-brand: oklch(0.62 0.16 27);
+}
+
+@layer base {
+  html,
+  body {
+    background: var(--color-bg);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+}

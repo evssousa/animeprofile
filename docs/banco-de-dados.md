@@ -10,7 +10,7 @@ que devolve JSON como texto (o helper `json()` trata os dois casos).
 
 | Arquivo | Conteúdo | Rodada na Hostinger? |
 |---|---|---|
-| (fase 2) `001_contas.sql` | usuários, sessões, perfis, papéis, `schema_migrations` | — |
+| `001_sistema.sql` | `system_config` (configurações), `cron_jobs` (agenda: estado e trava de cada tarefa), `cron_runs` (histórico) | ⏳ |
 
 - **Produção:** são aplicadas automaticamente quando o app inicia (`db/migrate.mjs`), registradas em
   `schema_migrations`. O MySQL da Hostinger só aceita conexão local.
