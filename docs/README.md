@@ -14,6 +14,10 @@ animeprofile.com.br só é ligado aqui no fim.
 |---|---|
 | [decisoes.md](decisoes.md) | Registro de decisões (o quê, quando e por quê) |
 | [inventario.md](inventario.md) | O que vem do site antigo, o que muda e o que fica para trás |
+| [arquitetura.md](arquitetura.md) | Stack, pastas, o que substitui o Supabase, login, economia, cron, imagens, variáveis |
+| [banco-de-dados.md](banco-de-dados.md) | MySQL: migrations, conversão do PostgreSQL, tabelas por área, importação |
+| [enderecos.md](enderecos.md) | Endereços que continuam e redirecionamentos do que saiu |
+| [deploy-hostinger.md](deploy-hostinger.md) | Como o app roda na Hostinger, endereço de teste e cuidados com o domínio |
 
 ## Status
 
@@ -26,7 +30,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 0 | Respostas do dono às perguntas do inventário | ✅ |
 | 0 | Números do banco antigo (linhas por tabela, tamanho dos arquivos) | ✅ |
 | 0 | Renomear o repositório antigo para `animeprofile-old` e criar o `animeprofile` | ✅ |
-| 1 | Arquitetura, banco e deploy (no modelo do respawnou) | ⏳ |
+| 1 | Arquitetura, banco, endereços e deploy (no modelo do respawnou) | ✅ |
+| 2 | Esqueleto do app no ar em `novo.animeprofile.com.br` (build, banco, migrations, cron) | ⏳ |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
 | 4 | Social: Feed, mensagens, blog, comentários, quarto otaku, Otaku TV | 💤 |

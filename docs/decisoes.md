@@ -2,6 +2,34 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-12 — Arquitetura do site novo
+
+- **Decisão:**
+  - **Contas próprias:**
+    - **Senhas antigas:** são conferidas no formato bcrypt do Supabase. As senhas novas usam `scrypt`.
+    - **Sessão:** fica num cookie `HttpOnly`.
+    - **Google:** login com cliente OAuth próprio.
+  - **Regras no servidor:**
+    - **Onde ficam:** as 813 funções e as regras de segurança do banco viram módulos TypeScript em `app/server/`.
+    - **Dinheiro e coleção:** passam por transação, trava de linha e chave única contra pagamento duplicado.
+  - **Carteira separada do perfil:**
+    - **Onde ficam os saldos:** na tabela `wallets`.
+    - **Extrato:** toda movimentação de AP Coins e Rubis grava uma linha no extrato.
+    - **Contadores da semana e do mês:** são calculados a partir do extrato.
+  - **Tempo real por consulta periódica:** a cada 3 s com o chat aberto e a cada 60 s para avisos, mais o push do
+    Firebase.
+  - **Uma entrada só no cron da Hostinger** (`/api/cron/tick` a cada 5 min), com a agenda das tarefas no banco.
+  - **Imagens das redes sociais:** geradas com `satori` + `sharp` no próprio servidor, sem navegador e sem
+    GitHub Actions.
+  - **Conteúdo das matérias:** continua em HTML.
+  - **Endereço de teste:** `novo.animeprofile.com.br`. O domínio principal só é ligado na virada.
+- **Por quê:**
+  - **Tudo na Hostinger, sem custo extra:** nenhuma dessas peças depende de serviço pago.
+  - **Mesmo modelo do respawnou:** aproveita o que já funciona lá.
+  - **O que os usuários não podem perder:** saldo, coleção e login.
+- **Detalhes:** [arquitetura.md](arquitetura.md), [banco-de-dados.md](banco-de-dados.md),
+  [enderecos.md](enderecos.md) e [deploy-hostinger.md](deploy-hostinger.md).
+
 ## 2026-11-12 — O que continua e o que sai, item a item
 
 - **Decisão:**
