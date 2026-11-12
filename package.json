@@ -34,7 +34,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "mysql-memory-server": "^1.13.0",
-    "vitest": "^3.2.4"
+    "vitest": "^5.1.0"
   },
   "engines": {
     "node": ">=22.18"

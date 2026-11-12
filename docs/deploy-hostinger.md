@@ -1,6 +1,7 @@
 # Deploy na Hostinger
 
-Status: ⏳ o app ainda não existe. Este é o plano; vira registro do que foi feito quando o primeiro deploy sair.
+Status: ✅ endereço de teste no ar desde 2026-11-12 em https://novo.animeprofile.com.br (fora do Google). O domínio
+principal continua no site antigo até a virada.
 
 ## Conta
 
@@ -21,12 +22,26 @@ Status: ⏳ o app ainda não existe. Este é o plano; vira registro do que foi f
 | Deploy | GitHub `evssousa/animeprofile`, branch `main`, **auto-deploy a cada push** |
 | Build | Node 24, `npm install` + `npm run build`, app type `express` |
 | Entrada | `server.js` (define NODE_ENV) → `server-app.js` (Express + migrations) |
-| Banco | MySQL próprio (`u..._animeprofile`) em `127.0.0.1:3306` |
+| Banco | MySQL 8 (`<usuário>_animeprofile`, ligado ao site `novo.`) em `127.0.0.1:3306`. Colunas JSON chegam como objeto |
 | Variáveis | Lista em [arquitetura.md](arquitetura.md). Os segredos são cadastrados pelo dono no hPanel |
 | Imagens | `~/animeprofile-media`, servidas em `/media` |
-| Cron | Uma entrada: a cada 5 min, `curl` em `/api/cron/tick?token=...` |
+| Cron | Uma entrada na conta: `*/5 * * * *`, `curl -s -m 50 -o /dev/null "https://novo.animeprofile.com.br/api/cron/tick?token=..."`. Na virada, o endereço muda para o domínio principal |
 | E-mail | Caixa `contato@animeprofile.com.br` (já existe), usada por SMTP como remetente "Anime Profile" |
 | SSL | Let's Encrypt (Hostinger); `www` → domínio sem `www` pelo `server-app.js` |
+
+## Variáveis cadastradas
+
+`VITE_SITE_URL`, `SITE_NOINDEX=1`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` e `CRON_TOKEN`. A senha do
+banco e o token do cron foram gerados pelo Claude e cadastrados pelo MCP em 2026-11-12. Não estão no repositório.
+
+- **Agora:** dá para trocar a lista inteira pelo MCP, porque todas as variáveis são conhecidas.
+- **Depois que o dono cadastrar as chaves dele no hPanel:** a substituição pelo MCP apagaria essas chaves, que não
+  estão com o Claude. A partir daí, variável nova só entra pelo hPanel (lição 7 abaixo).
+
+## O que a criação do site mudou no DNS
+
+A Hostinger acrescentou só `novo` (ALIAS para a CDN), `www.novo` (CNAME) e `ftp.novo` (A). Os registros do domínio
+principal (`@`, `www`, MX e TXT) ficaram iguais, conferidos antes e depois.
 
 ## Lições do respawnou que valem aqui
 

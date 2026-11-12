@@ -31,7 +31,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 0 | Números do banco antigo (linhas por tabela, tamanho dos arquivos) | ✅ |
 | 0 | Renomear o repositório antigo para `animeprofile-old` e criar o `animeprofile` | ✅ |
 | 1 | Arquitetura, banco, endereços e deploy (no modelo do respawnou) | ✅ |
-| 2 | Esqueleto do app no ar em `novo.animeprofile.com.br` (build, banco, migrations, cron) | ⏳ |
+| 2 | Esqueleto do app no ar em `novo.animeprofile.com.br` (build, banco, migrations, cron) | ✅ |
+| 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | ⏳ |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
 | 4 | Social: Feed, mensagens, blog, comentários, quarto otaku, Otaku TV | 💤 |
