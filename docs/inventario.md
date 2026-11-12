@@ -64,7 +64,6 @@ Os números de cada tabela (linhas e tamanho) entram aqui quando o dono rodar a 
 | Quizzes (`quizzes`) | ✅ | Partidas (`quiz_plays`): ❓ só as contagens |
 | Comentários nas notícias (`post_comments`, curtidas) | ❓ | Sugestão: vêm (são poucos e dão vida às matérias) |
 | Blog dos usuários (`blog_*`) | ❓ | Tem páginas no Google e é dos usuários. Sugestão: vem |
-| Versão em inglês (`/en`) | ❓ | Dobra o trabalho de cada tela. Sugestão: entra depois, se o tráfego de `/en` justificar |
 
 ## 6. Animes — ✅ vem
 
@@ -89,7 +88,6 @@ Os números de cada tabela (linhas e tamanho) entram aqui quando o dono rodar a 
 |---|---|---|
 | Mensagens diretas (chat) | `chat_*` | Vem o recurso. Do histórico, as conversas dos últimos 90 dias: perder tudo seria sentido |
 | Quarto otaku e pets | `room_*` (~35 tabelas), `user_pets`, `pet_*`, `otaku_rooms` | Os usuários gastaram moedas nele. Se continuar, vêm os itens e o quarto de cada um; se sair, devolver o valor gasto, como foi com os clãs |
-| Jogos: Fig Battle e Jogo da Memória | `card_battle_*`, `memory_game_*` | Vêm o deck, o andar alcançado e o ranking da Torre; o histórico de partidas não |
 | Eventos (presenciais e globais) | `events`, `user_event_*`, `global_event*`, `event_*` | Depende de estar em uso |
 | Rádio e Otaku TV | `radio_*`, `otaku_tv_plays` | Depende de estar em uso |
 | Liga semanal | `user_league*` | Depende de estar em uso |
@@ -104,6 +102,8 @@ Os números de cada tabela (linhas e tamanho) entram aqui quando o dono rodar a 
 | Comunidades (decisão do dono) | `community_*`, `communities`, `community_welcomes` |
 | Stripe (decisão do dono) | `processed_stripe_events`, partes de `subscriptions` |
 | Publicações antigas do Feed (decisão do dono; o recurso continua) | `feed_*`, `daily_prompt*` |
+| Jogos: Fig Battle e Jogo da Memória (decisão do dono) | `card_battle_*`, `memory_game_*` |
+| Versão em inglês `/en` (decisão do dono) | traduções e páginas `/en/*` |
 | Escritório 3D do admin | `office_*` |
 | Métricas e telemetria antigas | `page_views`, `site_telemetry`, `metrics_*`, `friction_events`, `user_activity_days`, `nps_responses`, `title_tests` |
 | Registros de envio e campanhas | `email_send_*`, `marketing_*`, `campaign*`, `whatsapp_sends`, `push_daily_counts`, `reengagement_pushes` |

@@ -25,7 +25,6 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 0 | Inventário do site antigo: o que vai e o que não vai | 🔄 |
 | 0 | Respostas do dono às perguntas do inventário | ❓ |
 | 0 | Números do banco antigo (linhas por tabela, tamanho dos arquivos) | ❓ |
-| 0 | Renovar o plano Business da Hostinger (vence em 07/12/2026) | ❓ dono |
 | 0 | Renomear o repositório antigo para `animeprofile-old` e criar o `animeprofile` | ✅ |
 | 1 | Arquitetura, banco e deploy (no modelo do respawnou) | ⏳ |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
