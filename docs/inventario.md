@@ -5,9 +5,28 @@ Levantado em 2026-11-12 no código do site antigo: 319 tabelas no banco e 138 p�
 - **✅ vem:** recurso e dados vêm para o site novo.
 - **🆕 vem sem o histórico:** o recurso continua, mas os dados antigos ficam para trás.
 - **❌ não vem:** nem recurso nem dados.
-- **❓ decidir:** sugestão minha, esperando a decisão do dono.
+Todas as decisões foram tomadas pelo dono em 2026-11-12.
 
-Os números de cada tabela (linhas e tamanho) entram aqui quando o dono rodar a consulta do fim do documento.
+## 0. Tamanho do site antigo (2026-11-12)
+
+O site é pequeno, e isso simplifica a importação: tudo cabe com folga na Hostinger, e dá para conferir conta por
+conta no ensaio.
+
+| O quê | Número |
+|---|---|
+| Usuários | 171 (22 entraram nos últimos 30 dias) |
+| Notícias e artigos (`posts`) | 945 |
+| Animes no catálogo | 118 (62 MB, quase tudo dados brutos do AniList que podem ser buscados de novo) |
+| Imagens das matérias (`post-images`) | 6.399 arquivos, 609 MB |
+| Fotos e capas de perfil (`profile-media`) | 175 arquivos, 36 MB |
+| Outros arquivos (`feed-images`, `images`, `emblemas-personalizados`, `bug-reports`) | menos de 4 MB no total |
+| Maiores tabelas que **não** vêm | telemetria (32 mil linhas), candidatas do robô (25 MB), visitas de página (16 MB) |
+
+- **Contagem aproximada:** a contagem de linhas vem da estatística do PostgreSQL. Tabelas pouco usadas podem
+  aparecer com número baixo ou nem aparecer (é o caso de `chat_*` e `sticker_catalog`). A contagem exata, com
+  `count(*)`, é feita no ensaio da importação.
+- **Arquivo `database_export_23_08_26`:** é um export antigo do banco guardado no armazenamento (11 MB). Não vem
+  para o site novo e, como pode ter dados pessoais, deve ser apagado do site antigo antes de ele ser desligado.
 
 ## 1. Contas e perfil — ✅ vem
 
@@ -61,9 +80,9 @@ Os números de cada tabela (linhas e tamanho) entram aqui quando o dono rodar a 
 | Notícias e artigos (`posts`), categorias, tags, redirecionamentos | ✅ | **Mesmos endereços** (`/noticias/...`, `/artigos/...`), para não perder posição no Google |
 | Imagens das matérias (`post-images`, `media_assets`) | ✅ | Copiadas para a Hostinger. Os endereços dentro do texto são trocados na importação |
 | Autores de IA (`ai_news_authors`) | ✅ | |
-| Quizzes (`quizzes`) | ✅ | Partidas (`quiz_plays`): ❓ só as contagens |
-| Comentários nas notícias (`post_comments`, curtidas) | ❓ | Sugestão: vêm (são poucos e dão vida às matérias) |
-| Blog dos usuários (`blog_*`) | ❓ | Tem páginas no Google e é dos usuários. Sugestão: vem |
+| Quizzes gerados no painel admin (`quizzes`) e partidas (`quiz_plays`) | ✅ | |
+| Comentários nas notícias (`post_comments`, curtidas) | ✅ | |
+| Blog dos usuários (`blog_*`) | ✅ | Mesmos endereços |
 
 ## 6. Animes — ✅ vem
 
@@ -82,16 +101,13 @@ Os números de cada tabela (linhas e tamanho) entram aqui quando o dono rodar a 
 | Ranking: vencedores da semana e do mês (`ranking_week_winners`, `leaderboard_snapshots`) | 🆕 | Vêm só os vencedores (aparecem no perfil); o resto é recalculado |
 | Indicações (`referral_codes`, `referrals`, `referrer_progress`) | ✅ | **Os links de convite já espalhados (`/convite/...`, `/w/...`) continuam funcionando** |
 
-## 8. Recursos sem decisão ainda — ❓
+## 8. Mensagens, quarto otaku e Otaku TV — ✅ vem
 
-| Recurso | Tabelas | Sugestão |
+| Recurso | Tabelas | Situação |
 |---|---|---|
-| Mensagens diretas (chat) | `chat_*` | Vem o recurso. Do histórico, as conversas dos últimos 90 dias: perder tudo seria sentido |
-| Quarto otaku e pets | `room_*` (~35 tabelas), `user_pets`, `pet_*`, `otaku_rooms` | Os usuários gastaram moedas nele. Se continuar, vêm os itens e o quarto de cada um; se sair, devolver o valor gasto, como foi com os clãs |
-| Eventos (presenciais e globais) | `events`, `user_event_*`, `global_event*`, `event_*` | Depende de estar em uso |
-| Rádio e Otaku TV | `radio_*`, `otaku_tv_plays` | Depende de estar em uso |
-| Liga semanal | `user_league*` | Depende de estar em uso |
-| Pedidos de matéria e de quiz | `article_requests`, `quiz_requests` | Sugestão: não vem |
+| Mensagens diretas (chat) | `chat_*` | ✅ Com todo o histórico: o volume é pequeno |
+| Quarto otaku e pets | `room_*`, `user_pets`, `pet_*`, `otaku_rooms` | ✅ Itens, quarto e pet de cada um, como estão |
+| Otaku TV | `otaku_tv_plays` | ✅ |
 
 ## 9. Não vem — ❌
 
@@ -104,6 +120,10 @@ Os números de cada tabela (linhas e tamanho) entram aqui quando o dono rodar a 
 | Publicações antigas do Feed (decisão do dono; o recurso continua) | `feed_*`, `daily_prompt*` |
 | Jogos: Fig Battle e Jogo da Memória (decisão do dono) | `card_battle_*`, `memory_game_*` |
 | Versão em inglês `/en` (decisão do dono) | traduções e páginas `/en/*` |
+| Eventos presenciais e globais (decisão do dono) | `events`, `user_event_*`, `global_event*`, `event_*` |
+| Rádio (decisão do dono) | `radio_*` |
+| Liga semanal (decisão do dono) | `user_league*` |
+| Pedidos de matéria e de quiz feitos pelos usuários (decisão do dono) | `article_requests`, `quiz_requests` |
 | Escritório 3D do admin | `office_*` |
 | Métricas e telemetria antigas | `page_views`, `site_telemetry`, `metrics_*`, `friction_events`, `user_activity_days`, `nps_responses`, `title_tests` |
 | Registros de envio e campanhas | `email_send_*`, `marketing_*`, `campaign*`, `whatsapp_sends`, `push_daily_counts`, `reengagement_pushes` |
@@ -125,21 +145,3 @@ Configurações dos robôs (fontes, horários, contas das redes) **vêm**: `ai_n
 5. **Aviso antes:** uma semana antes, aviso no site e nas redes sobre o que muda e o que sai (Comunidades e Fórum).
 6. **Ensaio completo** com cópia dos dados reais antes da virada, conferindo o saldo e a coleção de contas de
    teste, uma a uma.
-
-## Consulta para o dono rodar no SQL do Lovable
-
-Mostra quantas linhas tem cada tabela e quanto ocupam os arquivos. Ajuda a decidir os itens ❓ e a planejar a
-importação.
-
-```sql
-SELECT relname AS tabela, n_live_tup AS linhas, pg_size_pretty(pg_total_relation_size(relid)) AS tamanho
-FROM pg_stat_user_tables WHERE schemaname = 'public' AND n_live_tup > 0
-ORDER BY n_live_tup DESC;
-
-SELECT bucket_id, count(*) AS arquivos, pg_size_pretty(sum(COALESCE((metadata->>'size')::bigint, 0))) AS tamanho
-FROM storage.objects GROUP BY bucket_id ORDER BY 1;
-
-SELECT count(*) AS usuarios,
-       count(*) FILTER (WHERE last_sign_in_at > now() - interval '30 days') AS ativos_30_dias
-FROM auth.users;
-```

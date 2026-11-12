@@ -2,6 +2,15 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-12 — O que continua e o que sai, item a item
+
+- **Decisão:**
+  - **Continuam:** mensagens diretas (com o histórico), quarto otaku e pets, Otaku TV, blog dos usuários,
+    comentários nas notícias e os quizzes gerados no painel admin.
+  - **Saem:** eventos, Rádio, Liga semanal e os pedidos de matéria e de quiz feitos pelos usuários.
+- **Por quê:** continua o que é usado ou guarda algo dos usuários. Com 171 usuários e um banco pequeno, trazer o
+  histórico inteiro do que fica é simples.
+
 ## 2026-11-12 — Sem jogos e sem versão em inglês; só a branch main
 
 - **Decisão:**

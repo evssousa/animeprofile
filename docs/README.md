@@ -22,13 +22,13 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | Fase | Item | Status |
 |---|---|---|
 | 0 | Decisão: tudo na Hostinger, MySQL, repositório novo de portfólio | ✅ |
-| 0 | Inventário do site antigo: o que vai e o que não vai | 🔄 |
-| 0 | Respostas do dono às perguntas do inventário | ❓ |
-| 0 | Números do banco antigo (linhas por tabela, tamanho dos arquivos) | ❓ |
+| 0 | Inventário do site antigo: o que vai e o que não vai | ✅ |
+| 0 | Respostas do dono às perguntas do inventário | ✅ |
+| 0 | Números do banco antigo (linhas por tabela, tamanho dos arquivos) | ✅ |
 | 0 | Renomear o repositório antigo para `animeprofile-old` e criar o `animeprofile` | ✅ |
 | 1 | Arquitetura, banco e deploy (no modelo do respawnou) | ⏳ |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
-| 4 | Social e jogos (conforme o inventário) | 💤 |
+| 4 | Social: Feed, mensagens, blog, comentários, quarto otaku, Otaku TV | 💤 |
 | 5 | Painel admin e robôs (notícias por IA, redes sociais) | 💤 |
 | 6 | Importação dos dados, ensaio completo e virada do domínio | 💤 |
