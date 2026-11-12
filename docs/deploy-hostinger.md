@@ -58,18 +58,20 @@ Status: ⏳ o app ainda não existe. Este é o plano; vira registro do que foi f
 
 ## Contas e chaves externas
 
-O dono gera as chaves e as guarda fora do repositório e fora do chat. Elas vão para as variáveis do app no hPanel
-quando o app existir.
+O dono gera as chaves e as guarda fora do repositório e fora do chat. **Decidido em 2026-11-12: fica para o fim**,
+antes do ensaio da virada. Até lá, o desenvolvimento usa chaves de teste (Turnstile e Mercado Pago têm chaves
+oficiais de teste) e o login por e-mail e senha. O login com Google é testado quando o cliente OAuth estiver pronto:
+se o cliente usado hoje for do próprio dono, basta acrescentar os endereços de retorno do site novo.
 
 **Regra da troca:** as chaves e os apps do site antigo **não são apagados nem renovados** até a virada. O site
 antigo continua no ar usando-os. Depois de 30 dias com o site novo estável, as chaves antigas são revogadas.
 
 | Serviço | O que é criado | Status |
 |---|---|---|
-| Google Cloud (login) | Cliente OAuth "Aplicativo da Web" no projeto do Firebase. Retorno em `/auth/google/callback` nos endereços final, de teste e local (`http://localhost:5173`) | ⏳ dono |
-| Mercado Pago | **Aplicação nova** no painel de desenvolvedores (não renovar as credenciais da antiga) | ⏳ dono |
-| Gemini | Chave nova no AI Studio, num projeto sem cobrança (plano gratuito) | ⏳ dono |
-| Turnstile | Widget novo para `animeprofile.com.br` e `novo.animeprofile.com.br` | ⏳ dono |
-| Firebase | **Mesmo projeto** (as notificações dos celulares continuam). Só uma chave nova da conta de serviço; o par de chaves Web Push continua o mesmo | ⏳ dono |
-| Klipy | Conta própria de parceiro e chave (antes vinha pelo gateway do Lovable) | ⏳ dono |
+| Google Cloud (login) | Cliente OAuth "Aplicativo da Web" no projeto do Firebase. Retorno em `/auth/google/callback` nos endereços final, de teste e local (`http://localhost:5173`) | 💤 no fim |
+| Mercado Pago | **Aplicação nova** no painel de desenvolvedores (não renovar as credenciais da antiga) | 💤 no fim |
+| Gemini | Chave nova no AI Studio, num projeto sem cobrança (plano gratuito) | 💤 no fim |
+| Turnstile | Widget novo para `animeprofile.com.br` e `novo.animeprofile.com.br` | 💤 no fim |
+| Firebase | **Mesmo projeto** (as notificações dos celulares continuam). Só uma chave nova da conta de serviço; o par de chaves Web Push continua o mesmo | 💤 no fim |
+| Klipy | Conta própria de parceiro e chave (antes vinha pelo gateway do Lovable) | 💤 no fim |
 | Firecrawl | Adiado: na fase 5 avaliamos se o robô precisa dele (o respawnou funciona sem) | 💤 |
