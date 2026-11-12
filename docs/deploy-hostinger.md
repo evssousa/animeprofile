@@ -25,7 +25,7 @@ Status: ⏳ o app ainda não existe. Este é o plano; vira registro do que foi f
 | Variáveis | Lista em [arquitetura.md](arquitetura.md). Os segredos são cadastrados pelo dono no hPanel |
 | Imagens | `~/animeprofile-media`, servidas em `/media` |
 | Cron | Uma entrada: a cada 5 min, `curl` em `/api/cron/tick?token=...` |
-| E-mail | Caixa `nao-responda@animeprofile.com.br` no hPanel, usada por SMTP |
+| E-mail | Caixa `contato@animeprofile.com.br` (já existe), usada por SMTP como remetente "Anime Profile" |
 | SSL | Let's Encrypt (Hostinger); `www` → domínio sem `www` pelo `server-app.js` |
 
 ## Lições do respawnou que valem aqui
@@ -59,6 +59,5 @@ Status: ⏳ o app ainda não existe. Este é o plano; vira registro do que foi f
 ## O que o dono precisa fazer (na fase 2)
 
 - **Google Cloud:** criar o cliente OAuth do login com Google. É gratuito, e o passo a passo vem na hora.
-- **E-mail:** criar a caixa `nao-responda@animeprofile.com.br` no hPanel.
 - **Chaves novas:** gerar novas chaves do Mercado Pago, do Gemini, do Turnstile, do Firebase, do Firecrawl e do
   Klipy, e cadastrá-las nas variáveis do app.
