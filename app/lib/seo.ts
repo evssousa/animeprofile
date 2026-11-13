@@ -1,11 +1,22 @@
 import { SITE, absoluteUrl } from "./site";
 
-type SeoInput = { title: string; description?: string; path: string; type?: "website" | "article"; noindex?: boolean };
+type SeoInput = {
+  title: string;
+  description?: string | null;
+  path: string;
+  type?: "website" | "article";
+  image?: string | null;
+  publishedTime?: string | null;
+  modifiedTime?: string | null;
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>;
+};
 
-/** Metatags padrão de uma página: título, descrição, canonical, Open Graph e Twitter. */
-export function seo({ title, description, path, type = "website", noindex }: SeoInput) {
+/** Metatags padrão de uma página: título, descrição, canonical, Open Graph, Twitter e JSON-LD. */
+export function seo({ title, description, path, type = "website", image, publishedTime, modifiedTime, noindex, jsonLd }: SeoInput) {
   const fullTitle = title === SITE.name ? title : `${title} | ${SITE.name}`;
   const url = absoluteUrl(path);
+  const img = image ? (image.startsWith("http") ? image : absoluteUrl(image)) : absoluteUrl("/logo-192.png");
   return [
     { title: fullTitle },
     ...(description ? [{ name: "description", content: description }] : []),
@@ -15,8 +26,12 @@ export function seo({ title, description, path, type = "website", noindex }: Seo
     ...(description ? [{ property: "og:description", content: description }] : []),
     { property: "og:type", content: type },
     { property: "og:url", content: url },
+    { property: "og:image", content: img },
     { property: "og:locale", content: "pt_BR" },
-    { name: "twitter:card", content: "summary" },
+    ...(publishedTime ? [{ property: "article:published_time", content: publishedTime }] : []),
+    ...(modifiedTime ? [{ property: "article:modified_time", content: modifiedTime }] : []),
+    { name: "twitter:card", content: image ? "summary_large_image" : "summary" },
     ...(noindex ? [{ name: "robots", content: "noindex" }] : []),
+    ...(jsonLd ? [{ "script:ld+json": jsonLd }] : []),
   ];
 }

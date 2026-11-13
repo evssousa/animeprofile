@@ -88,7 +88,6 @@ export const FOOTER_LINKS: NavGroup[] = [
 export const INSTITUTIONAL: { label: string; to: string }[] = [
   { label: "Sobre", to: "/sobre" },
   { label: "Contato", to: "/contato" },
-  { label: "Faça parte", to: "/faca-parte" },
   { label: "Como instalar", to: "/como-instalar" },
 ];
 

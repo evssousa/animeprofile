@@ -8,5 +8,7 @@ export default defineConfig({
     include: ["tests/**/*.test.ts"],
     testTimeout: 20_000,
     hookTimeout: 300_000, // o primeiro teste com banco baixa o MySQL descartável
+    // Um arquivo por vez: vários MySQL descartáveis subindo juntos às vezes travam no Windows.
+    fileParallelism: false,
   },
 });

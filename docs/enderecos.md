@@ -7,7 +7,7 @@ favoritos dos usuários. Levantado em 2026-11-12 nas 138 rotas do site antigo.
 
 | Área | Endereços |
 |---|---|
-| Início e institucionais | `/`, `/sobre`, `/contato`, `/ajuda/:id`, `/como-instalar`, `/faca-parte`, `/links`, `/legal/*` (termos, privacidade, cookies, DMCA, menores, padrões editoriais), `/privacidade` |
+| Início e institucionais | `/`, `/sobre`, `/contato`, `/ajuda/:id`, `/como-instalar`, `/links`, `/legal/*` (termos, privacidade, cookies, DMCA, menores, padrões editoriais), `/privacidade` |
 | Notícias e artigos | `/news`, `/noticias`, `/noticias/:slug`, `/artigos`, `/artigos/:slug`, `/categoria/:slug`, `/tag/:slug`, `/autores/:slug`, `/busca` |
 | Blog | `/blog`, `/blog/:username/:slug`, `/blog/u/:username`, `/blog/categoria/:slug`, `/blog/tag/:slug`, `/blog/criadores`, `/blog/editor`, `/blog/dashboard`, `/blog/rss.xml`, `/blog/u/:username/rss.xml` |
 | Quiz | `/quiz`, `/quiz/:slug` |
@@ -31,6 +31,7 @@ favoritos dos usuários. Levantado em 2026-11-12 nas 138 rotas do site antigo.
 | `/eventos` | `/` |
 | `/fig-battle/*`, `/jogo-da-memoria`, `/games` | `/figurinhas` (os jogos usavam as figurinhas) |
 | `/qg` (escritório 3D) | `/sobre` |
+| `/faca-parte` | `/contato` (a página saiu em 2026-11-13) |
 | `/membros` | `/explorar` |
 | `/en`, `/en/*` | a mesma página sem o `/en` (`/en/news/:slug` → `/noticias/:slug`) |
 | `/sitemap-en.xml` | `/sitemap.xml` |
@@ -40,6 +41,11 @@ favoritos dos usuários. Levantado em 2026-11-12 nas 138 rotas do site antigo.
 `/lovable/*`, `/email/*` (envio do Lovable), `/social-render/:slug` (desenho das imagens com navegador), os ganchos
 `/api/public/hooks/*` (viram tarefas do cron) e `/api/public/ai-news/worker/*` (robô do GitHub Actions). Esses
 endereços respondem 410 (removido).
+
+## Onde está implementado
+
+Os redirecionamentos ficam em `redirects.mjs`, que o `server-app.js` aplica antes das páginas e que é testado em
+`tests/content.test.ts`. As páginas que ainda não existem no site novo ficam na lista `PENDING` de `app/routes.ts`.
 
 ## Como conferir na virada
 

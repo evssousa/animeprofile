@@ -35,21 +35,27 @@ describe("cron", () => {
     const [job] = await query<{ next_run_at: string }>("SELECT next_run_at FROM cron_jobs WHERE name = 'limpeza'");
     expect(job.next_run_at).toBe("2026-11-12 07:30:00.000");
 
-    // Dois ticks ao mesmo tempo (dois processos do LiteSpeed): só um reserva.
+    // Dois ticks ao mesmo tempo (dois processos do LiteSpeed): cada tarefa é reservada por um só.
+    // (A cópia do site antigo, de 3 em 3 horas, também está na hora; sem OLD_SUPABASE_* ela só se registra.)
     const t1 = new Date("2026-11-12T07:31:00Z");
     const [a, b] = await Promise.all([tick(t1), tick(t1)]);
-    expect([...a.started, ...b.started]).toEqual(["limpeza"]);
+    expect([...a.started, ...b.started].sort()).toEqual(["copiar-conteudo-antigo", "limpeza"]);
     await Promise.all([a.done, b.done]);
 
-    const runs = await query<{ job: string; status: string }>("SELECT job, status FROM cron_runs");
-    expect(runs).toEqual([{ job: "limpeza", status: "ok" }]);
+    const runs = await query<{ job: string; status: string }>("SELECT job, status FROM cron_runs ORDER BY job");
+    expect(runs).toEqual([
+      { job: "copiar-conteudo-antigo", status: "ok" },
+      { job: "limpeza", status: "ok" },
+    ]);
     const [after] = await query<{ next_run_at: string; locked_until: string | null; last_status: string }>(
       "SELECT next_run_at, locked_until, last_status FROM cron_jobs WHERE name = 'limpeza'",
     );
     expect(after).toEqual({ next_run_at: "2026-11-13 07:30:00.000", locked_until: null, last_status: "ok" });
 
     // Antes da próxima hora, nada roda.
-    expect((await tick(new Date("2026-11-12T12:00:00Z"))).started).toEqual([]);
+    const late = await tick(new Date("2026-11-12T12:00:00Z"));
+    expect(late.started).not.toContain("limpeza");
+    await late.done;
   });
 
   it("rodar agora: tarefa desconhecida, sucesso e histórico no status", async () => {
@@ -57,7 +63,7 @@ describe("cron", () => {
     const result = await runNow("limpeza");
     expect(result && result.status).toBe("ok");
     const s = await status(5);
-    expect(s.runs.length).toBe(2);
-    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["limpeza"]);
+    expect(s.runs.filter((r) => (r as { job: string }).job === "limpeza").length).toBe(2);
+    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["copiar-conteudo-antigo", "limpeza"]);
   });
 });

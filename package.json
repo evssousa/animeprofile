@@ -25,6 +25,7 @@
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router": "^8.5.1",
+    "sanitize-html": "^2.18.2",
     "tailwindcss": "^4.2.2",
     "typescript": "^5.9.3",
     "vite": "^8.0.3"
@@ -35,6 +36,7 @@
     "@types/node": "^22",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
+    "@types/sanitize-html": "^2.16.2",
     "mysql-memory-server": "^1.13.0",
     "vitest": "^5.1.0"
   },

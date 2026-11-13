@@ -31,7 +31,7 @@ principal continua no site antigo até a virada.
 
 ## Variáveis cadastradas
 
-`VITE_SITE_URL`, `SITE_NOINDEX=1`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` e `CRON_TOKEN`. A senha do
+`VITE_SITE_URL`, `SITE_NOINDEX=1`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` e `CRON_TOKEN`. Desde 2026-11-13 também `OLD_SUPABASE_URL` e `OLD_SUPABASE_KEY`: o endereço e a chave **pública** do site antigo, usados pela cópia das matérias. Saem depois da virada. A senha do
 banco e o token do cron foram gerados pelo Claude e cadastrados pelo MCP em 2026-11-12. Não estão no repositório.
 
 - **Agora:** dá para trocar a lista inteira pelo MCP, porque todas as variáveis são conhecidas.

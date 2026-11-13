@@ -4,6 +4,7 @@ import express from "express";
 import { createRequestHandler } from "@react-router/express";
 import { dbConfigFromEnv, migrate } from "./db/migrate.mjs";
 import { mediaDir } from "./server-paths.mjs";
+import { redirectFor } from "./redirects.mjs";
 
 const PORT = Number(process.env.PORT || 3000);
 // Endereço de teste (novo.animeprofile.com.br): nada entra no Google.
@@ -35,6 +36,9 @@ async function main() {
   app.use((req, res, next) => {
     const host = req.headers.host ?? "";
     if (host.startsWith("www.")) return res.redirect(301, `https://${host.slice(4)}${req.originalUrl}`);
+    // Endereços do site antigo que saíram (Clãs, Comunidades, jogos, /en, Faça parte...).
+    const to = redirectFor(req.path, req.originalUrl.slice(req.path.length));
+    if (to) return res.redirect(301, to);
     next();
   });
   if (NOINDEX) {

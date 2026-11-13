@@ -35,8 +35,10 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Esqueleto do app no ar em `novo.animeprofile.com.br` (build, banco, migrations, cron) | ✅ |
 | 2 | Layout novo "Top 10 claro" (topo, rodapé, cabeçalhos, tema claro e escuro) | ✅ |
 | 2 | Páginas institucionais e legais, formulários de Contato e Faça parte | ✅ |
-| 2 | Notícias e artigos (com cópia das matérias do site antigo no endereço de teste) | ⏳ |
-| 2 | Redirecionamentos do que saiu (Clãs, Comunidades, jogos, `/en`) | 💤 |
+| 2 | Notícias e artigos: listas, matéria, categoria, tag, autor, busca e página inicial | ✅ |
+| 2 | Cópia automática das matérias do site antigo (a cada 3 h, até a virada) | ✅ |
+| 2 | Sitemaps e RSS das matérias | ⏳ |
+| 2 | Redirecionamentos do que saiu (Clãs, Comunidades, jogos, `/en`, Faça parte) | ✅ |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
