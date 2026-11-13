@@ -2,21 +2,23 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
-## 2026-11-13 — Sem "Faça parte"; conteúdo copiado do site antigo até a virada
+## 2026-11-13 — Sem "Faça parte"; o site novo não fala com o Supabase
 
 - **Decisão:**
   - **"Faça parte":** a página sai. O endereço antigo leva ao Contato.
-  - **Cópia das matérias:**
-    - **Como:** a tarefa `copiar-conteudo-antigo` lê, a cada 3 horas, as matérias publicadas no site antigo pela API
-      pública. A chave é a pública, que o site antigo já entrega a qualquer navegador.
-    - **Onde grava:** no banco novo, mantendo os mesmos IDs e slugs.
-    - **Sem duplicar:** pode rodar quantas vezes for preciso, e o que sai do site antigo sai daqui também.
+  - **Importação do conteúdo, feita do computador do desenvolvedor:**
+    - **Quem lê o site antigo:** o script `scripts/exportar-conteudo-antigo.mjs` lê a API pública e envia um retrato
+      compactado ao site novo, em `POST /api/importar/conteudo`, protegido pelo `CRON_TOKEN`.
+    - **O que o site novo sabe do Supabase:** nada, nem endereço nem chave.
+    - **Repetir:** sem duplicar; o que sai do site antigo sai daqui também.
+  - **Sem atualização automática:** o site de teste fica com o conteúdo da última exportação. Na hora de desligar o
+    site antigo, uma última exportação traz o que foi publicado depois.
   - **Imagens das matérias:** continuam apontando para o armazenamento do site antigo até a importação final dos
     arquivos (fase 6).
 - **Por quê:**
   - **"Faça parte":** não é mais necessária (decisão do dono).
-  - **Cópia das matérias:** o site de teste fica com o conteúdo real e atualizado, e a mesma tarefa faz a importação
-    final do conteúdo na virada.
+  - **Importação:** a ideia é sair do Supabase. Colocar endereço e chave dele no servidor novo, mesmo
+    temporariamente, ia contra isso.
 
 ## 2026-11-13 — Visual definitivo: "Top 10 claro"
 

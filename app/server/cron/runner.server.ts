@@ -82,6 +82,24 @@ export async function runNow(name: string, now = new Date()) {
   return execute(job);
 }
 
+/**
+ * Registra em cron_runs uma execução que não é da agenda (ex.: importação enviada pelo script), para ela
+ * aparecer no mesmo histórico (/api/cron/status e, depois, no painel admin).
+ */
+export async function trackRun(name: string, fn: () => Promise<unknown>) {
+  const { insertId } = await exec("INSERT INTO cron_runs (job, started_at, status) VALUES (?, UTC_TIMESTAMP(3), 'running')", [name]);
+  try {
+    const stats = await fn();
+    await exec("UPDATE cron_runs SET finished_at = UTC_TIMESTAMP(3), status = 'ok', stats = ? WHERE id = ?", [JSON.stringify(stats ?? null), insertId]);
+    return { status: "ok" as const, stats };
+  } catch (err) {
+    const message = String((err as Error)?.message ?? err).slice(0, 1000);
+    await exec("UPDATE cron_runs SET finished_at = UTC_TIMESTAMP(3), status = 'error', message = ? WHERE id = ?", [message, insertId]);
+    console.error(`[import] ${name} falhou:`, err);
+    return { status: "error" as const, message };
+  }
+}
+
 export async function status(limit = 20) {
   const jobs = await query("SELECT name, schedule, enabled, next_run_at, locked_until, last_run_at, last_status FROM cron_jobs ORDER BY name");
   const runs = await query("SELECT id, job, started_at, finished_at, status, message, stats FROM cron_runs ORDER BY id DESC LIMIT ?", [limit]);

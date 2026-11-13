@@ -1,6 +1,5 @@
 // Catálogo das tarefas agendadas. O horário mora aqui (versionado); o estado mora em cron_jobs.
 // Cada tarefa devolve um resumo curto (vai para cron_runs.stats) ou lança erro.
-import { importOldContent } from "../content/import-old.server";
 import { exec } from "../db.server";
 
 export type JobStats = Record<string, unknown>;
@@ -25,13 +24,6 @@ export const JOBS: Job[] = [
       );
       return { execucoesApagadas: old.affected, execucoesTravadas: stuck.affected };
     },
-  },
-  {
-    // Até a virada do domínio: copia as matérias do site antigo. Sem OLD_SUPABASE_* configurado, não faz nada.
-    name: "copiar-conteudo-antigo",
-    schedule: "20 */3 * * *",
-    leaseMinutes: 15,
-    run: () => importOldContent(),
   },
 ];
 

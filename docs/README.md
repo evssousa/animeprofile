@@ -36,7 +36,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Layout novo "Top 10 claro" (topo, rodapé, cabeçalhos, tema claro e escuro) | ✅ |
 | 2 | Páginas institucionais e legais, formulários de Contato e Faça parte | ✅ |
 | 2 | Notícias e artigos: listas, matéria, categoria, tag, autor, busca e página inicial | ✅ |
-| 2 | Cópia automática das matérias do site antigo (a cada 3 h, até a virada) | ✅ |
+| 2 | Importação das matérias do site antigo pelo script `exportar-conteudo-antigo.mjs` (refazer na virada) | ✅ |
 | 2 | Sitemaps e RSS das matérias | ⏳ |
 | 2 | Redirecionamentos do que saiu (Clãs, Comunidades, jogos, `/en`, Faça parte) | ✅ |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |

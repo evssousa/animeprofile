@@ -1,0 +1,84 @@
+// Exporta o conteúdo do site antigo (notícias, artigos, categorias, tags e autores) e envia ao site novo.
+//
+// Roda no computador do desenvolvedor, nunca no servidor: o site novo não conhece endereço nem chave do Supabase.
+// Lê só a API pública (a chave pública que qualquer visitante do site antigo recebe) e não imprime nenhum valor
+// do .env. O site novo grava com "insere ou atualiza", então rodar de novo só traz o que mudou.
+//
+// Uso:
+//   CRON_TOKEN=... node scripts/exportar-conteudo-antigo.mjs <caminho do .env do site antigo> [endereço do site novo]
+//   (endereço padrão: https://novo.animeprofile.com.br)
+//   Sem CRON_TOKEN, só gera .import/conteudo.json.gz e não envia.
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { gzipSync } from "node:zlib";
+
+const [envPath, target = "https://novo.animeprofile.com.br"] = process.argv.slice(2);
+if (!envPath) {
+  console.error("Informe o caminho do .env do site antigo.");
+  process.exit(1);
+}
+const env = Object.fromEntries(
+  readFileSync(envPath, "utf8")
+    .split(/\r?\n/)
+    .filter((l) => l.includes("=") && !l.trim().startsWith("#"))
+    .map((l) => [l.slice(0, l.indexOf("=")).trim(), l.slice(l.indexOf("=") + 1).trim().replace(/^"|"$/g, "")]),
+);
+const BASE = (env.VITE_SUPABASE_URL ?? "").replace(/\/$/, "");
+const KEY = env.VITE_SUPABASE_PUBLISHABLE_KEY ?? "";
+if (!BASE || !KEY) {
+  console.error("O .env não tem VITE_SUPABASE_URL e VITE_SUPABASE_PUBLISHABLE_KEY.");
+  process.exit(1);
+}
+
+async function fetchAll(table, select, filter = "") {
+  const out = [];
+  for (let offset = 0; ; offset += 1000) {
+    const res = await fetch(`${BASE}/rest/v1/${table}?select=${select}${filter}&order=id&limit=1000&offset=${offset}`, {
+      headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
+    });
+    if (!res.ok) throw new Error(`${table}: HTTP ${res.status}`);
+    const rows = await res.json();
+    out.push(...rows);
+    if (rows.length < 1000) return out;
+  }
+}
+
+const POST_COLUMNS =
+  "id,slug,post_type,status,title,excerpt,content,featured_image,author_id,ai_author_id,is_ai_generated,anilist_id,focus_keyword,views_count,published_at,created_at,updated_at";
+
+const [posts, categories, tags, ai_news_authors, post_categories, post_tags, tag_redirects] = await Promise.all([
+  fetchAll("posts", POST_COLUMNS, "&status=eq.published"),
+  fetchAll("categories", "id,name,slug,kind,description,color"),
+  fetchAll("tags", "id,name,slug"),
+  fetchAll("ai_news_authors", "id,name,slug,avatar_url,signature"),
+  fetchAll("post_categories", "post_id,category_id"),
+  fetchAll("post_tags", "post_id,tag_id"),
+  fetchAll("tag_redirects", "old_slug,tag_id").catch(() => []),
+]);
+
+// Perfis só de quem assina matérias (autores humanos).
+const aiIds = new Set(ai_news_authors.map((a) => a.id));
+const userIds = [...new Set(posts.filter((p) => !p.ai_author_id && p.author_id && !aiIds.has(p.author_id)).map((p) => p.author_id))];
+const profiles = [];
+for (let i = 0; i < userIds.length; i += 100) {
+  profiles.push(...(await fetchAll("profiles", "id,username,display_name,avatar_url,bio", `&id=in.(${userIds.slice(i, i + 100).join(",")})`)));
+}
+
+const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects };
+const gz = gzipSync(JSON.stringify(snapshot));
+mkdirSync(".import", { recursive: true });
+writeFileSync(".import/conteudo.json.gz", gz);
+console.log(
+  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado).`,
+);
+
+if (!process.env.CRON_TOKEN) {
+  console.log("Sem CRON_TOKEN: arquivo salvo em .import/conteudo.json.gz, nada enviado.");
+  process.exit(0);
+}
+const res = await fetch(`${target.replace(/\/$/, "")}/api/importar/conteudo`, {
+  method: "POST",
+  headers: { "Content-Type": "application/gzip", "x-cron-token": process.env.CRON_TOKEN },
+  body: gz,
+});
+console.log(`Enviado para ${target}: HTTP ${res.status} ${await res.text()}`);
+console.log("O site novo grava em segundo plano. Resultado: /api/cron/status (tarefa importar-conteudo).");

@@ -1,11 +1,11 @@
-// Conteúdo: importação do site antigo (com uma API falsa no lugar do Supabase) e as consultas das páginas.
+// Conteúdo: importação do retrato do site antigo e as consultas das páginas.
 import { createDB } from "mysql-memory-server";
 import type mysql from "mysql2/promise";
-import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { migrate } from "../db/migrate.mjs";
 import { redirectFor } from "../redirects.mjs";
 import { createPool, setPool } from "~/server/db.server";
-import { importOldContent, mapPost } from "~/server/content/import-old.server";
+import { applySnapshot, mapPost, validateSnapshot, type OldSnapshot } from "~/server/content/import-old.server";
 import { readingMinutes, sanitizePostHtml } from "~/server/content/sanitize.server";
 import { getPost, getTag, latestPosts, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
 
@@ -16,7 +16,7 @@ const env = { ...process.env };
 const now = Date.now();
 const ago = (days: number) => new Date(now - days * 86_400_000).toISOString();
 
-// O "site antigo": o que a API pública devolve, tabela por tabela.
+// O retrato do "site antigo", como o script de exportação envia.
 const OLD: Record<string, unknown[]> = {
   posts: [
     { id: "00000000-0000-4000-8000-000000000001", slug: "sakamoto-days-arco-final", post_type: "news", status: "published", title: "SAKAMOTO DAYS entra no arco final", excerpt: "O mangá chega ao clímax.", content: { html: '<p>Texto <script>alert(1)</script><a href="https://jump.example/x">fonte</a></p><iframe src="https://www.youtube.com/embed/abc"></iframe><iframe src="https://evil.example/x"></iframe>' }, featured_image: "https://img.example/s.webp", author_id: null, ai_author_id: "a0000000-0000-4000-8000-000000000001", is_ai_generated: true, anilist_id: 1, focus_keyword: "sakamoto days", views_count: 50, published_at: ago(1), created_at: ago(2), updated_at: ago(1) },
@@ -47,14 +47,7 @@ const OLD: Record<string, unknown[]> = {
   profiles: [{ id: "u0000000-0000-4000-8000-000000000001", username: "redacao_ap", display_name: "Redação AP", avatar_url: null, bio: null }],
 };
 
-function fakeFetch(input: string | URL | Request) {
-  const url = new URL(String(input));
-  const table = url.pathname.split("/").pop()!;
-  const offset = Number(url.searchParams.get("offset") ?? 0);
-  let rows = (OLD[table] ?? []) as Record<string, unknown>[];
-  if (url.searchParams.get("status") === "eq.published") rows = rows.filter((r) => r.status === "published");
-  return Promise.resolve(new Response(JSON.stringify(offset > 0 ? [] : rows), { status: 200, headers: { "Content-Type": "application/json" } }));
-}
+const importOld = () => applySnapshot(OLD as unknown as OldSnapshot);
 
 beforeAll(async () => {
   server = await createDB({ version: "8.4.x", logLevel: "ERROR" });
@@ -62,12 +55,10 @@ beforeAll(async () => {
   await migrate(config, () => {});
   pool = createPool({ ...config, connectionLimit: 4 });
   setPool(pool);
-  Object.assign(process.env, { DB_NAME: server.dbName, DB_USER: server.username, OLD_SUPABASE_URL: "https://old.example", OLD_SUPABASE_KEY: "chave-publica" });
-  vi.stubGlobal("fetch", vi.fn(fakeFetch));
+  Object.assign(process.env, { DB_NAME: server.dbName, DB_USER: server.username });
 });
 
 afterAll(async () => {
-  vi.unstubAllGlobals();
   process.env = env;
   setPool(undefined);
   await pool?.end();
@@ -95,10 +86,15 @@ describe("limpeza do HTML", () => {
 });
 
 describe("importação e consultas", () => {
+  it("recusa retrato com formato errado", () => {
+    expect(validateSnapshot({ posts: [] })).toBe(false);
+    expect(validateSnapshot(OLD)).toBe(true);
+  });
+
   it("importa tudo e pode rodar de novo sem duplicar", async () => {
-    const first = await importOldContent();
+    const first = await importOld();
     expect(first).toMatchObject({ materias: 4, categorias: 2, tags: 2, autores: 2, puladas: [] });
-    const again = await importOldContent();
+    const again = await importOld();
     expect(again).toMatchObject({ materias: 4 });
   });
 
@@ -135,7 +131,7 @@ describe("importação e consultas", () => {
 
   it("o que sai do site antigo sai daqui também", async () => {
     const removed = OLD.posts.splice(2, 1);
-    await importOldContent();
+    await importOld();
     expect(await getPost("bleach-arte-ichigo")).toBeNull();
     OLD.posts.splice(2, 0, ...removed);
   });
