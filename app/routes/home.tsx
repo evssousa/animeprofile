@@ -8,7 +8,8 @@ import type { Route } from "./+types/home";
 import { PostCard, PostOverlay, PostRow, SectionHead } from "~/components/posts";
 import { readingLabel } from "~/lib/format";
 import { seo } from "~/lib/seo";
-import { isWideImage, latestPosts, mostRead, trendingTags, type PostCard as Card } from "~/server/content/posts.server";
+import { isWideImage } from "~/lib/images";
+import { latestPosts, mostRead, trendingTags, type PostCard as Card } from "~/server/content/posts.server";
 
 export async function loader() {
   // Capa grande: as 4 matérias mais recentes com imagem de resolução boa (>= 1280 px). Se faltar, completa com

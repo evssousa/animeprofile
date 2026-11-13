@@ -7,7 +7,8 @@ import { redirectFor } from "../redirects.mjs";
 import { createPool, setPool } from "~/server/db.server";
 import { applySnapshot, mapPost, validateSnapshot, type OldSnapshot } from "~/server/content/import-old.server";
 import { readingMinutes, sanitizePostHtml } from "~/server/content/sanitize.server";
-import { getPost, getTag, isWideImage, latestPosts, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
+import { isWideImage } from "~/lib/images";
+import { getPost, getTag, latestPosts, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
 
 let server: Awaited<ReturnType<typeof createDB>>;
 let pool: mysql.Pool;

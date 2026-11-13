@@ -6,7 +6,8 @@ import { PostCard } from "~/components/posts";
 import { formatDateLong, formatDateTime, readingLabel } from "~/lib/format";
 import { seo } from "~/lib/seo";
 import { SITE, absoluteUrl } from "~/lib/site";
-import { getPost, isWideImage, relatedPosts } from "~/server/content/posts.server";
+import { isWideImage } from "~/lib/images";
+import { getPost, relatedPosts } from "~/server/content/posts.server";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const post = await getPost(params.slug);

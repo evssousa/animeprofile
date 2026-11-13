@@ -29,10 +29,6 @@ export type PostFull = PostCard & {
   authorBio: string | null;
 };
 
-/** Capa com resolução boa para ocupar a largura da tela (capa da home, topo da matéria). */
-export const HERO_MIN_WIDTH = 1280;
-export const isWideImage = (p: Pick<PostCard, "image" | "imageWidth">) => Boolean(p.image && p.imageWidth && p.imageWidth >= HERO_MIN_WIDTH);
-
 export const postUrl = (type: PostType, slug: string) => `${type === "article" ? "/artigos" : "/noticias"}/${slug}`;
 export const authorUrl = (kind: string, slug: string) => (kind === "ai" ? `/autores/${slug}` : `/u/${slug}`);
 
