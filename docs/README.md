@@ -38,6 +38,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Notícias e artigos: listas, matéria, categoria, tag, autor, busca e página inicial | ✅ |
 | 2 | Importação das matérias do site antigo pelo script `exportar-conteudo-antigo.mjs` (refazer na virada) | ✅ |
 | 2 | Sitemaps e RSS das matérias | ⏳ |
+| 2 | Animes: catálogo, página do anime, calendário (alimenta "No ar hoje", Top 10 e Temporada da home) | 💤 |
 | 2 | Redirecionamentos do que saiu (Clãs, Comunidades, jogos, `/en`, Faça parte) | ✅ |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
@@ -45,3 +46,14 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 4 | Social: Feed, mensagens, blog, comentários, quarto otaku, Otaku TV | 💤 |
 | 5 | Painel admin e robôs (notícias por IA, redes sociais) | 💤 |
 | 6 | Importação dos dados, ensaio completo e virada do domínio | 💤 |
+
+## Onde paramos
+
+2026-11-13:
+- **Pausa** depois de notícias e artigos (lista única em `/news`, com `/noticias` redirecionando para ela).
+- **Para retomar:**
+  1. Sitemaps e RSS das matérias.
+  2. Animes.
+- **Para atualizar o conteúdo do site de teste:**
+  `CRON_TOKEN=... node scripts/exportar-conteudo-antigo.mjs ../animeprofile-old/.env`. O token está nas variáveis do
+  app no hPanel.
