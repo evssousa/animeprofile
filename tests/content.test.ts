@@ -148,8 +148,9 @@ describe("importação e consultas", () => {
 describe("redirecionamentos do que saiu", () => {
   it("leva cada endereço antigo para o lugar certo", () => {
     expect(redirectFor("/faca-parte")).toBe("/contato");
-    expect(redirectFor("/noticias")).toBe("/news?tipo=noticias");
-    expect(redirectFor("/noticias", "?pagina=2")).toBe("/news?tipo=noticias&pagina=2");
+    expect(redirectFor("/news")).toBe("/noticias");
+    expect(redirectFor("/news", "?tipo=noticias&pagina=2")).toBe("/noticias?tipo=noticias&pagina=2");
+    expect(redirectFor("/noticias")).toBeNull();
     expect(redirectFor("/noticias/uma-materia")).toBeNull();
     expect(redirectFor("/clas/meu-cla")).toBe("/ranking");
     expect(redirectFor("/comunidades")).toBe("/feed");

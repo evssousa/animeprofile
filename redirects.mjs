@@ -2,8 +2,8 @@
 // Usado pelo server-app.js antes do React Router. Em JavaScript puro para rodar sem build.
 
 const RULES = [
-  // A lista de notícias é a /news (a mesma página); as matérias continuam em /noticias/<slug>.
-  [/^\/noticias\/?$/, () => "/news?tipo=noticias"],
+  // A central de notícias do site antigo (/news) agora é a /noticias; a query (?tipo, ?pagina) vai junto.
+  [/^\/news\/?$/, () => "/noticias"],
   [/^\/faca-parte\/?$/, () => "/contato"],
   [/^\/clas(\/.*)?$/, () => "/ranking"],
   [/^\/comunidades(\/.*)?$/, () => "/feed"],

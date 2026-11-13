@@ -1,5 +1,5 @@
-// Listas: /news (tudo), /news?tipo=noticias (só notícias) e /artigos. ?pagina=N para paginar.
-// /noticias é a mesma lista: redireciona para /news?tipo=noticias (redirects.mjs). As matérias seguem em /noticias/<slug>.
+// Listas: /noticias (tudo), /noticias?tipo=noticias (só notícias) e /artigos. ?pagina=N para paginar.
+// O endereço antigo /news redireciona para /noticias (redirects.mjs). As matérias ficam em /noticias/<slug>.
 import { data } from "react-router";
 import type { Route } from "./+types/posts-list";
 import { PageHeader } from "~/components/PageHeader";
@@ -8,13 +8,13 @@ import { seo } from "~/lib/seo";
 import { listCategories, listPosts, mostRead, type PostType } from "~/server/content/posts.server";
 
 const PAGES: Record<string, { type?: PostType; label: string; title: string; intro: string; description: string }> = {
-  "/news": {
+  "/noticias": {
     label: "Central de notícias",
     title: "O pulso do universo otaku",
     intro: "Notícias, artigos e guias sobre animes, mangás, games e cultura pop japonesa, num lugar só.",
     description: "Notícias e artigos de anime, mangá e cultura otaku em português, atualizados todos os dias.",
   },
-  "/news?tipo=noticias": {
+  "/noticias?tipo=noticias": {
     type: "news",
     label: "Notícias",
     title: "O que está acontecendo agora",
@@ -32,8 +32,8 @@ const PAGES: Record<string, { type?: PostType; label: string; title: string; int
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  const pathname = url.pathname.replace(/\/$/, "") || "/news";
-  const path = pathname === "/news" && url.searchParams.get("tipo") === "noticias" ? "/news?tipo=noticias" : pathname;
+  const pathname = url.pathname.replace(/\/$/, "") || "/noticias";
+  const path = pathname === "/noticias" && url.searchParams.get("tipo") === "noticias" ? "/noticias?tipo=noticias" : pathname;
   const cfg = PAGES[path];
   if (!cfg) throw data(null, { status: 404 });
   const page = Math.max(1, Number(url.searchParams.get("pagina")) || 1);
@@ -57,8 +57,8 @@ export default function PostsList({ loaderData }: Route.ComponentProps) {
   const first = list.page === 1;
   const [lead, ...rest] = list.items;
   const tabs = [
-    { label: "Tudo", to: "/news" },
-    { label: "Notícias", to: "/news?tipo=noticias" },
+    { label: "Tudo", to: "/noticias" },
+    { label: "Notícias", to: "/noticias?tipo=noticias" },
     { label: "Artigos", to: "/artigos" },
   ];
   return (

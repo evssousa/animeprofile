@@ -50,7 +50,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 ## Onde paramos
 
 2026-11-13:
-- **Pausa** depois de notícias e artigos (lista única em `/news`, com `/noticias` redirecionando para ela).
+- **Pausa** depois de notícias e artigos (lista única em `/noticias`, com `/news` redirecionando para ela).
 - **Para retomar:**
   1. Sitemaps e RSS das matérias.
   2. Animes.

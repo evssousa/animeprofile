@@ -23,7 +23,7 @@ export const NAV: NavGroup[] = [
     label: "Descobrir",
     items: [
       { label: "Início", to: "/", icon: Home },
-      { label: "Notícias", to: "/news", icon: Newspaper },
+      { label: "Notícias", to: "/noticias", icon: Newspaper },
       { label: "Artigos", to: "/artigos", icon: BookOpen },
       { label: "Animes", to: "/animes", icon: Tv },
       { label: "Otaku TV", to: "/otaku-tv", icon: MonitorPlay },
@@ -56,7 +56,7 @@ export const NAV: NavGroup[] = [
 /** Menu do topo (computador). O celular usa os grupos completos de NAV. */
 export const TOP_NAV: { label: string; to: string }[] = [
   { label: "Início", to: "/" },
-  { label: "Notícias", to: "/news" },
+  { label: "Notícias", to: "/noticias" },
   { label: "Animes", to: "/animes" },
   { label: "Otaku TV", to: "/otaku-tv" },
   { label: "Quiz", to: "/quiz" },
@@ -68,7 +68,7 @@ export const FOOTER_LINKS: NavGroup[] = [
   {
     label: "Conteúdo",
     items: [
-      { label: "Notícias", to: "/news", icon: Newspaper },
+      { label: "Notícias", to: "/noticias", icon: Newspaper },
       { label: "Artigos", to: "/artigos", icon: BookOpen },
       { label: "Animes", to: "/animes", icon: Tv },
       { label: "Quiz", to: "/quiz", icon: Puzzle },
@@ -109,7 +109,5 @@ export const SOCIAL = [
 /** Ativo quando a rota é a do item ou uma sub-rota dele. "/" só vale exato. */
 export function isActive(pathname: string, to: string) {
   if (to === "/") return pathname === "/";
-  // "Notícias" (/news) também fica marcado lendo uma matéria (/noticias/<slug>).
-  if (to === "/news") return pathname === "/news" || pathname.startsWith("/noticias/");
   return pathname === to || pathname.startsWith(`${to}/`);
 }
