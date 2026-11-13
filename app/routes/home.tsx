@@ -246,9 +246,9 @@ function Collection() {
   return (
     <section
       aria-labelledby="colecao"
-      className="relative flex flex-wrap items-center gap-10 overflow-hidden rounded-[26px] bg-[#17141a] bg-[radial-gradient(520px_340px_at_78%_50%,rgba(194,53,43,.35),rgba(23,20,26,0)_70%),radial-gradient(420px_260px_at_100%_0%,rgba(140,90,255,.22),rgba(23,20,26,0)_70%)] p-8 text-night-ink shadow-[0_30px_60px_rgba(60,20,20,.22)] sm:p-11"
+      className="relative flex flex-wrap items-center gap-10 overflow-hidden rounded-[26px] bg-[#17141a] bg-[radial-gradient(520px_340px_at_78%_50%,rgba(194,53,43,.35),rgba(23,20,26,0)_70%),radial-gradient(420px_260px_at_100%_0%,rgba(140,90,255,.22),rgba(23,20,26,0)_70%)] p-6 text-night-ink shadow-[0_30px_60px_rgba(60,20,20,.22)] sm:p-11"
     >
-      <div className="flex max-w-[520px] flex-[1_1_340px] flex-col gap-3.5">
+      <div className="flex w-full max-w-[520px] min-w-0 flex-col gap-3.5 md:w-auto md:flex-[1_1_340px]">
         <p className="text-[0.82rem] font-bold text-glow">Coleção</p>
         <h2 id="colecao" className="text-[1.9rem] leading-[1.08] font-extrabold tracking-[-0.025em] sm:text-[2.3rem]">
           Colete figurinhas raras dos seus animes favoritos
@@ -264,7 +264,7 @@ function Collection() {
           Conhecer as figurinhas
         </Link>
       </div>
-      <div className="relative mx-auto h-[300px] w-[300px] shrink-0" aria-hidden>
+      <div className="relative mx-auto h-[300px] w-[300px] max-w-full shrink-0 origin-top scale-[.92] sm:scale-100" aria-hidden>
         <div className="absolute top-4 left-6 flex h-[260px] w-[170px] -rotate-6 flex-col items-center justify-center gap-3 overflow-hidden rounded-[18px] bg-[linear-gradient(160deg,#f25b4e,#9e1f18_60%,#5c0e0a)] shadow-[0_30px_60px_rgba(0,0,0,.6),inset_0_0_0_2px_rgba(255,255,255,.18)]">
           <span className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0)_30%,rgba(255,255,255,.35)_45%,rgba(255,255,255,0)_60%)]" />
           <span className="absolute inset-x-0 top-0 h-5 bg-[repeating-linear-gradient(90deg,rgba(0,0,0,.25)_0_6px,rgba(0,0,0,0)_6px_12px)]" />
