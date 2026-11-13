@@ -21,7 +21,6 @@ const PENDING = ["animes", "otaku-tv", "quiz", "feed", "blog", "missoes", "ranki
 export default [
   index("routes/home.tsx"),
   route("news", "routes/posts-list.tsx", { id: "lista-news" }),
-  route("noticias", "routes/posts-list.tsx", { id: "lista-noticias" }),
   route("artigos", "routes/posts-list.tsx", { id: "lista-artigos" }),
   route("noticias/:slug", "routes/post.tsx", { id: "materia-noticia" }),
   route("artigos/:slug", "routes/post.tsx", { id: "materia-artigo" }),

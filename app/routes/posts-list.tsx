@@ -1,4 +1,5 @@
-// Listas: /news (tudo), /noticias e /artigos. ?pagina=N para paginar; categorias levam a /categoria/<slug>.
+// Listas: /news (tudo), /news?tipo=noticias (só notícias) e /artigos. ?pagina=N para paginar.
+// /noticias é a mesma lista: redireciona para /news?tipo=noticias (redirects.mjs). As matérias seguem em /noticias/<slug>.
 import { data } from "react-router";
 import type { Route } from "./+types/posts-list";
 import { PageHeader } from "~/components/PageHeader";
@@ -13,7 +14,7 @@ const PAGES: Record<string, { type?: PostType; label: string; title: string; int
     intro: "Notícias, artigos e guias sobre animes, mangás, games e cultura pop japonesa, num lugar só.",
     description: "Notícias e artigos de anime, mangá e cultura otaku em português, atualizados todos os dias.",
   },
-  "/noticias": {
+  "/news?tipo=noticias": {
     type: "news",
     label: "Notícias",
     title: "O que está acontecendo agora",
@@ -31,7 +32,8 @@ const PAGES: Record<string, { type?: PostType; label: string; title: string; int
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  const path = url.pathname.replace(/\/$/, "") || "/news";
+  const pathname = url.pathname.replace(/\/$/, "") || "/news";
+  const path = pathname === "/news" && url.searchParams.get("tipo") === "noticias" ? "/news?tipo=noticias" : pathname;
   const cfg = PAGES[path];
   if (!cfg) throw data(null, { status: 404 });
   const page = Math.max(1, Number(url.searchParams.get("pagina")) || 1);
@@ -46,7 +48,7 @@ export function meta({ loaderData: d }: Route.MetaArgs) {
   return seo({
     title: page > 1 ? `${d.cfg.label}: página ${page}` : d.cfg.label === "Central de notícias" ? "Notícias e artigos de anime" : d.cfg.label,
     description: d.cfg.description,
-    path: page > 1 ? `${d.path}?pagina=${page}` : d.path,
+    path: page > 1 ? `${d.path}${d.path.includes("?") ? "&" : "?"}pagina=${page}` : d.path,
   });
 }
 
@@ -56,7 +58,7 @@ export default function PostsList({ loaderData }: Route.ComponentProps) {
   const [lead, ...rest] = list.items;
   const tabs = [
     { label: "Tudo", to: "/news" },
-    { label: "Notícias", to: "/noticias" },
+    { label: "Notícias", to: "/news?tipo=noticias" },
     { label: "Artigos", to: "/artigos" },
   ];
   return (
@@ -100,7 +102,7 @@ export default function PostsList({ loaderData }: Route.ComponentProps) {
         ) : null}
 
         <PostGrid posts={first ? rest : list.items} />
-        <Pagination page={list.page} pages={list.pages} basePath={path} />
+        <Pagination page={list.page} pages={list.pages} basePath={path.split("?")[0]} query={path.includes("?") ? { tipo: "noticias" } : {}} />
       </div>
     </>
   );

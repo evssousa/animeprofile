@@ -52,7 +52,7 @@ export function meta({ loaderData: d }: Route.MetaArgs) {
 
 export default function Post({ loaderData }: Route.ComponentProps) {
   const { post, related, showCover } = loaderData;
-  const section = post.type === "news" ? { label: "Notícias", to: "/noticias" } : { label: "Artigos", to: "/artigos" };
+  const section = post.type === "news" ? { label: "Notícias", to: "/news?tipo=noticias" } : { label: "Artigos", to: "/artigos" };
   return (
     <article>
       <header className="relative overflow-hidden rounded-b-[28px] bg-night text-night-ink shadow-[0_24px_50px_rgba(60,20,20,.16)]">

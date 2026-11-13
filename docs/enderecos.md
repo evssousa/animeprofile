@@ -8,7 +8,7 @@ favoritos dos usuários. Levantado em 2026-11-12 nas 138 rotas do site antigo.
 | Área | Endereços |
 |---|---|
 | Início e institucionais | `/`, `/sobre`, `/contato`, `/ajuda/:id`, `/como-instalar`, `/links`, `/legal/*` (termos, privacidade, cookies, DMCA, menores, padrões editoriais), `/privacidade` |
-| Notícias e artigos | `/news`, `/noticias`, `/noticias/:slug`, `/artigos`, `/artigos/:slug`, `/categoria/:slug`, `/tag/:slug`, `/autores/:slug`, `/busca` |
+| Notícias e artigos | `/news` (lista; `?tipo=noticias` só notícias), `/noticias/:slug`, `/artigos`, `/artigos/:slug`, `/categoria/:slug`, `/tag/:slug`, `/autores/:slug`, `/busca` |
 | Blog | `/blog`, `/blog/:username/:slug`, `/blog/u/:username`, `/blog/categoria/:slug`, `/blog/tag/:slug`, `/blog/criadores`, `/blog/editor`, `/blog/dashboard`, `/blog/rss.xml`, `/blog/u/:username/rss.xml` |
 | Quiz | `/quiz`, `/quiz/:slug` |
 | Animes | `/animes`, `/animes/:id`, `/animes/calendario`, `/animes/favoritos`, `/animes/seguindo`, `/animes/personagem/:id` |
@@ -32,6 +32,7 @@ favoritos dos usuários. Levantado em 2026-11-12 nas 138 rotas do site antigo.
 | `/fig-battle/*`, `/jogo-da-memoria`, `/games` | `/figurinhas` (os jogos usavam as figurinhas) |
 | `/qg` (escritório 3D) | `/sobre` |
 | `/faca-parte` | `/contato` (a página saiu em 2026-11-13) |
+| `/noticias` (lista) | `/news?tipo=noticias`: é a mesma página (decisão de 2026-11-13). As matérias seguem em `/noticias/:slug` |
 | `/membros` | `/explorar` |
 | `/en`, `/en/*` | a mesma página sem o `/en` (`/en/news/:slug` → `/noticias/:slug`) |
 | `/sitemap-en.xml` | `/sitemap.xml` |

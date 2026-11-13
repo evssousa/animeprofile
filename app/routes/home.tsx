@@ -74,7 +74,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
         {news.length > 0 && (
           <section aria-labelledby="noticias" className="flex flex-col gap-6">
-            <SectionHead id="noticias" label="Notícias" title="O que está acontecendo agora" more={{ to: "/noticias", text: "Todas as notícias" }} />
+            <SectionHead id="noticias" label="Notícias" title="O que está acontecendo agora" more={{ to: "/news?tipo=noticias", text: "Todas as notícias" }} />
             <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
               {news.map((p) => (
                 <PostCard key={p.id} post={p} />
