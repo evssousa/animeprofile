@@ -195,7 +195,7 @@ function Hero({ slides }: { slides: Card[] }) {
         aria-hidden
       />
       <div className="relative mx-auto mt-auto flex w-full max-w-[1328px] flex-wrap items-end gap-8 px-4 pt-16 pb-10 sm:px-8 lg:px-14">
-        <div className="flex max-w-[660px] min-w-0 flex-[1_1_480px] flex-col gap-4" aria-live="polite">
+        <div className="flex w-full max-w-[660px] min-w-0 flex-col gap-4 md:w-auto md:flex-[1_1_480px]" aria-live="polite">
           <div className="flex flex-wrap gap-2 text-[0.75rem] font-bold">
             <span className="rounded-[7px] bg-brand px-2.5 py-1.5">Destaque</span>
             {s.category && <span className="rounded-[7px] bg-white/15 px-2.5 py-1.5 font-semibold">{s.category.name}</span>}
