@@ -2,6 +2,19 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-13 — Visual definitivo: "Top 10 claro"
+
+- **Decisão:**
+  - **O que muda:** o layout "página de mangá carimbada" sai e entra o "Top 10 claro", escolhido em 4 rodadas de
+    opções.
+  - **O visual novo:** capa e cabeçalhos numa faixa escura cinematográfica, página clara, fonte Sora, vermelho
+    `#c2352b`, Top 10 com números gigantes e figurinhas num painel escuro.
+  - **Página inicial:** mantém a divisão de seções do site atual.
+  - **Detalhes:** em [design.md](design.md).
+- **Por quê:**
+  - **Reprovação:** o primeiro layout ficou diferente demais do site atual.
+  - **Escolha:** o dono quis uma evolução bonita, que os usuários reconheçam.
+
 ## 2026-11-12 — Contas por último; visual novo com a mesma marca
 
 - **Decisão:**

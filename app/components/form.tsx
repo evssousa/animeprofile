@@ -3,7 +3,7 @@
 import { useId } from "react";
 
 const control =
-  "w-full rounded-xl border bg-surface px-3.5 py-2.5 text-[1rem] placeholder:text-ink-soft/70 focus:outline-none focus:ring-2 focus:ring-ai/40 aria-[invalid=true]:border-hanko";
+  "w-full rounded-xl border bg-surface px-3.5 py-2.5 text-[1rem] placeholder:text-ink-soft/70 focus:outline-none focus:ring-2 focus:ring-link/40 aria-[invalid=true]:border-brand";
 
 type BaseProps = { label: string; name: string; error?: string; hint?: string; optional?: boolean };
 
@@ -21,7 +21,7 @@ function Wrapper({ id, label, error, hint, optional, children }: BaseProps & { i
         </p>
       )}
       {error && (
-        <p id={`${id}-error`} className="mt-1.5 text-[0.9rem] font-medium text-hanko">
+        <p id={`${id}-error`} className="mt-1.5 text-[0.9rem] font-medium text-brand">
           {error}
         </p>
       )}
@@ -117,7 +117,7 @@ export function SubmitButton({ busy, children }: { busy: boolean; children: Reac
     <button
       type="submit"
       disabled={busy}
-      className="rounded-full bg-hanko px-6 py-3 font-semibold text-hanko-ink hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+      className="rounded-[9px] bg-brand px-6 py-3 font-bold text-brand-ink hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
     >
       {busy ? "Enviando..." : children}
     </button>
@@ -128,7 +128,7 @@ export function Notice({ tone, children }: { tone: "ok" | "erro"; children: Reac
   return (
     <div
       role={tone === "erro" ? "alert" : "status"}
-      className={`rounded-xl border px-4 py-3 ${tone === "ok" ? "border-ai/40 bg-ai/10" : "border-hanko/40 bg-hanko/10"}`}
+      className={`rounded-xl border px-4 py-3 ${tone === "ok" ? "border-link/40 bg-link/10" : "border-brand/40 bg-brand/10"}`}
     >
       {children}
     </div>

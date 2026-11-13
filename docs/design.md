@@ -1,68 +1,92 @@
 # Design
 
-A identidade visual do site novo. A marca continua a mesma (o logo e o vermelho `#bb0000`); o que muda é o
-acabamento, para ficar com personalidade própria, no nível do respawnou.
+A identidade visual do site novo, escolhida pelo dono em 2026-11-13 depois de 4 rodadas de opções. O quadro com todas
+as opções e a página inicial completa está em https://claude.ai/artifact/1hMjNhfbgpyySNhVXQoBg1 (privado, do dono).
 
-## Ideia central: página de mangá carimbada
+## Ideia central: "Top 10 claro"
 
-O logo do Anime Profile é um quadrado vermelho, como o carimbo japonês (*hanko*). O site trata a página como papel de
-mangá: tinta, papel, o vermelho do carimbo e a retícula (os pontinhos de sombra dos mangás).
+Uma evolução do site atual com cara de app de streaming de anime:
 
-**Ousadia num lugar só:** o cabeçalho de cada página tem o título grande em Dela Gothic, o carimbo vermelho ao lado e
-a retícula se dissolvendo na diagonal. O resto do site fica quieto e organizado, para o conteúdo aparecer.
+- **Topo:** faixa escura cinematográfica com o menu.
+- **Cabeçalho das páginas:** continua a mesma faixa escura e termina com cantos arredondados.
+- **Corpo:** página clara, com o papel levemente rosado do site atual.
+- **Painéis escuros de destaque:** no meio da página clara, para as figurinhas e a Otaku TV.
+
+A página inicial segue a divisão de seções do site atual (lista abaixo).
 
 ## Cores
 
 Definidas em `app/app.css`, com tema claro e escuro. O tema escolhido fica salvo em `ap-theme`, a mesma chave do site
-antigo, então quem já usava o tema escuro continua com ele.
+antigo.
 
 | Nome | Claro | Escuro | Uso |
 |---|---|---|---|
-| `paper` | `#fbfbfc` | `#121117` | Fundo da página |
-| `surface` | `#ffffff` | `#1b1a21` | Menu lateral, cartões, campos |
-| `sunken` | `#f2f2f5` | `#17161c` | Item ativo, hover, cabeçalho de tabela |
-| `ink` | `#1a1820` | `#f1f0f4` | Texto |
-| `ink-soft` | `#57545f` | `#a7a4b0` | Texto secundário |
-| `line` | `#e3e2e9` | `#2d2b35` | Bordas |
-| `hanko` | `#bb0000` | `#e5413a` | A marca: botão principal, item ativo, marcadores |
-| `ai` | `#23407a` | `#93b0ee` | Índigo japonês: links e foco |
-
-Regra: o vermelho é da marca e das ações principais. Links de texto usam o índigo, para o vermelho não perder força.
+| `paper` | `#faf7f7` | `#121014` | Fundo da página |
+| `surface` | `#ffffff` | `#1b171a` | Cartões, campos, rodapé |
+| `sunken` | `#f4eded` | `#231e21` | Hover, cabeçalho de tabela |
+| `ink` | `#1c1414` | `#f4eff0` | Texto |
+| `ink-soft` | `#6e5f5f` | `#ab9d9f` | Texto secundário |
+| `line` | `#efe6e6` | `#2f282b` | Bordas |
+| `brand` | `#c2352b` | `#c2352b` | Botões e destaques (texto branco com contraste AA) |
+| `brand-soft` | `#fbedec` | `#3a1b19` | Fundo de item ativo e de botões secundários |
+| `link` | `#c2352b` | `#ff9a90` | Links |
+| `night` | `#0d0d10` | `#0b0b0e` | Faixa escura do topo e dos cabeçalhos |
+| `glow` | `#ff9a90` | `#ff9a90` | Rótulos vermelhos sobre fundo escuro |
 
 ## Tipografia
 
-- **Títulos:** Dela Gothic One, uma gótica japonesa pesada, com cara de capa de mangá. Só em títulos (h1 e h2).
-- **Texto:** M PLUS 2, de origem japonesa, legível em tamanho pequeno.
-- **Texto longo** (`.prose-ap`): até 68 caracteres por linha, entrelinha 1,75.
+- **Sora** em tudo, de 400 a 800.
+- **Títulos:** em 800, com espaçamento negativo entre letras.
+- **Rótulo:** cada seção tem um rótulo vermelho curto acima do título ("Top 3 do mês", "Ao vivo"), como no site atual.
+- **Texto longo** (`.prose-ap`): até 70 caracteres por linha, entrelinha 1,75.
 
 ## Estrutura
 
-- **Computador:**
-  - **Menu lateral fixo:** os grupos do site antigo (Descobrir, Comunidade, Recompensas, Coleção).
-  - **Barra de topo:** busca, tema, Entrar e Criar conta.
-- **Celular:**
-  - **Barra de topo:** com o carimbo da marca.
-  - **Menu:** abre por cima da tela (`<dialog>` nativo: o Esc fecha e o foco fica preso no menu).
-- **Páginas de texto:** índice lateral fixo com as seções. No celular, o índice vira uma caixa que abre e fecha.
-- **Formulários:** rótulo sempre visível, erro abaixo do campo e ligado a ele para leitores de tela, com um texto que
-  diz como corrigir.
+- **Computador:** topo com logo, menu na linha (Início, Notícias, Animes, Otaku TV, Quiz, Figurinhas, Comunidade),
+  busca, tema, Entrar e Criar conta.
+- **Celular:** o topo mostra só o logo, a busca, o tema e o Criar conta. O menu abre por cima da tela (`<dialog>`
+  nativo), com os grupos completos: Descobrir, Comunidade, Recompensas e Coleção.
+- **Páginas de texto:** índice lateral fixo. No celular, o índice vira uma caixa que abre e fecha.
+- **Rodapé:** branco, com colunas de links.
+
+## Página inicial (seções, na ordem do site atual)
+
+1. Destaques em carrossel, na capa escura, com miniaturas e barra de progresso.
+2. Top 3 do mês, em pódio, e Animes no ar hoje.
+3. Top 10 da semana: números gigantes vazados atrás dos pôsteres.
+4. Temporada atual.
+5. Artigos: filtros por categoria, um artigo grande, quatro menores e "Mais lidos do mês".
+6. Notícias.
+7. Otaku TV, num painel escuro.
+8. Quiz.
+9. Coleção de figurinhas, num painel escuro, com o pacote desenhado e a lendária holográfica.
+10. Blog da comunidade.
+11. Últimos comentários e "No feed agora".
+12. O diferencial ("Muito mais que notícias").
+13. Em alta e os mais lidos do mês.
+14. Chamada "Faça parte da comunidade".
 
 ## Acessibilidade (piso, não enfeite)
 
 - Link "Pular para o conteúdo".
-- Foco visível em índigo.
-- Contraste AA no tema claro e no escuro.
+- Foco visível em azul (`#2b5bd7`), legível sobre o claro e o escuro.
+- Contraste AA nos dois temas.
 - Respeito a "reduzir movimento".
-- Alvos de toque de pelo menos 40 px.
+- Alvos de toque de pelo menos 44 px.
 - Nenhuma rolagem horizontal em 390 px (conferido com print).
 
 ## Componentes
 
 | Arquivo | O que é |
 |---|---|
-| `app/components/layout/Sidebar.tsx` | Menu lateral e grupos do menu (usados também no celular) |
-| `app/components/layout/Header.tsx` | Barra de topo, busca e menu do celular |
+| `app/components/layout/Header.tsx` | Topo escuro, menu e menu do celular |
 | `app/components/layout/Footer.tsx` | Rodapé |
+| `app/components/layout/Logo.tsx` | Logo e nome |
 | `app/components/layout/ThemeToggle.tsx` | Tema claro e escuro, sem piscar ao carregar |
-| `app/components/PageHeader.tsx` | Cabeçalho de página com a retícula |
+| `app/components/PageHeader.tsx` | Cabeçalho escuro das páginas internas, com rótulo, título e introdução |
 | `app/components/form.tsx` | Campos, botão, avisos e campo-isca contra robôs |
+
+## Histórico
+
+O primeiro layout do código ("página de mangá carimbada", com Dela Gothic One e M PLUS 2) foi reprovado pelo dono
+em 2026-11-13 por estar diferente demais do site atual.

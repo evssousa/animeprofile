@@ -51,12 +51,13 @@ export default function Contato({ actionData }: Route.ComponentProps) {
   return (
     <>
       <PageHeader
+        label="Fale com a gente"
         title="Contato"
         intro="Dúvidas, problemas na conta, correções, parcerias ou imprensa: a equipe lê todas as mensagens e responde pelo e-mail que você informar."
       />
-      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-10 sm:px-6 sm:py-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
+      <div className="mx-auto grid max-w-[1328px] gap-12 px-4 py-10 sm:px-8 lg:px-14 sm:py-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <section aria-labelledby="form-title" className="max-w-2xl">
-          <h2 id="form-title" className="font-display text-2xl">
+          <h2 id="form-title" className="text-2xl font-extrabold">
             Mande uma mensagem
           </h2>
           {actionData?.sent ? (
@@ -88,7 +89,7 @@ export default function Contato({ actionData }: Route.ComponentProps) {
                 <SubmitButton busy={busy}>Enviar mensagem</SubmitButton>
                 <p className="text-[0.9rem] text-ink-soft">
                   Ao enviar, você concorda com a{" "}
-                  <a href="/legal/privacidade" className="text-ai underline underline-offset-2">
+                  <a href="/legal/privacidade" className="text-link underline underline-offset-2">
                     Política de Privacidade
                   </a>
                   .
@@ -98,10 +99,10 @@ export default function Contato({ actionData }: Route.ComponentProps) {
           )}
         </section>
         <aside className="h-fit rounded-2xl border border-line bg-surface p-6">
-          <Mail className="size-6 text-hanko" aria-hidden />
+          <Mail className="size-6 text-brand" aria-hidden />
           <h2 className="mt-3 font-bold">Prefere e-mail?</h2>
           <p className="mt-1 text-[0.95rem] text-ink-soft">Escreva para o mesmo endereço, sobre qualquer assunto.</p>
-          <a href={`mailto:${SITE.email}`} className="mt-3 inline-block font-semibold break-all text-ai underline underline-offset-2">
+          <a href={`mailto:${SITE.email}`} className="mt-3 inline-block font-semibold break-all text-link underline underline-offset-2">
             {SITE.email}
           </a>
           <p className="mt-5 text-[0.95rem] text-ink-soft">

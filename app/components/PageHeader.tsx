@@ -1,20 +1,19 @@
 /**
- * Cabeçalho das páginas: o único lugar com a retícula de mangá. Título grande em Dela Gothic,
- * carimbo vermelho ao lado e a textura se dissolvendo na diagonal.
+ * Cabeçalho das páginas internas: continua a faixa escura do topo e termina com cantos arredondados,
+ * como a capa cinematográfica da página inicial. `label` é o rótulo vermelho acima do título.
  */
-export function PageHeader({ title, intro, children }: { title: string; intro?: string; children?: React.ReactNode }) {
+export function PageHeader({ title, intro, label, children }: { title: string; intro?: string; label?: string; children?: React.ReactNode }) {
   return (
-    <header className="relative overflow-hidden border-b border-line">
-      <div className="screentone" aria-hidden />
-      <div className="relative mx-auto max-w-6xl px-4 pt-12 pb-10 sm:px-6 sm:pt-16 sm:pb-12">
-        <div className="flex items-start gap-4">
-          <span className="mt-2 hidden size-4 shrink-0 rotate-6 rounded-[3px] bg-hanko sm:block" aria-hidden />
-          <div className="min-w-0">
-            <h1 className="font-display text-[2.1rem] leading-[1.1] tracking-[-0.015em] text-balance sm:text-5xl">{title}</h1>
-            {intro && <p className="mt-4 max-w-[60ch] text-lg text-ink-soft text-pretty">{intro}</p>}
-            {children}
-          </div>
-        </div>
+    <header className="relative overflow-hidden rounded-b-[28px] bg-night text-night-ink shadow-[0_24px_50px_rgba(60,20,20,.16)]">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(620px_320px_at_85%_0%,rgba(194,53,43,.38),rgba(13,13,16,0)_70%)]"
+      />
+      <div className="relative mx-auto max-w-[1328px] px-4 pt-8 pb-12 sm:px-8 sm:pt-10 sm:pb-14 lg:px-14">
+        {label && <p className="mb-3 text-[0.85rem] font-bold text-glow">{label}</p>}
+        <h1 className="max-w-[22ch] text-[2.2rem] leading-[1.05] font-extrabold tracking-[-0.035em] text-balance sm:text-[3.2rem]">{title}</h1>
+        {intro && <p className="mt-4 max-w-[62ch] text-[1.05rem] leading-relaxed text-white/80 text-pretty sm:text-lg">{intro}</p>}
+        {children}
       </div>
     </header>
   );

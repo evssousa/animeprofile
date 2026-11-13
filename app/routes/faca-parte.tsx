@@ -68,10 +68,11 @@ export default function FacaParte({ actionData }: Route.ComponentProps) {
   return (
     <>
       <PageHeader
+        label="Vagas na equipe"
         title="Faça parte da equipe"
         intro="O Anime Profile é feito por fãs, para fãs. Se você quer ajudar o site a crescer, escolha uma área e conte um pouco sobre você."
       />
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
+      <div className="mx-auto max-w-[1328px] px-4 py-10 sm:px-8 lg:px-14 sm:py-12">
         <p className="max-w-[68ch] text-[1.05rem] text-ink-soft">
           A maior parte das vagas é voluntária, com benefícios dentro do site (AP Coins, cargos especiais e acesso antes de todo mundo às novidades) e a chance
           de participar da rotina editorial e do produto. Algumas funções podem passar a ser remuneradas conforme o projeto cresce.
@@ -88,16 +89,16 @@ export default function FacaParte({ actionData }: Route.ComponentProps) {
           <Form method="post" className="relative mt-10 flex flex-col gap-10" noValidate>
             <Honeypot />
             <fieldset>
-              <legend className="font-display text-2xl">Escolha uma área</legend>
-              {failed?.errors.role && <p className="mt-2 font-medium text-hanko">{failed.errors.role}</p>}
+              <legend className="text-2xl font-extrabold">Escolha uma área</legend>
+              {failed?.errors.role && <p className="mt-2 font-medium text-brand">{failed.errors.role}</p>}
               <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {ROLES.map(({ id, label, icon: Icon, desc }) => (
                   <label
                     key={id}
-                    className="group relative flex cursor-pointer gap-3 rounded-2xl border border-line bg-surface p-4 hover:border-ink-soft has-[:checked]:border-hanko has-[:checked]:shadow-[inset_0_0_0_1px_var(--hanko)] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ai/50"
+                    className="group relative flex cursor-pointer gap-3 rounded-2xl border border-line bg-surface p-4 hover:border-ink-soft has-[:checked]:border-brand has-[:checked]:shadow-[inset_0_0_0_1px_var(--brand)] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-link/50"
                   >
                     <input type="radio" name="role" value={id} defaultChecked={failed?.values.role === id} className="sr-only" />
-                    <Icon className="mt-0.5 size-5 shrink-0 text-ink-soft group-has-[:checked]:text-hanko" aria-hidden />
+                    <Icon className="mt-0.5 size-5 shrink-0 text-ink-soft group-has-[:checked]:text-brand" aria-hidden />
                     <span>
                       <span className="block font-bold">{label}</span>
                       <span className="mt-1 block text-[0.92rem] leading-snug text-ink-soft">{desc}</span>
@@ -109,7 +110,7 @@ export default function FacaParte({ actionData }: Route.ComponentProps) {
 
             <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
               <div className="flex max-w-2xl flex-col gap-5">
-                <h2 className="font-display text-2xl">Sobre você</h2>
+                <h2 className="text-2xl font-extrabold">Sobre você</h2>
                 {failed?.message && <Notice tone="erro">{failed.message}</Notice>}
                 <div className="grid gap-5 sm:grid-cols-2">
                   <TextField label="Nome" name="name" autoComplete="name" maxLength={100} defaultValue={failed?.values.name} error={failed?.errors.name} />
@@ -130,11 +131,11 @@ export default function FacaParte({ actionData }: Route.ComponentProps) {
                   <SubmitButton busy={busy}>Enviar candidatura</SubmitButton>
                   <p className="text-[0.9rem] text-ink-soft">
                     Ao enviar, você concorda com os{" "}
-                    <a href="/legal/termos" className="text-ai underline underline-offset-2">
+                    <a href="/legal/termos" className="text-link underline underline-offset-2">
                       Termos
                     </a>{" "}
                     e a{" "}
-                    <a href="/legal/privacidade" className="text-ai underline underline-offset-2">
+                    <a href="/legal/privacidade" className="text-link underline underline-offset-2">
                       Política de Privacidade
                     </a>
                     .
@@ -146,7 +147,7 @@ export default function FacaParte({ actionData }: Route.ComponentProps) {
                 <ul className="mt-3 flex flex-col gap-2.5 text-[0.95rem] text-ink-soft">
                   {LOOKING_FOR.map((t) => (
                     <li key={t} className="flex gap-2.5">
-                      <span className="mt-[0.55rem] size-1.5 shrink-0 rounded-full bg-hanko" aria-hidden />
+                      <span className="mt-[0.55rem] size-1.5 shrink-0 rounded-full bg-brand" aria-hidden />
                       {t}
                     </li>
                   ))}

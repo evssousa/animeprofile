@@ -21,14 +21,14 @@ export function meta({ loaderData: data }: Route.MetaArgs) {
 }
 
 export default function Pagina({ loaderData }: Route.ComponentProps) {
-  const { page, updatedLabel } = loaderData;
+  const { page, path, updatedLabel } = loaderData;
   const hasToc = page.toc.length > 0;
   return (
     <article>
-      <PageHeader title={page.title} intro={page.intro}>
-        {updatedLabel && <p className="mt-5 text-[0.9rem] text-ink-soft">Atualizado em {updatedLabel}</p>}
+      <PageHeader label={path.startsWith("/legal/") ? "Políticas do site" : "Anime Profile"} title={page.title} intro={page.intro}>
+        {updatedLabel && <p className="mt-5 text-[0.9rem] text-white/60">Atualizado em {updatedLabel}</p>}
       </PageHeader>
-      <div className={`mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12 ${hasToc ? "lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-14" : ""}`}>
+      <div className={`mx-auto max-w-[1328px] px-4 py-10 sm:px-8 lg:px-14 sm:py-12 ${hasToc ? "lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:gap-14" : ""}`}>
         {hasToc && (
           <>
             <details className="mb-8 rounded-xl border border-line bg-surface lg:hidden">
@@ -54,7 +54,7 @@ function Toc({ items }: { items: { id: string; text: string }[] }) {
     <ol className="flex flex-col gap-0.5 px-1 pb-3 lg:mt-2 lg:border-l lg:border-line lg:px-0">
       {items.map((t) => (
         <li key={t.id}>
-          <a href={`#${t.id}`} className="block rounded-lg px-3 py-1.5 text-[0.9rem] leading-snug text-ink-soft hover:bg-sunken hover:text-ink lg:-ml-px lg:rounded-none lg:border-l lg:border-transparent lg:hover:border-hanko lg:hover:bg-transparent">
+          <a href={`#${t.id}`} className="block rounded-lg px-3 py-1.5 text-[0.9rem] leading-snug text-ink-soft hover:bg-sunken hover:text-ink lg:-ml-px lg:rounded-none lg:border-l lg:border-transparent lg:hover:border-brand lg:hover:bg-transparent">
             {t.text}
           </a>
         </li>

@@ -1,54 +1,63 @@
 @import "tailwindcss";
 
 /*
- * Identidade visual do Anime Profile (docs/design.md).
- * Ideia central: página de mangá carimbada. Papel e tinta, o vermelho do hanko (a marca, #bb0000),
- * o índigo japonês (ai-iro) como cor secundária e a retícula de mangá como textura, usada só no
- * cabeçalho das páginas. Títulos em Dela Gothic One; texto em M PLUS 2.
+ * Identidade visual do Anime Profile (docs/design.md), escolhida em 2026-11-13: "Top 10 claro".
+ * Página clara (papel levemente rosado), faixas escuras cinematográficas no topo de cada página,
+ * vermelho da marca nos botões e destaques, fonte Sora em tudo.
  */
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 :root {
-  --paper: #fbfbfc;
+  --paper: #faf7f7;
   --surface: #ffffff;
-  --sunken: #f2f2f5;
-  --ink: #1a1820;
-  --ink-soft: #57545f;
-  --line: #e3e2e9;
-  --hanko: #bb0000;
-  --hanko-ink: #ffffff;
-  --ai: #23407a;
-  --tone: #1a1820;
+  --sunken: #f4eded;
+  --ink: #1c1414;
+  --ink-soft: #6e5f5f;
+  --line: #efe6e6;
+  --brand: #c2352b;
+  --brand-ink: #ffffff;
+  --brand-soft: #fbedec;
+  --link: #c2352b;
+  --night: #0d0d10;
+  --night-ink: #f4f4f6;
+  --glow: #ff9a90;
   color-scheme: light;
 }
 
 [data-theme="dark"] {
-  --paper: #121117;
-  --surface: #1b1a21;
-  --sunken: #17161c;
-  --ink: #f1f0f4;
-  --ink-soft: #a7a4b0;
-  --line: #2d2b35;
-  --hanko: #e5413a;
-  --hanko-ink: #ffffff;
-  --ai: #93b0ee;
-  --tone: #f1f0f4;
+  --paper: #121014;
+  --surface: #1b171a;
+  --sunken: #231e21;
+  --ink: #f4eff0;
+  --ink-soft: #ab9d9f;
+  --line: #2f282b;
+  --brand: #c2352b;
+  --brand-ink: #ffffff;
+  --brand-soft: #3a1b19;
+  --link: #ff9a90;
+  --night: #0b0b0e;
+  --night-ink: #f4f4f6;
+  --glow: #ff9a90;
   color-scheme: dark;
 }
 
 @theme inline {
-  --font-sans: "M PLUS 2", system-ui, sans-serif;
-  --font-display: "Dela Gothic One", "M PLUS 2", system-ui, sans-serif;
+  --font-sans: "Sora", system-ui, sans-serif;
+  --font-display: "Sora", system-ui, sans-serif;
   --color-paper: var(--paper);
   --color-surface: var(--surface);
   --color-sunken: var(--sunken);
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);
   --color-line: var(--line);
-  --color-hanko: var(--hanko);
-  --color-hanko-ink: var(--hanko-ink);
-  --color-ai: var(--ai);
+  --color-brand: var(--brand);
+  --color-brand-ink: var(--brand-ink);
+  --color-brand-soft: var(--brand-soft);
+  --color-link: var(--link);
+  --color-night: var(--night);
+  --color-night-ink: var(--night-ink);
+  --color-glow: var(--glow);
 }
 
 @layer base {
@@ -62,31 +71,24 @@
     font-size: 1rem;
     line-height: 1.6;
   }
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.02em;
+  }
   :focus-visible {
-    outline: 2px solid var(--ai);
+    outline: 2px solid #2b5bd7;
     outline-offset: 2px;
     border-radius: 4px;
   }
   ::selection {
-    background: color-mix(in oklab, var(--hanko) 22%, transparent);
+    background: color-mix(in oklab, var(--brand) 22%, transparent);
   }
-}
-
-/* Retícula de mangá: pontos de tinta que se dissolvem na diagonal. Só no cabeçalho das páginas. */
-.screentone {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background-image: radial-gradient(var(--tone) 1.1px, transparent 1.5px);
-  background-size: 8px 8px;
-  opacity: 0.22;
-  -webkit-mask-image: linear-gradient(115deg, transparent 38%, #000 92%);
-  mask-image: linear-gradient(115deg, transparent 38%, #000 92%);
 }
 
 /* Texto longo (páginas institucionais, matérias). */
 .prose-ap {
-  max-width: 68ch;
+  max-width: 70ch;
   font-size: 1.0625rem;
   line-height: 1.75;
 }
@@ -94,16 +96,15 @@
   margin-top: 1.1em;
 }
 .prose-ap h2 {
-  margin-top: 2.4em;
-  font-family: var(--font-display);
-  font-size: 1.45rem;
+  margin-top: 2.2em;
+  font-size: 1.5rem;
   line-height: 1.25;
-  font-weight: 400;
+  font-weight: 800;
   scroll-margin-top: 6rem;
 }
 .prose-ap h3 {
   margin-top: 1.8em;
-  font-size: 1.1rem;
+  font-size: 1.12rem;
   font-weight: 700;
   scroll-margin-top: 6rem;
 }
@@ -112,7 +113,8 @@
   margin-top: 0.6em;
 }
 .prose-ap a {
-  color: var(--ai);
+  color: var(--link);
+  font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
@@ -137,17 +139,18 @@
   margin-top: 0.4em;
 }
 .prose-ap li::marker {
-  color: var(--hanko);
+  color: var(--brand);
 }
 .prose-ap blockquote {
-  border-left: 3px solid var(--hanko);
+  border-left: 3px solid var(--brand);
   padding-left: 1em;
   color: var(--ink-soft);
 }
 .prose-ap .table-wrap {
   overflow-x: auto;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
+  background: var(--surface);
 }
 .prose-ap table {
   width: 100%;

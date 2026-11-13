@@ -33,7 +33,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 0 | Renomear o repositório antigo para `animeprofile-old` e criar o `animeprofile` | ✅ |
 | 1 | Arquitetura, banco, endereços e deploy (no modelo do respawnou) | ✅ |
 | 2 | Esqueleto do app no ar em `novo.animeprofile.com.br` (build, banco, migrations, cron) | ✅ |
-| 2 | Layout novo (menu, topo, rodapé, tema claro e escuro) | ✅ |
+| 2 | Layout novo "Top 10 claro" (topo, rodapé, cabeçalhos, tema claro e escuro) | ✅ |
 | 2 | Páginas institucionais e legais, formulários de Contato e Faça parte | ✅ |
 | 2 | Notícias e artigos (com cópia das matérias do site antigo no endereço de teste) | ⏳ |
 | 2 | Redirecionamentos do que saiu (Clãs, Comunidades, jogos, `/en`) | 💤 |

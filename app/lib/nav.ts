@@ -53,6 +53,17 @@ export const NAV: NavGroup[] = [
   },
 ];
 
+/** Menu do topo (computador). O celular usa os grupos completos de NAV. */
+export const TOP_NAV: { label: string; to: string }[] = [
+  { label: "Início", to: "/" },
+  { label: "Notícias", to: "/noticias" },
+  { label: "Animes", to: "/animes" },
+  { label: "Otaku TV", to: "/otaku-tv" },
+  { label: "Quiz", to: "/quiz" },
+  { label: "Figurinhas", to: "/figurinhas" },
+  { label: "Comunidade", to: "/feed" },
+];
+
 export const FOOTER_LINKS: NavGroup[] = [
   {
     label: "Conteúdo",

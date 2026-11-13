@@ -17,18 +17,19 @@ export default function Home() {
   return (
     <>
       <PageHeader
+        label="Versão nova em construção"
         title="Anime Profile"
         intro="Notícias de anime, coleção de figurinhas, quizzes e comunidade otaku em português. Esta é a versão nova do site, em construção."
       />
-      <section aria-labelledby="secoes" className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-12">
-        <h2 id="secoes" className="font-display text-2xl">
+      <section aria-labelledby="secoes" className="mx-auto max-w-[1328px] px-4 py-10 sm:px-8 lg:px-14 sm:py-12">
+        <h2 id="secoes" className="text-2xl font-extrabold">
           O que tem no site
         </h2>
         <ul className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {sections.map(({ label, to, icon: Icon }) => (
             <li key={to}>
               <Link to={to} className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3.5 font-semibold hover:border-ink-soft">
-                <Icon className="size-5 text-hanko" aria-hidden />
+                <Icon className="size-5 text-brand" aria-hidden />
                 {label}
               </Link>
             </li>
