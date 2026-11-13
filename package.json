@@ -37,6 +37,7 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@types/sanitize-html": "^2.16.2",
+    "image-size": "^2.1.0",
     "mysql-memory-server": "^1.13.0",
     "vitest": "^5.1.0"
   },

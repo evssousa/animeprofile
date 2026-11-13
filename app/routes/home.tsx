@@ -8,10 +8,13 @@ import type { Route } from "./+types/home";
 import { PostCard, PostOverlay, PostRow, SectionHead } from "~/components/posts";
 import { readingLabel } from "~/lib/format";
 import { seo } from "~/lib/seo";
-import { latestPosts, mostRead, trendingTags, type PostCard as Card } from "~/server/content/posts.server";
+import { isWideImage, latestPosts, mostRead, trendingTags, type PostCard as Card } from "~/server/content/posts.server";
 
 export async function loader() {
-  const featured = (await latestPosts({}, 8)).filter((p) => p.image).slice(0, 4);
+  // Capa grande: as 4 matérias mais recentes com imagem de resolução boa (>= 1280 px). Se faltar, completa com
+  // as outras, que aparecem desfocadas no fundo.
+  const recent = (await latestPosts({}, 30)).filter((p) => p.image);
+  const featured = [...recent.filter(isWideImage), ...recent.filter((p) => !isWideImage(p))].slice(0, 4);
   const exclude = featured.map((p) => p.id);
   const [news, articles, topArticles, topAll, tags] = await Promise.all([
     latestPosts({ type: "news", excludeIds: exclude }, 8),
@@ -183,7 +186,7 @@ function Hero({ slides }: { slides: Card[] }) {
           src={sl.image!}
           alt=""
           loading={n === 0 ? "eager" : "lazy"}
-          className={`absolute inset-0 size-full object-cover transition-opacity duration-700 ${n === i ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 size-full object-cover transition-opacity duration-700 ${isWideImage(sl) ? "" : "scale-110 blur-2xl"} ${n === i ? "opacity-100" : "opacity-0"}`}
         />
       ))}
       <div

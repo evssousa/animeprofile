@@ -11,6 +11,8 @@ export type PostCard = {
   title: string;
   excerpt: string | null;
   image: string | null;
+  /** Largura real da capa (null se não foi medida). */
+  imageWidth: number | null;
   publishedAt: string | null;
   readingMinutes: number;
   category: { name: string; slug: string } | null;
@@ -27,6 +29,10 @@ export type PostFull = PostCard & {
   authorBio: string | null;
 };
 
+/** Capa com resolução boa para ocupar a largura da tela (capa da home, topo da matéria). */
+export const HERO_MIN_WIDTH = 1280;
+export const isWideImage = (p: Pick<PostCard, "image" | "imageWidth">) => Boolean(p.image && p.imageWidth && p.imageWidth >= HERO_MIN_WIDTH);
+
 export const postUrl = (type: PostType, slug: string) => `${type === "article" ? "/artigos" : "/noticias"}/${slug}`;
 export const authorUrl = (kind: string, slug: string) => (kind === "ai" ? `/autores/${slug}` : `/u/${slug}`);
 
@@ -34,7 +40,7 @@ const VISIBLE = "p.status = 'published' AND p.published_at IS NOT NULL AND p.pub
 
 // Categoria principal: a primeira do mesmo tipo da matéria (notícia ou artigo), por nome.
 const CARD_COLUMNS = `
-  p.id, p.post_type, p.slug, p.title, p.excerpt, p.featured_image, p.published_at, p.reading_minutes,
+  p.id, p.post_type, p.slug, p.title, p.excerpt, p.featured_image, p.image_width, p.published_at, p.reading_minutes,
   (SELECT c.name FROM post_categories pc JOIN categories c ON c.id = pc.category_id WHERE pc.post_id = p.id ORDER BY c.kind = p.post_type DESC, c.name LIMIT 1) AS cat_name,
   (SELECT c.slug FROM post_categories pc JOIN categories c ON c.id = pc.category_id WHERE pc.post_id = p.id ORDER BY c.kind = p.post_type DESC, c.name LIMIT 1) AS cat_slug,
   a.name AS author_name, a.slug AS author_slug, a.kind AS author_kind, a.avatar_url AS author_avatar`;
@@ -46,6 +52,7 @@ type CardRow = {
   title: string;
   excerpt: string | null;
   featured_image: string | null;
+  image_width: number | null;
   published_at: string | null;
   reading_minutes: number;
   cat_name: string | null;
@@ -65,6 +72,7 @@ function toCard(r: CardRow): PostCard {
     title: r.title,
     excerpt: r.excerpt,
     image: r.featured_image,
+    imageWidth: r.image_width == null ? null : Number(r.image_width),
     publishedAt: iso(r.published_at) ?? null,
     readingMinutes: Number(r.reading_minutes) || 1,
     category: r.cat_name && r.cat_slug ? { name: r.cat_name, slug: r.cat_slug } : null,

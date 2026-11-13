@@ -7,7 +7,7 @@ import { redirectFor } from "../redirects.mjs";
 import { createPool, setPool } from "~/server/db.server";
 import { applySnapshot, mapPost, validateSnapshot, type OldSnapshot } from "~/server/content/import-old.server";
 import { readingMinutes, sanitizePostHtml } from "~/server/content/sanitize.server";
-import { getPost, getTag, latestPosts, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
+import { getPost, getTag, isWideImage, latestPosts, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
 
 let server: Awaited<ReturnType<typeof createDB>>;
 let pool: mysql.Pool;
@@ -19,9 +19,9 @@ const ago = (days: number) => new Date(now - days * 86_400_000).toISOString();
 // O retrato do "site antigo", como o script de exportação envia.
 const OLD: Record<string, unknown[]> = {
   posts: [
-    { id: "00000000-0000-4000-8000-000000000001", slug: "sakamoto-days-arco-final", post_type: "news", status: "published", title: "SAKAMOTO DAYS entra no arco final", excerpt: "O mangá chega ao clímax.", content: { html: '<p>Texto <script>alert(1)</script><a href="https://jump.example/x">fonte</a></p><iframe src="https://www.youtube.com/embed/abc"></iframe><iframe src="https://evil.example/x"></iframe>' }, featured_image: "https://img.example/s.webp", author_id: null, ai_author_id: "a0000000-0000-4000-8000-000000000001", is_ai_generated: true, anilist_id: 1, focus_keyword: "sakamoto days", views_count: 50, published_at: ago(1), created_at: ago(2), updated_at: ago(1) },
+    { id: "00000000-0000-4000-8000-000000000001", slug: "sakamoto-days-arco-final", post_type: "news", status: "published", title: "SAKAMOTO DAYS entra no arco final", excerpt: "O mangá chega ao clímax.", content: { html: '<p>Texto <script>alert(1)</script><a href="https://jump.example/x">fonte</a></p><iframe src="https://www.youtube.com/embed/abc"></iframe><iframe src="https://evil.example/x"></iframe>' }, featured_image: "https://img.example/s.webp", image_width: 1600, image_height: 900, author_id: null, ai_author_id: "a0000000-0000-4000-8000-000000000001", is_ai_generated: true, anilist_id: 1, focus_keyword: "sakamoto days", views_count: 50, published_at: ago(1), created_at: ago(2), updated_at: ago(1) },
     { id: "00000000-0000-4000-8000-000000000002", slug: "onde-assistir-jujutsu-kaisen", post_type: "article", status: "published", title: "Onde assistir Jujutsu Kaisen", excerpt: "Guia completo de streaming.", content: { html: "<p>" + "palavra ".repeat(900) + "</p>" }, featured_image: null, author_id: "u0000000-0000-4000-8000-000000000001", ai_author_id: null, is_ai_generated: false, anilist_id: null, focus_keyword: null, views_count: 900, published_at: ago(3), created_at: ago(3), updated_at: ago(3) },
-    { id: "00000000-0000-4000-8000-000000000003", slug: "bleach-arte-ichigo", post_type: "news", status: "published", title: "Bleach: arte inédita de Ichigo", excerpt: "Tite Kubo compartilha ilustração.", content: { html: "<p>Ichigo</p>" }, featured_image: "https://img.example/b.webp", author_id: null, ai_author_id: "a0000000-0000-4000-8000-000000000001", is_ai_generated: true, anilist_id: null, focus_keyword: null, views_count: 10, published_at: ago(2), created_at: ago(2), updated_at: ago(2) },
+    { id: "00000000-0000-4000-8000-000000000003", slug: "bleach-arte-ichigo", post_type: "news", status: "published", title: "Bleach: arte inédita de Ichigo", excerpt: "Tite Kubo compartilha ilustração.", content: { html: "<p>Ichigo</p>" }, featured_image: "https://img.example/b.webp", image_width: 800, image_height: 450, author_id: null, ai_author_id: "a0000000-0000-4000-8000-000000000001", is_ai_generated: true, anilist_id: null, focus_keyword: null, views_count: 10, published_at: ago(2), created_at: ago(2), updated_at: ago(2) },
     { id: "00000000-0000-4000-8000-000000000004", slug: "materia-do-futuro", post_type: "news", status: "published", title: "Agendada", excerpt: null, content: { html: "<p>x</p>" }, featured_image: null, author_id: null, ai_author_id: null, is_ai_generated: false, anilist_id: null, focus_keyword: null, views_count: 0, published_at: new Date(now + 86_400_000).toISOString(), created_at: ago(1), updated_at: ago(1) },
   ],
   categories: [
@@ -127,6 +127,13 @@ describe("importação e consultas", () => {
     expect((await trendingTags(5))[0]).toMatchObject({ slug: "jump" });
     expect(await getTag("bleach-anime")).toMatchObject({ redirectTo: "bleach" });
     expect((await latestPosts({ excludeIds: ["00000000-0000-4000-8000-000000000001"] }, 5)).length).toBe(2);
+  });
+
+  it("capas com resolução boa são reconhecidas para a capa grande", async () => {
+    const [sakamoto, bleach] = await latestPosts({ type: "news" }, 2);
+    expect([sakamoto.imageWidth, isWideImage(sakamoto)]).toEqual([1600, true]);
+    expect([bleach.imageWidth, isWideImage(bleach)]).toEqual([800, false]);
+    expect(isWideImage({ image: null, imageWidth: 2000 })).toBe(false);
   });
 
   it("o que sai do site antigo sai daqui também", async () => {

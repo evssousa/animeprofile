@@ -6,7 +6,7 @@ import { PostCard } from "~/components/posts";
 import { formatDateLong, formatDateTime, readingLabel } from "~/lib/format";
 import { seo } from "~/lib/seo";
 import { SITE, absoluteUrl } from "~/lib/site";
-import { getPost, relatedPosts } from "~/server/content/posts.server";
+import { getPost, isWideImage, relatedPosts } from "~/server/content/posts.server";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const post = await getPost(params.slug);
@@ -55,7 +55,13 @@ export default function Post({ loaderData }: Route.ComponentProps) {
   return (
     <article>
       <header className="relative overflow-hidden rounded-b-[28px] bg-night text-night-ink shadow-[0_24px_50px_rgba(60,20,20,.16)]">
-        {post.image && <img src={post.image} alt="" className="absolute inset-0 size-full object-cover opacity-45" />}
+        {post.image && (
+          <img
+            src={post.image}
+            alt=""
+            className={`absolute inset-0 size-full object-cover ${isWideImage(post) ? "opacity-45" : "scale-110 opacity-50 blur-2xl"}`}
+          />
+        )}
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(13,13,16,.97)_0%,rgba(13,13,16,.8)_45%,rgba(13,13,16,.35)_100%),linear-gradient(0deg,rgba(13,13,16,.9)_0%,rgba(13,13,16,0)_45%)]" aria-hidden />
         <div className="relative mx-auto max-w-[1328px] px-4 pt-8 pb-12 sm:px-8 sm:pt-12 sm:pb-16 lg:px-14">
           <nav aria-label="Você está em" className="flex flex-wrap items-center gap-2 text-[0.85rem] text-white/70">

@@ -10,6 +10,7 @@
 //   Sem CRON_TOKEN, só gera .import/conteudo.json.gz e não envia.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
+import { imageSize } from "image-size";
 
 const [envPath, target = "https://novo.animeprofile.com.br"] = process.argv.slice(2);
 if (!envPath) {
@@ -63,12 +64,36 @@ for (let i = 0; i < userIds.length; i += 100) {
   profiles.push(...(await fetchAll("profiles", "id,username,display_name,avatar_url,bio", `&id=in.(${userIds.slice(i, i + 100).join(",")})`)));
 }
 
+// Tamanho real de cada capa (só o começo do arquivo é baixado). A página inicial usa na capa grande só as
+// imagens com resolução boa.
+async function measure(url) {
+  try {
+    const res = await fetch(url, { headers: { Range: "bytes=0-131071" } });
+    if (!res.ok) return null;
+    const { width, height } = imageSize(Buffer.from(await res.arrayBuffer()));
+    return width && height ? { width, height } : null;
+  } catch {
+    return null;
+  }
+}
+const withImage = posts.filter((p) => p.featured_image);
+for (let i = 0; i < withImage.length; i += 8) {
+  await Promise.all(
+    withImage.slice(i, i + 8).map(async (p) => {
+      const d = await measure(p.featured_image);
+      p.image_width = d?.width ?? null;
+      p.image_height = d?.height ?? null;
+    }),
+  );
+}
+const measured = withImage.filter((p) => p.image_width).length;
+
 const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects };
 const gz = gzipSync(JSON.stringify(snapshot));
 mkdirSync(".import", { recursive: true });
 writeFileSync(".import/conteudo.json.gz", gz);
 console.log(
-  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado).`,
+  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado). Capas medidas: ${measured} de ${withImage.length}.`,
 );
 
 if (!process.env.CRON_TOKEN) {

@@ -19,6 +19,9 @@ export type OldPost = {
   excerpt: string | null;
   content: { html?: string } | null;
   featured_image: string | null;
+  /** Medidas pelo script de exportação (podem faltar em retratos antigos). */
+  image_width?: number | null;
+  image_height?: number | null;
   author_id: string | null;
   ai_author_id: string | null;
   is_ai_generated: boolean;
@@ -68,6 +71,8 @@ export function mapPost(p: OldPost) {
     excerpt: p.excerpt,
     content_html: html,
     featured_image: p.featured_image,
+    image_width: p.image_width ?? null,
+    image_height: p.image_height ?? null,
     author_id: p.ai_author_id ?? p.author_id,
     is_ai_generated: p.is_ai_generated ? 1 : 0,
     anilist_id: p.anilist_id,

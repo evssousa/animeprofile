@@ -66,6 +66,15 @@ antigo.
 13. Em alta e os mais lidos do mês.
 14. Chamada "Faça parte da comunidade".
 
+## Imagens grandes
+
+A capa da home e o topo das matérias ocupam a largura da tela. Imagem pequena esticada fica borrada, então:
+
+- **Medida das capas:** a exportação mede o tamanho real de cada uma (`posts.image_width`).
+- **Carrossel da home:** prefere as matérias recentes com capa de **1280 px ou mais**.
+- **Capa menor numa área grande:** aparece **desfocada como fundo** (efeito proposital), nunca pixelada.
+- **Situação em 2026-11-13:** das 60 capas mais recentes, 45 tinham 1280 px ou mais e 15 tinham de 800 a 1279 px.
+
 ## Acessibilidade (piso, não enfeite)
 
 - Link "Pular para o conteúdo".

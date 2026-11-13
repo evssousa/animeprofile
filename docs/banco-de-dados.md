@@ -13,6 +13,7 @@ que devolve JSON como texto (o helper `json()` trata os dois casos).
 | `001_sistema.sql` | `system_config` (configurações), `cron_jobs` (agenda: estado e trava de cada tarefa), `cron_runs` (histórico) | ✅ 2026-11-12 (automática no primeiro deploy) |
 | `002_contato.sql` | `contact_messages`: mensagens dos formulários de Contato e Faça parte (guarda o hash do IP, não o IP) | automática no deploy |
 | `003_conteudo.sql` | `posts` (HTML já limpo, mesmos IDs e slugs do site antigo), `post_authors` (IA e pessoas), `categories`, `tags`, `tag_redirects`, `post_categories`, `post_tags` | automática no deploy |
+| `004_imagem_dimensoes.sql` | `posts.image_width` e `image_height`: tamanho real da capa, medido na exportação. A capa grande da home só usa imagens com 1280 px ou mais; as menores aparecem desfocadas como fundo | automática no deploy |
 
 - **Produção:** são aplicadas automaticamente quando o app inicia (`db/migrate.mjs`), registradas em
   `schema_migrations`. O MySQL da Hostinger só aceita conexão local.
