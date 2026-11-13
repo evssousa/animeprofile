@@ -29,10 +29,10 @@ if (!BASE || !KEY) {
   process.exit(1);
 }
 
-async function fetchAll(table, select, filter = "") {
+async function fetchAll(table, select, filter = "", order = "id") {
   const out = [];
   for (let offset = 0; ; offset += 1000) {
-    const res = await fetch(`${BASE}/rest/v1/${table}?select=${select}${filter}&order=id&limit=1000&offset=${offset}`, {
+    const res = await fetch(`${BASE}/rest/v1/${table}?select=${select}${filter}&order=${order}&limit=1000&offset=${offset}`, {
       headers: { apikey: KEY, Authorization: `Bearer ${KEY}` },
     });
     if (!res.ok) throw new Error(`${table}: HTTP ${res.status}`);
@@ -50,9 +50,9 @@ const [posts, categories, tags, ai_news_authors, post_categories, post_tags, tag
   fetchAll("categories", "id,name,slug,kind,description,color"),
   fetchAll("tags", "id,name,slug"),
   fetchAll("ai_news_authors", "id,name,slug,avatar_url,signature"),
-  fetchAll("post_categories", "post_id,category_id"),
-  fetchAll("post_tags", "post_id,tag_id"),
-  fetchAll("tag_redirects", "old_slug,tag_id").catch(() => []),
+  fetchAll("post_categories", "post_id,category_id", "", "post_id,category_id"),
+  fetchAll("post_tags", "post_id,tag_id", "", "post_id,tag_id"),
+  fetchAll("tag_redirects", "old_slug,tag_id", "", "old_slug").catch(() => []),
 ]);
 
 // Perfis só de quem assina matérias (autores humanos).

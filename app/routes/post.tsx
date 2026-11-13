@@ -14,7 +14,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const path = new URL(request.url).pathname;
   if (path !== post.url) throw redirect(post.url, 301);
   const related = await relatedPosts(post, 4);
-  return { post, related };
+  // Muitas matérias já trazem a capa no começo do texto: aí a capa do corpo não aparece, para não repetir.
+  const coverFile = post.image?.split("?")[0].split("/").pop()?.replace(/-\d+(\.\w+)$/, "$1") ?? "";
+  const showCover = Boolean(post.image) && !(coverFile && post.html.includes(coverFile.replace(/\.\w+$/, "")));
+  return { post, related, showCover };
 }
 
 export function meta({ loaderData: d }: Route.MetaArgs) {
@@ -47,7 +50,7 @@ export function meta({ loaderData: d }: Route.MetaArgs) {
 }
 
 export default function Post({ loaderData }: Route.ComponentProps) {
-  const { post, related } = loaderData;
+  const { post, related, showCover } = loaderData;
   const section = post.type === "news" ? { label: "Notícias", to: "/noticias" } : { label: "Artigos", to: "/artigos" };
   return (
     <article>
@@ -93,7 +96,7 @@ export default function Post({ loaderData }: Route.ComponentProps) {
 
       <div className="mx-auto max-w-[1328px] px-4 py-10 sm:px-8 sm:py-14 lg:px-14">
         <div className="mx-auto max-w-[760px]">
-          {post.image && <img src={post.image} alt="" className="mb-10 aspect-video w-full rounded-[18px] object-cover shadow-[0_20px_40px_rgba(60,20,20,.16)]" />}
+          {showCover && post.image && <img src={post.image} alt="" className="mb-10 aspect-video w-full rounded-[18px] object-cover shadow-[0_20px_40px_rgba(60,20,20,.16)]" />}
           <div className="prose-ap mx-auto" dangerouslySetInnerHTML={{ __html: post.html }} />
 
           {post.tags.length > 0 && (
