@@ -46,6 +46,8 @@ export type OldSnapshot = {
   tag_redirects: { old_slug: string; tag_id: string }[];
   /** Sinopses traduzidas do catálogo de animes (opcional: retratos antigos não têm). */
   anime_catalog?: { anilist_id: number; title: string; synopsis_pt: string | null }[];
+  /** Comentários públicos (opcional: retratos antigos não têm). */
+  post_comments?: { id: string; post_id: string; author_id: string; parent_id: string | null; content: string; created_at: string }[];
 };
 
 /** Confere o formato antes de gravar qualquer coisa. */
@@ -112,7 +114,8 @@ export async function applySnapshot(s: OldSnapshot) {
   const posts = s.posts.filter((p) => p.status === "published");
   const postRows = posts.map(mapPost);
   const postIds = new Set(postRows.map((p) => p.id));
-  const authorIds = new Set(postRows.map((p) => p.author_id).filter(Boolean));
+  const comments = s.post_comments ?? [];
+  const authorIds = new Set([...postRows.map((p) => p.author_id).filter(Boolean), ...comments.map((c) => c.author_id)]);
   const authors = [
     ...s.ai_news_authors.map((a) => ({ id: a.id, kind: "ai", slug: a.slug, name: a.name, avatar_url: a.avatar_url, bio: a.signature })),
     ...s.profiles
@@ -135,6 +138,14 @@ export async function applySnapshot(s: OldSnapshot) {
     }
     await replaceLinks(conn, "post_categories", "category_id", s.post_categories.filter((r) => postIds.has(r.post_id)).map((r) => ({ post_id: r.post_id, id: r.category_id })));
     await replaceLinks(conn, "post_tags", "tag_id", s.post_tags.filter((r) => postIds.has(r.post_id)).map((r) => ({ post_id: r.post_id, id: r.tag_id })));
+    // Comentários: por enquanto todos vêm do site antigo, então o retrato manda (o que saiu de lá sai daqui).
+    // Quando o site novo aceitar comentários, esta parte passa a apagar só os que vieram do site antigo.
+    const knownAuthors = new Set(authors.map((a) => a.id));
+    const commentRows = comments
+      .filter((c) => postIds.has(c.post_id) && knownAuthors.has(c.author_id) && c.content?.trim())
+      .map((c) => ({ id: c.id, post_id: c.post_id, author_id: c.author_id, parent_id: c.parent_id, content: c.content.trim().slice(0, 5000), created_at: toSqlDate(c.created_at) }));
+    await conn.query("DELETE FROM post_comments");
+    await upsert(conn, "post_comments", commentRows, ["id"]);
     await conn.query("DELETE FROM tag_redirects");
     await upsert(conn, "tag_redirects", s.tag_redirects, ["old_slug"]);
     // O que deixou de estar publicado no site antigo sai daqui também.
@@ -151,6 +162,7 @@ export async function applySnapshot(s: OldSnapshot) {
     tags: s.tags.length,
     autores: authors.length,
     sinopsesDeAnime: sinopses,
+    comentarios: comments.length,
     puladas: skipped.slice(0, 10),
   };
 }

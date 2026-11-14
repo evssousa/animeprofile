@@ -27,6 +27,7 @@ export type PostFull = PostCard & {
   categories: { name: string; slug: string }[];
   tags: { name: string; slug: string }[];
   authorBio: string | null;
+  anilistId: number | null;
 };
 
 export const postUrl = (type: PostType, slug: string) => `${type === "article" ? "/artigos" : "/noticias"}/${slug}`;
@@ -150,8 +151,8 @@ export async function mostRead(limit: number, type?: PostType) {
 
 export async function getPost(slug: string): Promise<PostFull | null> {
   if (!hasDatabase()) return null;
-  const rows = await query<CardRow & { content_html: string; updated_at: string; is_ai_generated: number; focus_keyword: string | null; author_bio: string | null }>(
-    `SELECT ${CARD_COLUMNS}, p.content_html, p.updated_at, p.is_ai_generated, p.focus_keyword, a.bio AS author_bio
+  const rows = await query<CardRow & { content_html: string; updated_at: string; is_ai_generated: number; focus_keyword: string | null; author_bio: string | null; anilist_id: number | null }>(
+    `SELECT ${CARD_COLUMNS}, p.content_html, p.updated_at, p.is_ai_generated, p.focus_keyword, a.bio AS author_bio, p.anilist_id
      FROM posts p LEFT JOIN post_authors a ON a.id = p.author_id WHERE ${VISIBLE} AND p.slug = ? LIMIT 1`,
     [slug],
   );
@@ -173,6 +174,7 @@ export async function getPost(slug: string): Promise<PostFull | null> {
     categories,
     tags,
     authorBio: r.author_bio,
+    anilistId: r.anilist_id == null ? null : Number(r.anilist_id),
   };
 }
 
@@ -232,4 +234,95 @@ export async function getAiAuthor(slug: string) {
     [slug],
   );
   return a ?? null;
+}
+
+// ------------------------------------------------------------------------------------------- comentários
+
+export type CommentItem = {
+  id: string;
+  parentId: string | null;
+  content: string;
+  createdAt: string;
+  author: { name: string; slug: string; avatar: string | null; url: string };
+  post?: { title: string; url: string };
+};
+
+type CommentRow = {
+  id: string;
+  parent_id: string | null;
+  content: string;
+  created_at: string;
+  a_name: string;
+  a_slug: string;
+  a_avatar: string | null;
+  p_title?: string;
+  p_type?: PostType;
+  p_slug?: string;
+};
+
+const toComment = (r: CommentRow): CommentItem => ({
+  id: r.id,
+  parentId: r.parent_id,
+  content: r.content,
+  createdAt: iso(r.created_at)!,
+  author: { name: r.a_name, slug: r.a_slug, avatar: r.a_avatar, url: authorUrl("user", r.a_slug) },
+  ...(r.p_slug && r.p_type ? { post: { title: r.p_title!, url: postUrl(r.p_type, r.p_slug) } } : {}),
+});
+
+/** Comentários de uma matéria, do mais antigo ao mais novo (respostas logo abaixo de quem responderam). */
+export async function postComments(postId: string) {
+  if (!hasDatabase()) return [];
+  const rows = await query<CommentRow>(
+    `SELECT c.id, c.parent_id, c.content, c.created_at, a.name AS a_name, a.slug AS a_slug, a.avatar_url AS a_avatar
+     FROM post_comments c JOIN post_authors a ON a.id = c.author_id WHERE c.post_id = ? ORDER BY c.created_at`,
+    [postId],
+  );
+  const all = rows.map(toComment);
+  const roots = all.filter((c) => !c.parentId || !all.some((p) => p.id === c.parentId));
+  return roots.map((r) => ({ ...r, replies: all.filter((c) => c.parentId === r.id) }));
+}
+
+/** Últimos comentários das matérias do tipo (barra lateral). */
+export async function latestComments(type: PostType, limit = 5) {
+  if (!hasDatabase()) return [];
+  const rows = await query<CommentRow>(
+    `SELECT c.id, c.parent_id, c.content, c.created_at, a.name AS a_name, a.slug AS a_slug, a.avatar_url AS a_avatar,
+            p.title AS p_title, p.post_type AS p_type, p.slug AS p_slug
+     FROM post_comments c JOIN post_authors a ON a.id = c.author_id JOIN posts p ON p.id = c.post_id
+     WHERE ${VISIBLE} AND p.post_type = ? ORDER BY c.created_at DESC LIMIT ?`,
+    [type, limit],
+  );
+  return rows.map(toComment);
+}
+
+/** Mais lidas dos últimos 30 dias do tipo, sem a matéria aberta ("Em alta" da barra lateral). */
+export async function trendingPosts(type: PostType, excludeId: string, limit = 5) {
+  if (!hasDatabase()) return [];
+  const w = where({ type, excludeIds: [excludeId] });
+  const rows = await query<CardRow>(
+    `SELECT ${CARD_COLUMNS} FROM posts p LEFT JOIN post_authors a ON a.id = p.author_id
+     WHERE ${w.sql} AND p.published_at > UTC_TIMESTAMP(3) - INTERVAL 30 DAY ORDER BY p.views_count DESC LIMIT ?`,
+    [...w.params, limit],
+  );
+  return rows.map(toCard);
+}
+
+/** Índice da matéria: dá um id a cada subtítulo (h2) do texto e devolve a lista para o "Nesta matéria". */
+export function withToc(html: string) {
+  const toc: { id: string; text: string }[] = [];
+  const used = new Set<string>();
+  const out = html.replace(/<h2([^>]*)>([\s\S]*?)<\/h2>/g, (_all, attrs: string, inner: string) => {
+    const text = inner.replace(/<[^>]+>/g, "").trim();
+    let id = text
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "secao";
+    while (used.has(id)) id += "-2";
+    used.add(id);
+    toc.push({ id, text });
+    return `<h2${attrs.replace(/\sid="[^"]*"/, "")} id="${id}">${inner}</h2>`;
+  });
+  return { html: out, toc };
 }

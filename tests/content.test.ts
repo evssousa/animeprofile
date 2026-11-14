@@ -8,8 +8,9 @@ import { createPool, setPool } from "~/server/db.server";
 import { applySnapshot, mapPost, validateSnapshot, type OldSnapshot } from "~/server/content/import-old.server";
 import { readingMinutes, sanitizePostHtml } from "~/server/content/sanitize.server";
 import { isWideImage } from "~/lib/images";
+import { timeAgo } from "~/lib/format";
 import { rssFeed, sitemapArticles, sitemapIndex, sitemapNews, sitemapStatic, sitemapTaxonomy } from "~/server/seo/feeds.server";
-import { getPost, getTag, latestPosts, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
+import { getPost, getTag, latestComments, latestPosts, postComments, withToc, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
 
 let server: Awaited<ReturnType<typeof createDB>>;
 let pool: mysql.Pool;
@@ -46,7 +47,15 @@ const OLD: Record<string, unknown[]> = {
     { post_id: "00000000-0000-4000-8000-000000000003", tag_id: "t0000000-0000-4000-8000-000000000002" },
   ],
   tag_redirects: [{ old_slug: "bleach-anime", tag_id: "t0000000-0000-4000-8000-000000000001" }],
-  profiles: [{ id: "u0000000-0000-4000-8000-000000000001", username: "redacao_ap", display_name: "Redação AP", avatar_url: null, bio: null }],
+  profiles: [
+    { id: "u0000000-0000-4000-8000-000000000001", username: "redacao_ap", display_name: "Redação AP", avatar_url: null, bio: null },
+    { id: "u0000000-0000-4000-8000-000000000002", username: "kaiju", display_name: "Kaiju", avatar_url: null, bio: null },
+  ],
+  post_comments: [
+    { id: "m0000000-0000-4000-8000-000000000001", post_id: "00000000-0000-4000-8000-000000000001", author_id: "u0000000-0000-4000-8000-000000000002", parent_id: null, content: "Que arco final!", created_at: ago(0.5) },
+    { id: "m0000000-0000-4000-8000-000000000002", post_id: "00000000-0000-4000-8000-000000000001", author_id: "u0000000-0000-4000-8000-000000000001", parent_id: "m0000000-0000-4000-8000-000000000001", content: "Também acho.", created_at: ago(0.2) },
+    { id: "m0000000-0000-4000-8000-000000000003", post_id: "00000000-0000-4000-8000-000000000004", author_id: "u0000000-0000-4000-8000-000000000002", parent_id: null, content: "Em matéria agendada", created_at: ago(0.1) },
+  ],
 };
 
 const importOld = () => applySnapshot(OLD as unknown as OldSnapshot);
@@ -95,7 +104,7 @@ describe("importação e consultas", () => {
 
   it("importa tudo e pode rodar de novo sem duplicar", async () => {
     const first = await importOld();
-    expect(first).toMatchObject({ materias: 4, categorias: 2, tags: 2, autores: 2, puladas: [] });
+    expect(first).toMatchObject({ materias: 4, categorias: 2, tags: 2, autores: 3, comentarios: 3, puladas: [] }); // autores: IA, a redação e quem comentou
     const again = await importOld();
     expect(again).toMatchObject({ materias: 4 });
   });
@@ -191,5 +200,28 @@ describe("sitemaps e RSS", () => {
     expect(rss).toContain("<rss version=\"2.0\"");
     expect(rss).toContain("<title>SAKAMOTO DAYS entra no arco final</title>");
     expect(rss).not.toContain("Agendada");
+  });
+});
+
+describe("comentários, índice e tempo relativo", () => {
+  it("comentários da matéria com respostas, e os últimos só de matérias visíveis", async () => {
+    const list = await postComments("00000000-0000-4000-8000-000000000001");
+    expect(list.map((c) => [c.author.name, c.content, c.replies.map((r) => r.content)])).toEqual([["Kaiju", "Que arco final!", ["Também acho."]]]);
+    const side = await latestComments("news", 5);
+    expect(side.map((c) => c.content)).toEqual(["Também acho.", "Que arco final!"]); // o da matéria agendada fica de fora
+    expect(side[0].post?.url).toBe("/noticias/sakamoto-days-arco-final");
+  });
+  it("índice com ids nos subtítulos, sem repetir", () => {
+    const r = withToc('<p>a</p><h2>Onde assistir?</h2><p>b</p><h2 id="x">Onde assistir?</h2>');
+    expect(r.toc).toEqual([{ id: "onde-assistir", text: "Onde assistir?" }, { id: "onde-assistir-2", text: "Onde assistir?" }]);
+    expect(r.html).toContain('<h2 id="onde-assistir-2">');
+  });
+  it("tempo relativo", () => {
+    const now = new Date("2026-11-14T12:00:00Z");
+    expect(timeAgo("2026-11-14T11:59:30Z", now)).toBe("agora");
+    expect(timeAgo("2026-11-14T11:30:00Z", now)).toBe("há 30 min");
+    expect(timeAgo("2026-11-14T09:00:00Z", now)).toBe("há 3 h");
+    expect(timeAgo("2026-11-13T09:00:00Z", now)).toBe("há 1 dia");
+    expect(timeAgo("2026-09-01T12:00:00Z", now)).toBe("1 de set. de 2026");
   });
 });

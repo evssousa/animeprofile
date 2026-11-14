@@ -61,9 +61,23 @@ const anime_catalog = await fetchAll("anime_catalog", "anilist_id,title,synopsis
   return [];
 });
 
-// Perfis só de quem assina matérias (autores humanos).
+// Comentários públicos (os escondidos por denúncia ficam de fora), só das matérias exportadas.
+const postIdSet = new Set(posts.map((p) => p.id));
+const post_comments = (
+  await fetchAll("post_comments", "id,post_id,author_id,parent_id,content,created_at", "&hidden_by_reports=eq.false", "id").catch((e) => {
+    console.log(`Aviso: comentários não lidos (${e.message}).`);
+    return [];
+  })
+).filter((c) => postIdSet.has(c.post_id));
+
+// Perfis públicos de quem assina matérias (autores humanos) e de quem comentou.
 const aiIds = new Set(ai_news_authors.map((a) => a.id));
-const userIds = [...new Set(posts.filter((p) => !p.ai_author_id && p.author_id && !aiIds.has(p.author_id)).map((p) => p.author_id))];
+const userIds = [
+  ...new Set([
+    ...posts.filter((p) => !p.ai_author_id && p.author_id && !aiIds.has(p.author_id)).map((p) => p.author_id),
+    ...post_comments.map((c) => c.author_id),
+  ]),
+];
 const profiles = [];
 for (let i = 0; i < userIds.length; i += 100) {
   profiles.push(...(await fetchAll("profiles", "id,username,display_name,avatar_url,bio", `&id=in.(${userIds.slice(i, i + 100).join(",")})`)));
@@ -93,12 +107,12 @@ for (let i = 0; i < withImage.length; i += 8) {
 }
 const measured = withImage.filter((p) => p.image_width).length;
 
-const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog };
+const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog, post_comments };
 const gz = gzipSync(JSON.stringify(snapshot));
 mkdirSync(".import", { recursive: true });
 writeFileSync(".import/conteudo.json.gz", gz);
 console.log(
-  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado). Capas medidas: ${measured} de ${withImage.length}. Sinopses de anime: ${anime_catalog.length}.`,
+  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado). Capas medidas: ${measured} de ${withImage.length}. Sinopses de anime: ${anime_catalog.length}. Comentários: ${post_comments.length}.`,
 );
 
 if (!process.env.CRON_TOKEN) {

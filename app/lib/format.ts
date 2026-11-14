@@ -13,3 +13,14 @@ export const formatDateLong = (iso: string | null | undefined) => (iso ? dateLon
 export const formatDateTime = (iso: string | null | undefined) => (iso ? dateTime.format(new Date(iso)).replace(", ", " às ") : "");
 
 export const readingLabel = (minutes: number) => `${minutes} min de leitura`;
+
+/** "agora", "há 5 min", "há 3 h", "há 2 dias" ou a data (mais de 30 dias). Calcular no loader (servidor). */
+export function timeAgo(iso: string, now = new Date()): string {
+  const s = Math.max(0, (now.getTime() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return "agora";
+  if (s < 3600) return `há ${Math.floor(s / 60)} min`;
+  if (s < 86400) return `há ${Math.floor(s / 3600)} h`;
+  const d = Math.floor(s / 86400);
+  if (d <= 30) return d === 1 ? "há 1 dia" : `há ${d} dias`;
+  return formatDate(iso);
+}

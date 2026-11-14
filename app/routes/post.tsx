@@ -2,24 +2,47 @@
 // Se o tipo do endereço não bater (artigo aberto em /noticias), redireciona para o certo.
 import { data, Link, redirect } from "react-router";
 import type { Route } from "./+types/post";
+import { Comments, PostSidebar, ShareBar } from "~/components/post-extras";
 import { PostCard } from "~/components/posts";
-import { formatDateLong, formatDateTime, readingLabel } from "~/lib/format";
+import { formatDateLong, formatDateTime, readingLabel, timeAgo } from "~/lib/format";
 import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
 import { SITE, absoluteUrl } from "~/lib/site";
 import { isWideImage } from "~/lib/images";
-import { getPost, relatedPosts } from "~/server/content/posts.server";
+import { getAnime } from "~/server/anime/anime.server";
+import { getPost, latestComments, latestPosts, postComments, relatedPosts, trendingPosts, withToc } from "~/server/content/posts.server";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const post = await getPost(params.slug);
   if (!post) throw data(null, { status: 404 });
   const path = routePath(request);
   if (path !== post.url) throw redirect(post.url, 301);
-  const related = await relatedPosts(post, 4);
   // Muitas matérias já trazem a capa no começo do texto: aí a capa do corpo não aparece, para não repetir.
   const coverFile = post.image?.split("?")[0].split("/").pop()?.replace(/-\d+(\.\w+)$/, "$1") ?? "";
   const showCover = Boolean(post.image) && !(coverFile && post.html.includes(coverFile.replace(/\.\w+$/, "")));
-  return { post, related, showCover };
+  const { html, toc } = withToc(post.html);
+
+  // Barra lateral (como no site antigo): anime da matéria, destaque, últimas, comentários, índice e em alta.
+  // O anime vem só do banco (sem buscar no AniList), para a matéria abrir rápido.
+  const [related, recent, sideComments, trending, comments, anime] = await Promise.all([
+    relatedPosts(post, 4),
+    latestPosts({ type: post.type, excludeIds: [post.id] }, 8),
+    latestComments(post.type, 5),
+    trendingPosts(post.type, post.id, 5),
+    postComments(post.id),
+    post.anilistId ? getAnime(post.anilistId, { remote: false }).catch(() => null) : null,
+  ]);
+  const featured = recent.find((p) => p.image) ?? null;
+  const latest = recent.filter((p) => p.id !== featured?.id).slice(0, 6);
+  const now = new Date();
+  const label = <T extends { createdAt: string }>(c: T) => ({ ...c, ago: timeAgo(c.createdAt, now) });
+  return {
+    post: { ...post, html },
+    related,
+    showCover,
+    sidebar: { anime, featured, latest, comments: sideComments.map(label), toc, trending },
+    comments: comments.map((c) => ({ ...label(c), replies: c.replies.map(label) })),
+  };
 }
 
 export function meta({ loaderData: d }: Route.MetaArgs) {
@@ -52,7 +75,7 @@ export function meta({ loaderData: d }: Route.MetaArgs) {
 }
 
 export default function Post({ loaderData }: Route.ComponentProps) {
-  const { post, related, showCover } = loaderData;
+  const { post, related, showCover, sidebar, comments } = loaderData;
   const section = post.type === "news" ? { label: "Notícias", to: "/noticias?tipo=noticias" } : { label: "Artigos", to: "/artigos" };
   return (
     <article>
@@ -103,9 +126,13 @@ export default function Post({ loaderData }: Route.ComponentProps) {
       </header>
 
       <div className="mx-auto max-w-[1328px] px-4 py-10 sm:px-8 sm:py-14 lg:px-14">
-        <div className="mx-auto max-w-[760px]">
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0">
+          <div className="mb-8">
+            <ShareBar url={absoluteUrl(post.url)} title={post.title} />
+          </div>
           {showCover && post.image && <img src={post.image} alt="" className="mb-10 aspect-video w-full rounded-[18px] object-cover shadow-[0_20px_40px_rgba(60,20,20,.16)]" />}
-          <div className="prose-ap mx-auto" dangerouslySetInnerHTML={{ __html: post.html }} />
+          <div className="prose-ap max-w-none" dangerouslySetInnerHTML={{ __html: post.html }} />
 
           {post.tags.length > 0 && (
             <div className="mt-12 flex flex-wrap gap-2" aria-label="Assuntos">
@@ -142,6 +169,13 @@ export default function Post({ loaderData }: Route.ComponentProps) {
             </Link>
             .
           </p>
+
+          <Comments items={comments} />
+        </div>
+
+        <aside aria-label="Mais do Anime Profile">
+          <PostSidebar {...sidebar} kindLabel={post.type === "news" ? "notícias" : "artigos"} />
+        </aside>
         </div>
 
         {related.length > 0 && (
