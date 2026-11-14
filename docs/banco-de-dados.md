@@ -17,6 +17,7 @@ que devolve JSON como texto (o helper `json()` trata os dois casos).
 | `005_animes.sql` | `anime_catalog` (ficha do AniList + sinopse em português, streamings, personagens, posição em alta, próximo episódio) e `anime_airing` (horários dos próximos 8 dias) | automática no deploy |
 | `006_personagens.sql` | `anime_characters`: ficha pronta de cada personagem (nomes, foto, descrição com spoilers separados, animes, dubladores), guardada por 7 dias | automática no deploy |
 | `007_comentarios.sql` | `post_comments`: comentários das matérias (com respostas). Por enquanto vêm do site antigo, só para leitura; autores em `post_authors` (kind `user`) | automática no deploy |
+| `008_otaku_tv.sql` | `post_videos`: vídeos do YouTube dentro das matérias (a tarefa `videos-materias` e a importação refazem a tabela) | automática no deploy |
 
 - **Produção:** são aplicadas automaticamente quando o app inicia (`db/migrate.mjs`), registradas em
   `schema_migrations`. O MySQL da Hostinger só aceita conexão local.

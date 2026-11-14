@@ -22,6 +22,7 @@ export const STATIC_PAGES: { path: string; changefreq: string; priority: string 
   { path: "/artigos", changefreq: "daily", priority: "0.8" },
   { path: "/animes", changefreq: "daily", priority: "0.9" },
   { path: "/animes/calendario", changefreq: "daily", priority: "0.8" },
+  { path: "/otaku-tv", changefreq: "daily", priority: "0.8" },
   { path: "/sobre", changefreq: "monthly", priority: "0.6" },
   { path: "/contato", changefreq: "monthly", priority: "0.4" },
   { path: "/como-instalar", changefreq: "monthly", priority: "0.4" },

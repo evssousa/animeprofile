@@ -2,6 +2,16 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-15 — Otaku TV: o que vem do nosso banco e o que vem do navegador
+
+- **Decisão:**
+  - **Das matérias e Trailers da temporada:** o servidor lê do nosso banco. Os vídeos do texto das matérias ficam
+    em `post_videos`, e os trailers vêm do AniList guardado em `anime_catalog`.
+  - **Aberturas e encerramentos:** o navegador chama o AnimeThemes direto, como o site antigo fazia.
+- **Por quê:**
+  - **AnimeThemes:** a API leva de 6 a 10 s e respondeu 503 durante o desenvolvimento. Num pedido do navegador, uma
+    falha mostra um aviso com "Tentar de novo" e não afeta mais nada. No servidor, travaria a página.
+
 ## 2026-11-14 — Robôs não disparam buscas no AniList
 
 - **O que aconteceu:**

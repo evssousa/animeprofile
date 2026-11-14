@@ -1,6 +1,7 @@
 // Catálogo das tarefas agendadas. O horário mora aqui (versionado); o estado mora em cron_jobs.
 // Cada tarefa devolve um resumo curto (vai para cron_runs.stats) ou lança erro.
 import { syncAnimes } from "../anime/anime.server";
+import { rebuildPostVideos } from "../tv/tv.server";
 import { exec } from "../db.server";
 
 export type JobStats = Record<string, unknown>;
@@ -25,6 +26,13 @@ export const JOBS: Job[] = [
       );
       return { execucoesApagadas: old.affected, execucoesTravadas: stuck.affected };
     },
+  },
+  {
+    // Vídeos do YouTube dentro das matérias (Otaku TV). A importação também refaz a tabela.
+    name: "videos-materias",
+    schedule: "40 */6 * * *",
+    leaseMinutes: 5,
+    run: () => rebuildPostVideos(),
   },
   {
     // Temporada atual, em alta nesta semana e episódios dos próximos 8 dias, do AniList (gratuito, sem chave).

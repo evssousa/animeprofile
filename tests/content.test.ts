@@ -9,6 +9,7 @@ import { applySnapshot, mapPost, validateSnapshot, type OldSnapshot } from "~/se
 import { readingMinutes, sanitizePostHtml } from "~/server/content/sanitize.server";
 import { isWideImage } from "~/lib/images";
 import { timeAgo } from "~/lib/format";
+import { findVideo, listPostVideos, youtubeIds } from "~/server/tv/tv.server";
 import { rssFeed, sitemapArticles, sitemapIndex, sitemapNews, sitemapStatic, sitemapTaxonomy } from "~/server/seo/feeds.server";
 import { getPost, getTag, latestComments, latestPosts, postComments, withToc, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
 
@@ -22,9 +23,9 @@ const ago = (days: number) => new Date(now - days * 86_400_000).toISOString();
 // O retrato do "site antigo", como o script de exportação envia.
 const OLD: Record<string, unknown[]> = {
   posts: [
-    { id: "00000000-0000-4000-8000-000000000001", slug: "sakamoto-days-arco-final", post_type: "news", status: "published", title: "SAKAMOTO DAYS entra no arco final", excerpt: "O mangá chega ao clímax.", content: { html: '<p>Texto <script>alert(1)</script><a href="https://jump.example/x">fonte</a></p><iframe src="https://www.youtube.com/embed/abc"></iframe><iframe src="https://evil.example/x"></iframe>' }, featured_image: "https://img.example/s.webp", image_width: 1600, image_height: 900, author_id: null, ai_author_id: "a0000000-0000-4000-8000-000000000001", is_ai_generated: true, anilist_id: 1, focus_keyword: "sakamoto days", views_count: 50, published_at: ago(1), created_at: ago(2), updated_at: ago(1) },
+    { id: "00000000-0000-4000-8000-000000000001", slug: "sakamoto-days-arco-final", post_type: "news", status: "published", title: "SAKAMOTO DAYS entra no arco final", excerpt: "O mangá chega ao clímax.", content: { html: '<p>Texto <script>alert(1)</script><a href="https://jump.example/x">fonte</a></p><iframe src="https://www.youtube.com/embed/AAAAAAAAAAA"></iframe><iframe src="https://www.youtube.com/embed/BBBBBBBBBBB"></iframe><iframe src="https://evil.example/x"></iframe>' }, featured_image: "https://img.example/s.webp", image_width: 1600, image_height: 900, author_id: null, ai_author_id: "a0000000-0000-4000-8000-000000000001", is_ai_generated: true, anilist_id: 1, focus_keyword: "sakamoto days", views_count: 50, published_at: ago(1), created_at: ago(2), updated_at: ago(1) },
     { id: "00000000-0000-4000-8000-000000000002", slug: "onde-assistir-jujutsu-kaisen", post_type: "article", status: "published", title: "Onde assistir Jujutsu Kaisen", excerpt: "Guia completo de streaming.", content: { html: "<p>" + "palavra ".repeat(900) + "</p>" }, featured_image: null, author_id: "u0000000-0000-4000-8000-000000000001", ai_author_id: null, is_ai_generated: false, anilist_id: null, focus_keyword: null, views_count: 900, published_at: ago(3), created_at: ago(3), updated_at: ago(3) },
-    { id: "00000000-0000-4000-8000-000000000003", slug: "bleach-arte-ichigo", post_type: "news", status: "published", title: "Bleach: arte inédita de Ichigo", excerpt: "Tite Kubo compartilha ilustração.", content: { html: "<p>Ichigo</p>" }, featured_image: "https://img.example/b.webp", image_width: 800, image_height: 450, author_id: null, ai_author_id: "a0000000-0000-4000-8000-000000000001", is_ai_generated: true, anilist_id: null, focus_keyword: null, views_count: 10, published_at: ago(2), created_at: ago(2), updated_at: ago(2) },
+    { id: "00000000-0000-4000-8000-000000000003", slug: "bleach-arte-ichigo", post_type: "news", status: "published", title: "Bleach: arte inédita de Ichigo", excerpt: "Tite Kubo compartilha ilustração.", content: { html: '<p>Ichigo</p><iframe src="https://www.youtube.com/embed/AAAAAAAAAAA"></iframe>' }, featured_image: "https://img.example/b.webp", image_width: 800, image_height: 450, author_id: null, ai_author_id: "a0000000-0000-4000-8000-000000000001", is_ai_generated: true, anilist_id: null, focus_keyword: null, views_count: 10, published_at: ago(2), created_at: ago(2), updated_at: ago(2) },
     { id: "00000000-0000-4000-8000-000000000004", slug: "materia-do-futuro", post_type: "news", status: "published", title: "Agendada", excerpt: null, content: { html: "<p>x</p>" }, featured_image: null, author_id: null, ai_author_id: null, is_ai_generated: false, anilist_id: null, focus_keyword: null, views_count: 0, published_at: new Date(now + 86_400_000).toISOString(), created_at: ago(1), updated_at: ago(1) },
   ],
   categories: [
@@ -81,7 +82,7 @@ describe("limpeza do HTML", () => {
     const html = sanitizePostHtml((OLD.posts[0] as { content: { html: string } }).content.html);
     expect(html).not.toContain("<script");
     expect(html).not.toContain("evil.example");
-    expect(html).toContain("youtube.com/embed/abc");
+    expect(html).toContain("youtube.com/embed/AAAAAAAAAAA");
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noopener noreferrer"');
   });
@@ -223,5 +224,32 @@ describe("comentários, índice e tempo relativo", () => {
     expect(timeAgo("2026-11-14T09:00:00Z", now)).toBe("há 3 h");
     expect(timeAgo("2026-11-13T09:00:00Z", now)).toBe("há 1 dia");
     expect(timeAgo("2026-09-01T12:00:00Z", now)).toBe("1 de set. de 2026");
+  });
+});
+
+describe("Otaku TV: vídeos das matérias", () => {
+  it("acha os ids do YouTube em embed, youtu.be e watch, sem repetir", () => {
+    expect(youtubeIds('<iframe src="https://www.youtube.com/embed/AAAAAAAAAAA"></iframe> https://youtu.be/BBBBBBBBBBB https://www.youtube.com/watch?v=CCCCCCCCCCC <iframe src="https://www.youtube-nocookie.com/embed/AAAAAAAAAAA">')).toEqual(["AAAAAAAAAAA", "BBBBBBBBBBB", "CCCCCCCCCCC"]);
+    expect(youtubeIds("<p>sem vídeo</p>")).toEqual([]);
+  });
+
+  it("a importação monta a lista: vídeo repetido aparece uma vez, na matéria mais nova, e agendada fica fora", async () => {
+    await importOld();
+    const all = await listPostVideos("", 1);
+    expect(all.items.map((v) => [v.id, v.title])).toEqual([
+      ["AAAAAAAAAAA", "SAKAMOTO DAYS entra no arco final"],
+      ["BBBBBBBBBBB", "SAKAMOTO DAYS entra no arco final"],
+    ]);
+    expect(all.items[0]).toMatchObject({ postUrl: "/noticias/sakamoto-days-arco-final", subtitle: "Notícia" });
+    // a busca é pelo título: o mesmo vídeo aparece na matéria do Ichigo, que também o tem
+    expect((await listPostVideos("ichigo", 1)).items.map((v) => [v.id, v.title])).toEqual([["AAAAAAAAAAA", "Bleach: arte inédita de Ichigo"]]);
+    expect((await listPostVideos("naoexiste", 1)).total).toBe(0);
+    expect((await listPostVideos("sakamoto", 1)).total).toBe(2);
+  });
+
+  it("abre um vídeo pelo id (com a matéria) e ignora ids inválidos", async () => {
+    expect(await findVideo("BBBBBBBBBBB")).toMatchObject({ title: "SAKAMOTO DAYS entra no arco final", postUrl: "/noticias/sakamoto-days-arco-final" });
+    expect(await findVideo("ZZZZZZZZZZZ")).toBeNull();
+    expect(await findVideo("curto")).toBeNull();
   });
 });

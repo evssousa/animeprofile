@@ -41,6 +41,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Animes: `/animes` (busca, no ar hoje, Top 10, temporada), ficha `/animes/:id`, calendário e seções da home | ✅ |
 | 2 | Personagens (`/animes/personagem/:id`): sobre (spoilers escondidos), ficha, animes e dublagem | ✅ |
 | 2 | Matéria com barra lateral (anime da matéria, destaque, últimas, comentários, índice e em alta), compartilhar e comentários (leitura) | ✅ |
+| 2 | Otaku TV: vídeos das matérias, trailers da temporada e aberturas/encerramentos (AnimeThemes, no navegador) | ✅ |
 | 2 | Redirecionamentos do que saiu (Clãs, Comunidades, jogos, `/en`, Faça parte) | ✅ |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |

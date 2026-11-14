@@ -61,6 +61,6 @@ describe("cron", () => {
     expect(result && result.status).toBe("ok");
     const s = await status(5);
     expect(s.runs.filter((r) => (r as { job: string }).job === "limpeza").length).toBe(2);
-    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["animes-anilist", "limpeza"]);
+    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["animes-anilist", "limpeza", "videos-materias"]);
   });
 });

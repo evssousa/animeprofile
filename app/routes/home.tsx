@@ -2,7 +2,7 @@
 // ainda não migrados (ranking do mês, Otaku TV, quiz, blog, comentários e feed) entram quando cada área for construída.
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
-import { Award, MessagesSquare, Sofa, Sparkles } from "lucide-react";
+import { Award, MessagesSquare, Play, Sofa, Sparkles } from "lucide-react";
 import type { Route } from "./+types/home";
 import { AiringPoster, AnimePoster, TopTen } from "~/components/anime";
 import { PostCard, PostOverlay, PostRow, SectionHead } from "~/components/posts";
@@ -10,7 +10,9 @@ import { SEASON_PT, brDay } from "~/lib/anime";
 import { readingLabel } from "~/lib/format";
 import { seo } from "~/lib/seo";
 import { isWideImage } from "~/lib/images";
+import { ytThumb } from "~/components/otaku-tv";
 import { airingBetween, seasonAnimes, trendingAnimes } from "~/server/anime/anime.server";
+import { latestTvVideos } from "~/server/tv/tv.server";
 import { latestPosts, mostRead, trendingTags, type PostCard as Card } from "~/server/content/posts.server";
 
 export async function loader() {
@@ -20,7 +22,7 @@ export async function loader() {
   const featured = [...recent.filter(isWideImage), ...recent.filter((p) => !isWideImage(p))].slice(0, 4);
   const exclude = featured.map((p) => p.id);
   const dayStart = new Date(`${brDay(new Date())}T00:00:00-03:00`);
-  const [news, articles, topArticles, topAll, tags, airing, trending, season] = await Promise.all([
+  const [news, articles, topArticles, topAll, tags, airing, trending, season, tv] = await Promise.all([
     latestPosts({ type: "news", excludeIds: exclude }, 8),
     latestPosts({ type: "article", excludeIds: exclude }, 5),
     mostRead(5, "article"),
@@ -29,8 +31,9 @@ export async function loader() {
     airingBetween(dayStart, new Date(dayStart.getTime() + 86400_000), 8),
     trendingAnimes(10),
     seasonAnimes(8),
+    latestTvVideos(5),
   ]);
-  return { featured, news, articles, topArticles, topAll, tags, airing, trending, season };
+  return { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv };
 }
 
 export function meta() {
@@ -42,7 +45,7 @@ export function meta() {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { featured, news, articles, topArticles, topAll, tags, airing, trending, season } = loaderData;
+  const { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv } = loaderData;
   const [leadArticle, ...moreArticles] = articles;
   return (
     <>
@@ -122,6 +125,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </div>
           </section>
         )}
+
+        {tv.length > 0 && <OtakuTvPanel videos={tv} />}
 
         <Collection />
 
@@ -317,6 +322,53 @@ function Collection() {
         </div>
         <div className="absolute top-0 right-2 h-[170px] w-[124px] rotate-6 rounded-[14px] border-[5px] border-[#f2c14e] bg-[conic-gradient(from_210deg,#ff0080,#ffd600,#00ffaa,#008cff,#be00ff,#ff0080)] opacity-90 shadow-[0_20px_40px_rgba(0,0,0,.55),0_0_30px_rgba(242,193,78,.45)]" />
         <div className="absolute right-10 bottom-0 h-[150px] w-[110px] -rotate-3 rounded-[14px] border-[5px] border-[#b197fc] bg-[linear-gradient(160deg,#3b2a6b,#17141a)] shadow-[0_20px_40px_rgba(0,0,0,.55),0_0_26px_rgba(177,151,252,.35)]" />
+      </div>
+    </section>
+  );
+}
+
+/** Painel escuro da Otaku TV: um vídeo grande e os próximos em lista. */
+function OtakuTvPanel({ videos }: { videos: Awaited<ReturnType<typeof latestTvVideos>> }) {
+  const [main, ...rest] = videos;
+  const href = (id: string) => `/otaku-tv?v=${id}`;
+  return (
+    <section aria-labelledby="otaku-tv" className="flex flex-col gap-6 rounded-[26px] bg-[#1c1414] p-6 text-night-ink sm:p-9">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="text-[0.82rem] font-bold text-glow">Otaku TV</p>
+          <h2 id="otaku-tv" className="mt-1.5 text-[1.6rem] leading-tight font-extrabold tracking-[-0.025em] sm:text-[1.9rem]">
+            Trailers e vídeos fresquinhos
+          </h2>
+        </div>
+        <Link to="/otaku-tv" className="text-[0.9rem] font-bold whitespace-nowrap text-glow hover:underline">
+          Abrir a Otaku TV
+        </Link>
+      </div>
+      <div className="grid gap-5 lg:grid-cols-12">
+        <article className="group relative overflow-hidden rounded-2xl bg-night lg:col-span-7">
+          <img src={ytThumb(main.id)} alt="" loading="lazy" className="aspect-video w-full object-cover opacity-90" />
+          <span className="absolute inset-0 bg-[linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,0)_55%)]" aria-hidden />
+          <span className="absolute top-[45%] left-1/2 grid size-[68px] -translate-x-1/2 -translate-y-1/2 place-items-center rounded-full bg-white text-night transition-transform group-hover:scale-105">
+            <Play className="ml-1 size-7 fill-current" aria-hidden />
+          </span>
+          <h3 className="absolute inset-x-5 bottom-4 text-[1.1rem] leading-snug font-bold sm:text-[1.25rem]">
+            <Link to={href(main.id)} className="line-clamp-2 after:absolute after:inset-0">
+              {main.title}
+            </Link>
+          </h3>
+        </article>
+        <ul className="flex flex-col gap-3 lg:col-span-5">
+          {rest.map((v) => (
+            <li key={v.id} className="group relative flex items-center gap-3.5 rounded-xl bg-white/5 p-2 hover:bg-white/10">
+              <img src={ytThumb(v.id)} alt="" loading="lazy" className="aspect-video w-[130px] shrink-0 rounded-lg object-cover" />
+              <h3 className="text-[0.9rem] leading-snug font-semibold">
+                <Link to={href(v.id)} className="line-clamp-3 after:absolute after:inset-0">
+                  {v.title}
+                </Link>
+              </h3>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

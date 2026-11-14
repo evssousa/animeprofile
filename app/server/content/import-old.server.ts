@@ -9,6 +9,7 @@
 import type { PoolConnection, RowDataPacket } from "mysql2/promise";
 import { query, tx } from "../db.server";
 import { importSynopses } from "../anime/anime.server";
+import { rebuildPostVideos } from "../tv/tv.server";
 import { readingMinutes, sanitizePostHtml } from "./sanitize.server";
 
 export type OldPost = {
@@ -155,6 +156,7 @@ export async function applySnapshot(s: OldSnapshot) {
   });
 
   const sinopses = s.anime_catalog ? await importSynopses(s.anime_catalog) : 0;
+  const videos = await rebuildPostVideos();
   const [count] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM posts WHERE status = 'published'");
   return {
     materias: Number(count?.n ?? 0),
@@ -162,6 +164,7 @@ export async function applySnapshot(s: OldSnapshot) {
     tags: s.tags.length,
     autores: authors.length,
     sinopsesDeAnime: sinopses,
+    videosDasMaterias: videos.videos,
     comentarios: comments.length,
     puladas: skipped.slice(0, 10),
   };
