@@ -70,12 +70,36 @@ const post_comments = (
   })
 ).filter((c) => postIdSet.has(c.post_id));
 
+// Blog da comunidade: posts publicados e não escondidos, comentários, e só as categorias e tags que eles usam.
+const soft = (what) => (e) => {
+  console.log(`Aviso: ${what} não lidos (${e.message}).`);
+  return [];
+};
+const blog_posts = await fetchAll(
+  "blog_posts",
+  "id,author_id,slug,title,content,excerpt,cover_url,focus_keyword,status,promoted_post_id,views_count,likes_count,claps_count,bookmarks_count,comments_count,quality_score,published_at,created_at,updated_at",
+  "&status=eq.published&hidden_by_reports=eq.false",
+  "id",
+).catch(soft("posts do blog"));
+const blogIds = new Set(blog_posts.map((p) => p.id));
+const blog_post_comments = (
+  await fetchAll("blog_post_comments", "id,blog_post_id,author_id,parent_id,content,created_at", "&hidden_by_reports=eq.false", "id").catch(soft("comentários do blog"))
+).filter((c) => blogIds.has(c.blog_post_id));
+const blog_post_categories = (await fetchAll("blog_post_categories", "blog_post_id,category_id", "", "blog_post_id,category_id").catch(soft("categorias do blog"))).filter((r) => blogIds.has(r.blog_post_id));
+const blog_post_tags = (await fetchAll("blog_post_tags", "blog_post_id,tag_id", "", "blog_post_id,tag_id").catch(soft("tags do blog"))).filter((r) => blogIds.has(r.blog_post_id));
+const usedCats = new Set(blog_post_categories.map((r) => r.category_id));
+const usedTags = new Set(blog_post_tags.map((r) => r.tag_id));
+const blog_categories = (await fetchAll("blog_categories", "id,user_id,name,slug").catch(soft("categorias do blog"))).filter((c) => usedCats.has(c.id));
+const blog_tags = (await fetchAll("blog_tags", "id,user_id,name,slug").catch(soft("tags do blog"))).filter((t) => usedTags.has(t.id));
+
 // Perfis públicos de quem assina matérias (autores humanos) e de quem comentou.
 const aiIds = new Set(ai_news_authors.map((a) => a.id));
 const userIds = [
   ...new Set([
     ...posts.filter((p) => !p.ai_author_id && p.author_id && !aiIds.has(p.author_id)).map((p) => p.author_id),
     ...post_comments.map((c) => c.author_id),
+    ...blog_posts.map((p) => p.author_id),
+    ...blog_post_comments.map((c) => c.author_id),
   ]),
 ];
 const profiles = [];
@@ -138,12 +162,12 @@ for (let i = 0; i < quizzes.length; i += 5) {
   );
 }
 
-const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog, post_comments, quizzes, quiz_result_counts };
+const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog, post_comments, quizzes, quiz_result_counts, blog_posts, blog_categories, blog_tags, blog_post_categories, blog_post_tags, blog_post_comments };
 const gz = gzipSync(JSON.stringify(snapshot));
 mkdirSync(".import", { recursive: true });
 writeFileSync(".import/conteudo.json.gz", gz);
 console.log(
-  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado). Capas medidas: ${measured} de ${withImage.length}. Sinopses de anime: ${anime_catalog.length}. Comentários: ${post_comments.length}. Quizzes: ${quizzes.length} (partidas: ${quiz_result_counts.reduce((n, r) => n + r.plays, 0)}).`,
+  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado). Capas medidas: ${measured} de ${withImage.length}. Sinopses de anime: ${anime_catalog.length}. Comentários: ${post_comments.length}. Blog: ${blog_posts.length} posts, ${blog_post_comments.length} comentários. Quizzes: ${quizzes.length} (partidas: ${quiz_result_counts.reduce((n, r) => n + r.plays, 0)}).`,
 );
 
 if (!process.env.CRON_TOKEN) {

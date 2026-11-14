@@ -39,3 +39,24 @@ export function readingMinutes(html: string): number {
   const words = html.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length;
   return Math.max(1, Math.round(words / 200));
 }
+
+/** Limpeza do HTML gerado a partir do Markdown de usuários (blog): mais restrita que a das matérias. */
+export function sanitizeUserHtml(html: string): string {
+  return sanitizeHtml(html, {
+    allowedTags: ["p", "br", "hr", "h2", "h3", "h4", "strong", "b", "em", "i", "u", "s", "del", "blockquote", "code", "pre", "ul", "ol", "li", "a", "img", "table", "thead", "tbody", "tr", "th", "td"],
+    allowedAttributes: { a: ["href", "title", "target", "rel"], img: ["src", "alt", "title", "loading"] },
+    allowedSchemes: ["https", "http", "mailto"],
+    allowedSchemesByTag: { img: ["https"] },
+    transformTags: {
+      // A página já tem o seu h1.
+      h1: "h2",
+      a: (tagName, attribs) => {
+        const href = attribs.href ?? "";
+        const external = /^https?:\/\//i.test(href) && !/^https?:\/\/(www\.)?animeprofile\.com\.br/i.test(href);
+        const base: Record<string, string> = { href, ...(attribs.title ? { title: attribs.title } : {}) };
+        return { tagName, attribs: external ? { ...base, target: "_blank", rel: "nofollow ugc noopener noreferrer" } : base };
+      },
+      img: (tagName, attribs) => ({ tagName, attribs: { ...attribs, loading: "lazy" } }),
+    },
+  });
+}

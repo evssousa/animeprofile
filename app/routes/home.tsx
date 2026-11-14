@@ -12,9 +12,11 @@ import { seo } from "~/lib/seo";
 import { isWideImage } from "~/lib/images";
 import { ytThumb } from "~/components/otaku-tv";
 import { QuizCard } from "~/components/quiz";
+import { BlogTile } from "~/components/blog";
 import { airingBetween, seasonAnimes, trendingAnimes } from "~/server/anime/anime.server";
 import { latestTvVideos } from "~/server/tv/tv.server";
 import { listQuizzes } from "~/server/quiz/quiz.server";
+import { latestBlogWithCover } from "~/server/blog/blog.server";
 import { latestPosts, mostRead, trendingTags, type PostCard as Card } from "~/server/content/posts.server";
 
 export async function loader() {
@@ -24,7 +26,7 @@ export async function loader() {
   const featured = [...recent.filter(isWideImage), ...recent.filter((p) => !isWideImage(p))].slice(0, 4);
   const exclude = featured.map((p) => p.id);
   const dayStart = new Date(`${brDay(new Date())}T00:00:00-03:00`);
-  const [news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes] = await Promise.all([
+  const [news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes, blog] = await Promise.all([
     latestPosts({ type: "news", excludeIds: exclude }, 8),
     latestPosts({ type: "article", excludeIds: exclude }, 5),
     mostRead(5, "article"),
@@ -35,8 +37,9 @@ export async function loader() {
     seasonAnimes(8),
     latestTvVideos(5),
     listQuizzes({ order: "novos", limit: 4 }),
+    latestBlogWithCover(6),
   ]);
-  return { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes };
+  return { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes, blog };
 }
 
 export function meta() {
@@ -48,7 +51,7 @@ export function meta() {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes } = loaderData;
+  const { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes, blog } = loaderData;
   const [leadArticle, ...moreArticles] = articles;
   return (
     <>
@@ -143,6 +146,19 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         )}
 
         <Collection />
+
+        {blog.length > 0 && (
+          <section aria-labelledby="blog" className="flex flex-col gap-6">
+            <SectionHead id="blog" label="Blog da comunidade" title="Posts pessoais dos otakus" more={{ to: "/blog", text: "Ver tudo" }} />
+            <div className="-mx-4 flex snap-x gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+              {blog.map((p) => (
+                <div key={p.id} className="w-[75%] shrink-0 snap-start sm:w-auto">
+                  <BlogTile post={p} />
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
         <section aria-labelledby="diferencial" className="flex flex-col gap-6">
           <div className="text-center">

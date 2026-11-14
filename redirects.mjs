@@ -2,6 +2,8 @@
 // Usado pelo server-app.js antes do React Router. Em JavaScript puro para rodar sem build.
 
 const RULES = [
+  // O blog saiu da central de notícias: /news?tipo=blog e /noticias?tipo=blog vão para /blog (sem a query).
+  [/^\/(news|noticias)\/?$/, (_m, search) => (new URLSearchParams(search).get("tipo") === "blog" ? { to: "/blog" } : null)],
   // A central de notícias do site antigo (/news) agora é a /noticias; a query (?tipo, ?pagina) vai junto.
   [/^\/news\/?$/, () => "/noticias"],
   [/^\/faca-parte\/?$/, () => "/contato"],
@@ -21,7 +23,9 @@ export function redirectFor(pathname, search = "") {
   for (const [re, to] of RULES) {
     const m = re.exec(pathname);
     if (m) {
-      const target = to(m);
+      const target = to(m, search);
+      if (target == null) continue;
+      if (typeof target === "object") return target.to;
       // Junta a query original (ex.: ?pagina=2) com a do destino, se ele já tiver uma.
       return search && target.includes("?") ? `${target}&${search.replace(/^\?/, "")}` : target + search;
     }

@@ -162,6 +162,9 @@ describe("redirecionamentos do que saiu", () => {
     expect(redirectFor("/news")).toBe("/noticias");
     expect(redirectFor("/news", "?tipo=noticias&pagina=2")).toBe("/noticias?tipo=noticias&pagina=2");
     expect(redirectFor("/noticias")).toBeNull();
+    expect(redirectFor("/noticias", "?tipo=blog")).toBe("/blog");
+    expect(redirectFor("/news", "?tipo=blog&pagina=2")).toBe("/blog");
+    expect(redirectFor("/noticias", "?tipo=noticias")).toBeNull();
     expect(redirectFor("/noticias/uma-materia")).toBeNull();
     expect(redirectFor("/clas/meu-cla")).toBe("/ranking");
     expect(redirectFor("/comunidades")).toBe("/feed");

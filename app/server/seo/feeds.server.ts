@@ -12,6 +12,7 @@ import { hasDatabase, iso, query } from "../db.server";
 import { VISIBLE, latestPosts, postUrl, type PostType } from "../content/posts.server";
 import { animeIdsForSitemap } from "../anime/anime.server";
 import { quizzesForSitemap } from "../quiz/quiz.server";
+import { blogForSitemap, blogRssItems } from "../blog/blog.server";
 
 export const xmlEscape = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[c]!);
@@ -25,6 +26,7 @@ export const STATIC_PAGES: { path: string; changefreq: string; priority: string 
   { path: "/animes/calendario", changefreq: "daily", priority: "0.8" },
   { path: "/otaku-tv", changefreq: "daily", priority: "0.8" },
   { path: "/quiz", changefreq: "weekly", priority: "0.7" },
+  { path: "/blog", changefreq: "daily", priority: "0.8" },
   { path: "/sobre", changefreq: "monthly", priority: "0.6" },
   { path: "/contato", changefreq: "monthly", priority: "0.4" },
   { path: "/como-instalar", changefreq: "monthly", priority: "0.4" },
@@ -36,7 +38,7 @@ export const STATIC_PAGES: { path: string; changefreq: string; priority: string 
   { path: "/legal/padroes-editoriais", changefreq: "monthly", priority: "0.4" },
 ];
 
-export const SITEMAPS = ["/sitemap-static.xml", "/sitemap-news.xml", "/sitemap-articles.xml", "/sitemap-taxonomy.xml", "/sitemap-animes.xml", "/sitemap-quiz.xml"];
+export const SITEMAPS = ["/sitemap-static.xml", "/sitemap-news.xml", "/sitemap-articles.xml", "/sitemap-taxonomy.xml", "/sitemap-animes.xml", "/sitemap-quiz.xml", "/sitemap-blog.xml"];
 
 const urlset = (body: string[], extraNs = "") =>
   [`<?xml version="1.0" encoding="UTF-8"?>`, `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"${extraNs}>`, ...body, `</urlset>`].join("\n");
@@ -126,6 +128,47 @@ export async function sitemapAnimes() {
 export async function sitemapQuiz() {
   const rows = await quizzesForSitemap();
   return urlset(rows.map((r) => url(`/quiz/${r.slug}`, { lastmod: iso(r.updated_at ?? r.published_at), changefreq: "monthly", priority: "0.7" })));
+}
+
+export async function sitemapBlog() {
+  const { posts, authors } = await blogForSitemap();
+  return urlset([
+    ...posts.map((r) => url(`/blog/${r.a_slug}/${r.slug}`, { lastmod: iso(r.updated_at ?? r.published_at), changefreq: "weekly", priority: "0.6" })),
+    ...authors.map((a) => url(`/blog/u/${a.slug}`, { changefreq: "weekly", priority: "0.5" })),
+  ]);
+}
+
+/** RSS 2.0 do blog (os 50 mais recentes; do autor, se houver username). null se o autor não existe. */
+export async function blogRss(username?: string) {
+  const items = await blogRssItems(username);
+  if (!items) return null;
+  const self = username ? `/blog/u/${username}/rss.xml` : "/blog/rss.xml";
+  return [
+    `<?xml version="1.0" encoding="UTF-8"?>`,
+    `<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">`,
+    "  <channel>",
+    `    <title>${xmlEscape(username ? `Blog de ${items[0]?.author.name ?? username}` : `Blog — ${SITE.name}`)}</title>`,
+    `    <link>${xmlEscape(absoluteUrl(username ? `/blog/u/${username}` : "/blog"))}</link>`,
+    `    <atom:link href="${xmlEscape(absoluteUrl(self))}" rel="self" type="application/rss+xml" />`,
+    "    <description>Posts da comunidade otaku do Anime Profile.</description>",
+    "    <language>pt-BR</language>",
+    ...items.map((p) =>
+      [
+        "    <item>",
+        `      <title>${xmlEscape(p.title)}</title>`,
+        `      <link>${xmlEscape(absoluteUrl(p.url))}</link>`,
+        `      <guid isPermaLink="true">${xmlEscape(absoluteUrl(p.url))}</guid>`,
+        p.publishedAt ? `      <pubDate>${new Date(p.publishedAt).toUTCString()}</pubDate>` : "",
+        `      <dc:creator>${xmlEscape(p.author.name)}</dc:creator>`,
+        p.excerpt ? `      <description>${xmlEscape(p.excerpt)}</description>` : "",
+        "    </item>",
+      ]
+        .filter(Boolean)
+        .join("\n"),
+    ),
+    "  </channel>",
+    "</rss>",
+  ].join("\n");
 }
 
 /** RSS 2.0 com as 30 matérias mais recentes (notícias e artigos). */

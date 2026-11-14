@@ -9,13 +9,15 @@ type SeoInput = {
   publishedTime?: string | null;
   modifiedTime?: string | null;
   noindex?: boolean;
+  /** Endereço canônico quando difere do `path` (ex.: post do blog promovido a artigo). */
+  canonical?: string;
   jsonLd?: Record<string, unknown>;
 };
 
 /** Metatags padrão de uma página: título, descrição, canonical, Open Graph, Twitter e JSON-LD. */
-export function seo({ title, description, path, type = "website", image, publishedTime, modifiedTime, noindex, jsonLd }: SeoInput) {
+export function seo({ title, description, path, type = "website", image, publishedTime, modifiedTime, noindex, jsonLd, canonical }: SeoInput) {
   const fullTitle = title === SITE.name ? title : `${title} | ${SITE.name}`;
-  const url = absoluteUrl(path);
+  const url = absoluteUrl(canonical ?? path);
   const img = image ? (image.startsWith("http") ? image : absoluteUrl(image)) : absoluteUrl("/logo-192.png");
   return [
     { title: fullTitle },
