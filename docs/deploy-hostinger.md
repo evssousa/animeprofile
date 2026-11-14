@@ -68,8 +68,10 @@ principal (`@`, `www`, MX e TXT) ficaram iguais, conferidos antes e depois.
   1. baixar o TTL;
   2. pausar as gravações no site antigo;
   3. fazer a importação final;
-  4. apontar o DNS;
-  5. conferir.
+  4. trocar `VITE_SITE_URL` para `https://animeprofile.com.br`, tirar `SITE_NOINDEX` e refazer o build (o canonical,
+     os sitemaps e o RSS usam esse endereço);
+  5. apontar o DNS;
+  6. conferir e enviar `/sitemap.xml` ao Google Search Console.
 
 ## Contas e chaves externas
 
