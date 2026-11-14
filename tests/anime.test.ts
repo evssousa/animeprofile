@@ -116,6 +116,8 @@ describe("banco e tarefa", () => {
     expect(today.map((t) => [t.anime.id, t.episode])).toEqual([[1, 7]]);
     const week = await airingBetween(start, new Date(start.getTime() + 7 * 86400_000));
     expect(week.map((t) => t.anime.id)).toEqual([1, 3]);
+    // home: só os mais populares do período, mas na ordem do horário (o 1 é mais popular que o 3)
+    expect((await airingBetween(start, new Date(start.getTime() + 7 * 86400_000), 1)).map((t) => t.anime.id)).toEqual([1]);
   });
 
   it("sinopse em português do site antigo não é apagada pela sincronização", async () => {

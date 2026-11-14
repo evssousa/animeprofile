@@ -59,7 +59,7 @@ export function TopTen({ items }: { items: AnimeCard[] }) {
         <li key={a.id} className="group relative flex shrink-0 snap-start items-end">
           <span
             aria-hidden
-            className="mr-[-28px] text-[150px] leading-[.78] font-extrabold tracking-[-0.07em] text-paper [-webkit-text-stroke:2px_color-mix(in_oklab,var(--ink)_32%,transparent)] select-none sm:text-[168px]"
+            className="mr-[-14px] text-[150px] leading-[.78] font-extrabold tracking-[-0.07em] text-paper [-webkit-text-stroke:2px_color-mix(in_oklab,var(--ink)_32%,transparent)] select-none sm:text-[168px]"
           >
             {i + 1}
           </span>

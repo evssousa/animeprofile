@@ -26,11 +26,11 @@ export async function loader() {
     mostRead(5, "article"),
     mostRead(4),
     trendingTags(14),
-    airingBetween(dayStart, new Date(dayStart.getTime() + 86400_000)),
+    airingBetween(dayStart, new Date(dayStart.getTime() + 86400_000), 8),
     trendingAnimes(10),
     seasonAnimes(8),
   ]);
-  return { featured, news, articles, topArticles, topAll, tags, airing: airing.slice(0, 8), trending, season };
+  return { featured, news, articles, topArticles, topAll, tags, airing, trending, season };
 }
 
 export function meta() {

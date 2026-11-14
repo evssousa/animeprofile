@@ -167,15 +167,21 @@ export async function trendingAnimes(limit = 10) {
 
 export type AiringItem = { anime: AnimeCard; episode: number; airingAt: string };
 
-/** Episódios entre duas datas (calendário e "No ar hoje"), na ordem do horário. */
-export async function airingBetween(from: Date, to: Date): Promise<AiringItem[]> {
+/**
+ * Episódios entre duas datas (calendário e "No ar hoje"), na ordem do horário.
+ * Com `top`, pega só os N animes mais populares do período (home), ainda na ordem do horário.
+ */
+export async function airingBetween(from: Date, to: Date, top?: number): Promise<AiringItem[]> {
   if (!hasDatabase()) return [];
   const rows = await query<CardRow & { ep: number; at: string }>(
     `SELECT ${CARD_COLS}, a.episode AS ep, a.airing_at AS at FROM anime_airing a JOIN anime_catalog c ON c.anilist_id = a.anilist_id
-     WHERE a.airing_at >= ? AND a.airing_at < ? AND c.is_adult = 0 ORDER BY a.airing_at, c.popularity DESC`,
-    [from, to],
+     WHERE a.airing_at >= ? AND a.airing_at < ? AND c.is_adult = 0
+     ORDER BY ${top ? "c.popularity DESC LIMIT ?" : "a.airing_at, c.popularity DESC"}`,
+    top ? [from, to, top] : [from, to],
   );
-  return rows.map((r) => ({ anime: toCard(r), episode: Number(r.ep), airingAt: iso(r.at)! }));
+  return rows
+    .map((r) => ({ anime: toCard(r), episode: Number(r.ep), airingAt: iso(r.at)! }))
+    .sort((a, b) => a.airingAt.localeCompare(b.airingAt));
 }
 
 const DETAILS_MAX_AGE_MS = 3 * 86400_000;
@@ -256,5 +262,8 @@ export async function searchAnimes(q: string) {
 /** Para o sitemap: animes com ficha no banco. */
 export async function animeIdsForSitemap() {
   if (!hasDatabase()) return [];
-  return query<{ anilist_id: number; synced_at: string }>("SELECT anilist_id, synced_at FROM anime_catalog WHERE is_adult = 0 ORDER BY popularity DESC LIMIT 5000");
+  // Só fichas completas (vindas do AniList); as linhas criadas só com a sinopse antiga ficam de fora até alguém abrir.
+  return query<{ anilist_id: number; synced_at: string }>(
+    "SELECT anilist_id, synced_at FROM anime_catalog WHERE is_adult = 0 AND cover_url IS NOT NULL ORDER BY popularity DESC LIMIT 5000",
+  );
 }
