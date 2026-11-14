@@ -48,6 +48,10 @@ tests/
 docs/
 ```
 
+**Regra do endereço:** nenhum `loader` lê `new URL(request.url).pathname` direto. Todos usam `routePath(request)`, de
+`app/lib/route-path.ts`. Na navegação por clique, o React Router pede `<endereço>.data`, e sem isso a página dava
+"não encontrada" só ao clicar (bug de 2026-11-14, o mesmo do respawnou em 2026-11-12).
+
 **Regra:** as rotas não falam com o banco. Elas chamam o módulo da área em `app/server/`, que valida, confere a
 permissão e grava.
 

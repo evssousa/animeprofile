@@ -4,6 +4,7 @@ import { data } from "react-router";
 import type { Route } from "./+types/posts-list";
 import { PageHeader } from "~/components/PageHeader";
 import { Chips, Pagination, PostGrid, PostOverlay, PostRow } from "~/components/posts";
+import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
 import { listCategories, listPosts, mostRead, type PostType } from "~/server/content/posts.server";
 
@@ -32,7 +33,7 @@ const PAGES: Record<string, { type?: PostType; label: string; title: string; int
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  const pathname = url.pathname.replace(/\/$/, "") || "/noticias";
+  const pathname = routePath(request).replace(/\/$/, "") || "/noticias";
   const path = pathname === "/noticias" && url.searchParams.get("tipo") === "noticias" ? "/noticias?tipo=noticias" : pathname;
   const cfg = PAGES[path];
   if (!cfg) throw data(null, { status: 404 });

@@ -4,9 +4,10 @@ import { Link } from "react-router";
 import type { Route } from "./+types/em-breve";
 import { PageHeader } from "~/components/PageHeader";
 import { NAV } from "~/lib/nav";
+import { routePath } from "~/lib/route-path";
 
 export function loader({ request }: Route.LoaderArgs) {
-  const path = new URL(request.url).pathname;
+  const path = routePath(request);
   const item = NAV.flatMap((g) => g.items).find((i) => i.to === path);
   return { path, label: item?.label ?? null };
 }

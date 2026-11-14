@@ -4,6 +4,7 @@ import { data, Link, redirect } from "react-router";
 import type { Route } from "./+types/post";
 import { PostCard } from "~/components/posts";
 import { formatDateLong, formatDateTime, readingLabel } from "~/lib/format";
+import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
 import { SITE, absoluteUrl } from "~/lib/site";
 import { isWideImage } from "~/lib/images";
@@ -12,7 +13,7 @@ import { getPost, relatedPosts } from "~/server/content/posts.server";
 export async function loader({ params, request }: Route.LoaderArgs) {
   const post = await getPost(params.slug);
   if (!post) throw data(null, { status: 404 });
-  const path = new URL(request.url).pathname;
+  const path = routePath(request);
   if (path !== post.url) throw redirect(post.url, 301);
   const related = await relatedPosts(post, 4);
   // Muitas matérias já trazem a capa no começo do texto: aí a capa do corpo não aparece, para não repetir.

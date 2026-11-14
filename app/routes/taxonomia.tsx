@@ -3,12 +3,14 @@ import { data, redirect } from "react-router";
 import type { Route } from "./+types/taxonomia";
 import { PageHeader } from "~/components/PageHeader";
 import { Pagination, PostGrid } from "~/components/posts";
+import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
 import { getAiAuthor, getCategory, getTag, listPosts, type ListFilter } from "~/server/content/posts.server";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const url = new URL(request.url);
-  const kind = url.pathname.split("/")[1] as "categoria" | "tag" | "autores";
+  const path = routePath(request);
+  const kind = path.split("/")[1] as "categoria" | "tag" | "autores";
   const page = Math.max(1, Number(url.searchParams.get("pagina")) || 1);
   const slug = params.slug;
   let filter: ListFilter;
@@ -34,7 +36,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const list = await listPosts(filter, page, 24);
   if (page > list.pages && list.total > 0) throw data(null, { status: 404 });
-  return { kind, path: url.pathname, head, list };
+  return { kind, path, head, list };
 }
 
 export function meta({ loaderData: d }: Route.MetaArgs) {

@@ -3,13 +3,14 @@
 import { data } from "react-router";
 import type { Route } from "./+types/pagina";
 import { PageHeader } from "~/components/PageHeader";
+import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
 import { getPage } from "~/server/pages.server";
 
 const dateFmt = new Intl.DateTimeFormat("pt-BR", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
 
 export function loader({ request }: Route.LoaderArgs) {
-  const path = new URL(request.url).pathname.replace(/\/$/, "");
+  const path = routePath(request).replace(/\/$/, "");
   const page = getPage(path.slice(1).replace(/\//g, "-"));
   if (!page) throw data(null, { status: 404 });
   return { page, path, updatedLabel: page.updated ? dateFmt.format(new Date(`${page.updated}T12:00:00Z`)) : null };
