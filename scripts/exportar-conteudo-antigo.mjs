@@ -9,6 +9,7 @@
 //   (endereço padrão: https://novo.animeprofile.com.br)
 //   Sem CRON_TOKEN, só gera .import/conteudo.json.gz e não envia.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import { gzipSync } from "node:zlib";
 import { imageSize } from "image-size";
 
@@ -162,7 +163,75 @@ for (let i = 0; i < quizzes.length; i += 5) {
   );
 }
 
-const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog, post_comments, quizzes, quiz_result_counts, blog_posts, blog_categories, blog_tags, blog_post_categories, blog_post_tags, blog_post_comments };
+// Figurinhas: álbuns, catálogo e destaques da semana. As imagens são COPIADAS para o site novo (/media/figurinhas),
+// em tamanho original, com uma miniatura WebP de 400 px ao lado. Sem CRON_TOKEN (só gerar o arquivo), as URLs antigas ficam.
+const sticker_albums = await fetchAll("sticker_albums", "id,slug,name,description,cover_url,anilist_id,sort_order,available_from,available_until,created_at,updated_at").catch(soft("álbuns de figurinhas"));
+const sticker_catalog = await fetchAll("sticker_catalog", "id,album_id,name,rarity,xp,image_url,active,sort_order,created_at,updated_at")
+  .catch(() => fetchAll("sticker_catalog", "id,album_id,name,rarity,xp,image_url,sort_order,created_at,updated_at"))
+  .catch(soft("figurinhas"));
+const weekly_featured_album = (await fetchAll("weekly_featured_album", "week_key,album_id,discount_pct,computed_at", "", "week_key").catch(soft("destaques da semana"))).slice(-4);
+
+const MEDIA_LIMIT = 300 * 1024 * 1024;
+let mediaBytes = 0;
+let mediaSent = 0;
+const media = new Map(); // url antiga -> { url, thumb, width, height } | null
+async function copyImage(url) {
+  if (!url) return null;
+  if (media.has(url)) return media.get(url);
+  let result = null;
+  try {
+    // Sempre o original: o endereço render/image do Supabase recomprime.
+    const original = url.replace("/render/image/public/", "/object/public/").split("?")[0];
+    const res = await fetch(original);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const bytes = Buffer.from(await res.arrayBuffer());
+    mediaBytes += bytes.length;
+    if (mediaBytes > MEDIA_LIMIT) {
+      console.error(`Parando: as imagens passaram de 300 MB (${(mediaBytes / 1024 / 1024).toFixed(0)} MB). Avise o dono antes de enviar.`);
+      process.exit(2);
+    }
+    const info = imageSize(bytes);
+    const ext = ({ jpg: "jpg", jpeg: "jpg", png: "png", webp: "webp", gif: "gif", avif: "avif" })[info.type];
+    if (!ext || !info.width) throw new Error("tipo de imagem não aceito");
+    const hash = createHash("sha256").update(bytes).digest("hex").slice(0, 24);
+    const files = [{ name: `figurinhas/${hash}.${ext}`, body: bytes, type: ext === "jpg" ? "image/jpeg" : `image/${ext}` }];
+    let thumb = `/media/figurinhas/${hash}.${ext}`;
+    if (info.width > 400 && ext !== "gif") {
+      const { default: sharp } = await import("sharp");
+      files.push({ name: `figurinhas/${hash}-w400.webp`, body: await sharp(bytes).resize({ width: 400 }).webp({ quality: 90, effort: 5 }).toBuffer(), type: "image/webp" });
+      thumb = `/media/figurinhas/${hash}-w400.webp`;
+    }
+    if (process.env.CRON_TOKEN) {
+      for (const f of files) {
+        const head = await fetch(`${target.replace(/\/$/, "")}/media/${f.name}`, { method: "HEAD" });
+        if (head.ok) continue;
+        const up = await fetch(`${target.replace(/\/$/, "")}/api/importar/midia`, { method: "POST", headers: { "x-cron-token": process.env.CRON_TOKEN, "x-media-name": f.name, "Content-Type": f.type }, body: f.body });
+        if (!up.ok) throw new Error(`envio HTTP ${up.status}`);
+        mediaSent++;
+      }
+      result = { url: `/media/figurinhas/${hash}.${ext}`, thumb, width: info.width, height: info.height };
+    } else {
+      result = { url, thumb: url, width: info.width, height: info.height };
+    }
+  } catch (e) {
+    console.log(`Aviso: imagem não copiada (${url.slice(-60)}): ${e.message}. Fica o endereço antigo.`);
+  }
+  media.set(url, result);
+  return result;
+}
+const urls = [...new Set([...sticker_albums.map((a) => a.cover_url), ...sticker_catalog.map((c) => c.image_url)].filter(Boolean))];
+for (let i = 0; i < urls.length; i += 4) await Promise.all(urls.slice(i, i + 4).map(copyImage));
+for (const a of sticker_albums) {
+  const m = media.get(a.cover_url);
+  if (m) a.cover_url = m.url;
+}
+for (const c of sticker_catalog) {
+  const m = media.get(c.image_url);
+  if (m) Object.assign(c, { image_url: m.url, thumb_url: m.thumb, image_width: m.width, image_height: m.height });
+}
+console.log(`Figurinhas: ${sticker_albums.length} álbuns, ${sticker_catalog.length} figurinhas, ${urls.length} imagens (${(mediaBytes / 1024 / 1024).toFixed(1)} MB; ${mediaSent} arquivos novos enviados).`);
+
+const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog, post_comments, quizzes, quiz_result_counts, blog_posts, blog_categories, blog_tags, blog_post_categories, blog_post_tags, blog_post_comments, sticker_albums, sticker_catalog, weekly_featured_album };
 const gz = gzipSync(JSON.stringify(snapshot));
 mkdirSync(".import", { recursive: true });
 writeFileSync(".import/conteudo.json.gz", gz);

@@ -8,6 +8,7 @@ import type { Route } from "./+types/api.importar";
 import { hasDatabase } from "~/server/db.server";
 import { trackRun } from "~/server/cron/runner.server";
 import { applySnapshot, validateSnapshot } from "~/server/content/import-old.server";
+import { MAX_MEDIA_BYTES, MediaError, saveImportedMedia } from "~/server/content/media-import.server";
 
 const MAX_BYTES = 80 * 1024 * 1024; // depois de descompactado
 
@@ -28,6 +29,17 @@ export async function loader() {
 }
 
 export async function action({ request, params }: Route.ActionArgs) {
+  if (request.method === "POST" && params.what === "midia" && authorized(request)) {
+    // Uma imagem por pedido: corpo em bytes, nome em x-media-name (ver media-import.server.ts).
+    try {
+      const bytes = Buffer.from(await request.arrayBuffer());
+      if (bytes.length > MAX_MEDIA_BYTES) return Response.json({ error: "arquivo grande demais" }, { status: 400, headers });
+      return Response.json({ ok: true, ...(await saveImportedMedia(request.headers.get("x-media-name") ?? "", bytes)) }, { headers });
+    } catch (err) {
+      if (err instanceof MediaError) return Response.json({ error: err.message }, { status: 400, headers });
+      throw err;
+    }
+  }
   if (request.method !== "POST" || params.what !== "conteudo" || !authorized(request) || !hasDatabase()) return notFound();
   let snapshot: unknown;
   try {

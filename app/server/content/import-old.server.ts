@@ -12,6 +12,7 @@ import { importSynopses } from "../anime/anime.server";
 import { rebuildPostVideos } from "../tv/tv.server";
 import { importQuizzes } from "../quiz/quiz.server";
 import { importBlog, type OldBlogSnapshot } from "../blog/blog.server";
+import { importStickers, type OldStickerSnapshot } from "../stickers/stickers.server";
 import { readingMinutes, sanitizePostHtml } from "./sanitize.server";
 
 export type OldPost = {
@@ -54,7 +55,8 @@ export type OldSnapshot = {
   /** Quizzes publicados e a contagem por resultado (opcionais: retratos antigos não têm). */
   quizzes?: { id: string; slug: string; title: string; description: string | null; cover_url: string | null; kind: "personalidade" | "conhecimento"; data: unknown; status: string; anilist_id: number | null; plays_count: number | null; published_at: string | null; created_at: string; updated_at: string }[];
   quiz_result_counts?: { quiz_id: string; result_id: string; plays: number }[];
-} & OldBlogSnapshot;
+} & OldBlogSnapshot &
+  OldStickerSnapshot;
 
 /** Confere o formato antes de gravar qualquer coisa. */
 export function validateSnapshot(s: unknown): s is OldSnapshot {
@@ -169,6 +171,7 @@ export async function applySnapshot(s: OldSnapshot) {
   const videos = await rebuildPostVideos();
   const quiz = s.quizzes ? await importQuizzes(s) : undefined;
   const blog = s.blog_posts ? await importBlog(s) : undefined;
+  const stickers = s.sticker_albums ? await importStickers(s) : undefined;
   const [count] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM posts WHERE status = 'published'");
   return {
     materias: Number(count?.n ?? 0),
@@ -179,6 +182,7 @@ export async function applySnapshot(s: OldSnapshot) {
     videosDasMaterias: videos.videos,
     ...(quiz ? { quizzes: quiz.quizzes, partidasDeQuiz: quiz.partidas, quizzesPulados: quiz.pulados } : {}),
     ...(blog ? { blogPosts: blog.posts, blogComentarios: blog.comentarios, blogPulados: blog.pulados } : {}),
+    ...(stickers ? { albuns: stickers.albuns, figurinhas: stickers.figurinhas, figurinhasSemImagem: stickers.semImagem, figurinhasPuladas: stickers.pulados } : {}),
     comentarios: comments.length,
     puladas: skipped.slice(0, 10),
   };

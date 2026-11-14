@@ -17,6 +17,7 @@ import { airingBetween, seasonAnimes, trendingAnimes } from "~/server/anime/anim
 import { latestTvVideos } from "~/server/tv/tv.server";
 import { listQuizzes } from "~/server/quiz/quiz.server";
 import { latestBlogWithCover } from "~/server/blog/blog.server";
+import { collectionTeaser } from "~/server/stickers/stickers.server";
 import { latestPosts, mostRead, trendingTags, type PostCard as Card } from "~/server/content/posts.server";
 
 export async function loader() {
@@ -26,7 +27,7 @@ export async function loader() {
   const featured = [...recent.filter(isWideImage), ...recent.filter((p) => !isWideImage(p))].slice(0, 4);
   const exclude = featured.map((p) => p.id);
   const dayStart = new Date(`${brDay(new Date())}T00:00:00-03:00`);
-  const [news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes, blog] = await Promise.all([
+  const [news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes, blog, teaser] = await Promise.all([
     latestPosts({ type: "news", excludeIds: exclude }, 8),
     latestPosts({ type: "article", excludeIds: exclude }, 5),
     mostRead(5, "article"),
@@ -38,8 +39,9 @@ export async function loader() {
     latestTvVideos(5),
     listQuizzes({ order: "novos", limit: 4 }),
     latestBlogWithCover(6),
+    collectionTeaser(),
   ]);
-  return { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes, blog };
+  return { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes, blog, teaser };
 }
 
 export function meta() {
@@ -51,7 +53,7 @@ export function meta() {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes, blog } = loaderData;
+  const { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes, blog, teaser } = loaderData;
   const [leadArticle, ...moreArticles] = articles;
   return (
     <>
@@ -145,7 +147,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           </section>
         )}
 
-        <Collection />
+        <Collection teaser={teaser} />
 
         {blog.length > 0 && (
           <section aria-labelledby="blog" className="flex flex-col gap-6">
@@ -317,7 +319,7 @@ function Hero({ slides }: { slides: Card[] }) {
 }
 
 /** Painel escuro da coleção de figurinhas (o álbum de verdade chega com as contas). */
-function Collection() {
+function Collection({ teaser }: { teaser: Awaited<ReturnType<typeof collectionTeaser>> }) {
   return (
     <section
       aria-labelledby="colecao"
@@ -329,6 +331,11 @@ function Collection() {
           Colete figurinhas raras dos seus animes favoritos
         </h2>
         <p className="leading-relaxed text-white/72">Abra pacotes de 1 ou de 10, troque repetidas com a comunidade e ganhe XP a cada pacote aberto.</p>
+        {teaser.stickers > 0 && (
+          <p className="text-[0.9rem] font-semibold text-white/85">
+            {teaser.stickers.toLocaleString("pt-BR")} figurinhas em {teaser.albums} {teaser.albums === 1 ? "álbum" : "álbuns"}
+          </p>
+        )}
         <ul className="flex flex-wrap gap-2 text-[0.75rem] font-bold">
           <li className="rounded-full bg-white/10 px-2.5 py-1.5">Comum</li>
           <li className="rounded-full bg-[rgba(99,230,190,.16)] px-2.5 py-1.5 text-[#63e6be]">Rara</li>
@@ -338,20 +345,30 @@ function Collection() {
         <Link to="/figurinhas" className="mt-2 self-start rounded-[9px] bg-brand px-6 py-3.5 font-extrabold text-brand-ink shadow-[0_10px_30px_rgba(194,53,43,.4)] hover:brightness-110">
           Conhecer as figurinhas
         </Link>
+        {teaser.featured && (
+          <Link to={`/figurinhas/${teaser.featured.slug}`} className="self-start text-[0.9rem] font-bold text-glow hover:underline">
+            Álbum da semana: {teaser.featured.name}
+          </Link>
+        )}
       </div>
       <div className="relative mx-auto h-[300px] w-[300px] max-w-full shrink-0 origin-top scale-[.92] sm:scale-100" aria-hidden>
         <div className="absolute top-4 left-6 flex h-[260px] w-[170px] -rotate-6 flex-col items-center justify-center gap-3 overflow-hidden rounded-[18px] bg-[linear-gradient(160deg,#f25b4e,#9e1f18_60%,#5c0e0a)] shadow-[0_30px_60px_rgba(0,0,0,.6),inset_0_0_0_2px_rgba(255,255,255,.18)]">
           <span className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0)_30%,rgba(255,255,255,.35)_45%,rgba(255,255,255,0)_60%)]" />
           <span className="absolute inset-x-0 top-0 h-5 bg-[repeating-linear-gradient(90deg,rgba(0,0,0,.25)_0_6px,rgba(0,0,0,0)_6px_12px)]" />
-          <img src="/logo-192.png" alt="" className="size-16 rounded-2xl" />
+          <img src={teaser.featured?.image ?? "/logo-192.png"} alt="" className={teaser.featured?.image ? "h-24 w-[72px] rounded-xl object-cover" : "size-16 rounded-2xl"} />
           <span className="text-center text-[1.05rem] leading-tight font-extrabold">
             Pacote
             <br />
             da temporada
           </span>
         </div>
-        <div className="absolute top-0 right-2 h-[170px] w-[124px] rotate-6 rounded-[14px] border-[5px] border-[#f2c14e] bg-[conic-gradient(from_210deg,#ff0080,#ffd600,#00ffaa,#008cff,#be00ff,#ff0080)] opacity-90 shadow-[0_20px_40px_rgba(0,0,0,.55),0_0_30px_rgba(242,193,78,.45)]" />
-        <div className="absolute right-10 bottom-0 h-[150px] w-[110px] -rotate-3 rounded-[14px] border-[5px] border-[#b197fc] bg-[linear-gradient(160deg,#3b2a6b,#17141a)] shadow-[0_20px_40px_rgba(0,0,0,.55),0_0_26px_rgba(177,151,252,.35)]" />
+        <div className="absolute top-0 right-2 h-[170px] w-[124px] rotate-6 overflow-hidden rounded-[14px] border-[5px] border-[#f2c14e] bg-[conic-gradient(from_210deg,#ff0080,#ffd600,#00ffaa,#008cff,#be00ff,#ff0080)] opacity-90 shadow-[0_20px_40px_rgba(0,0,0,.55),0_0_30px_rgba(242,193,78,.45)]">
+          {teaser.legendary && <img src={teaser.legendary} alt="" className="size-full object-cover" />}
+          <span className="absolute inset-0 bg-[linear-gradient(115deg,rgba(255,255,255,0)_30%,rgba(255,255,255,.3)_45%,rgba(255,255,255,0)_60%)]" />
+        </div>
+        <div className="absolute right-10 bottom-0 h-[150px] w-[110px] -rotate-3 overflow-hidden rounded-[14px] border-[5px] border-[#b197fc] bg-[linear-gradient(160deg,#3b2a6b,#17141a)] shadow-[0_20px_40px_rgba(0,0,0,.55),0_0_26px_rgba(177,151,252,.35)]">
+          {teaser.epic && <img src={teaser.epic} alt="" className="size-full object-cover" />}
+        </div>
       </div>
     </section>
   );

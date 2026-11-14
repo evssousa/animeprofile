@@ -16,7 +16,7 @@ const TEXT_PAGES = [
 
 // Endereços do menu que ainda não existem no site novo: mostram "em construção" com link para o
 // site atual. Cada um sai desta lista quando a página for construída.
-const PENDING = ["animes/favoritos", "animes/seguindo", "feed", "blog/editor", "blog/dashboard", "missoes", "ranking", "figurinhas", "quarto", "login", "cadastro", "u/:username"];
+const PENDING = ["animes/favoritos", "animes/seguindo", "feed", "blog/editor", "blog/dashboard", "missoes", "ranking", "quarto", "login", "cadastro", "u/:username"];
 
 export default [
   index("routes/home.tsx"),
@@ -31,6 +31,8 @@ export default [
   route("otaku-tv", "routes/otaku-tv.tsx"),
   route("quiz", "routes/quiz-list.tsx"),
   route("quiz/:slug", "routes/quiz.tsx"),
+  route("figurinhas", "routes/figurinhas.tsx"),
+  route("figurinhas/:slug", "routes/figurinha-album.tsx"),
   route("blog", "routes/blog-list.tsx"),
   route("blog/rss.xml", "routes/blog-feeds.ts", { id: "blog-rss" }),
   route("blog/criadores", "routes/redirect-temp.ts", { id: "blog-criadores" }),
@@ -47,7 +49,7 @@ export default [
   route("contato", "routes/contato.tsx"),
   ...PENDING.map((path) => route(path, "routes/em-breve.tsx", { id: `em-breve-${path}` })),
   route("robots.txt", "routes/robots.ts"),
-  ...["sitemap.xml", "sitemap-static.xml", "sitemap-news.xml", "sitemap-articles.xml", "sitemap-taxonomy.xml", "sitemap-animes.xml", "sitemap-quiz.xml", "sitemap-blog.xml", "rss.xml"].map((f) =>
+  ...["sitemap.xml", "sitemap-static.xml", "sitemap-news.xml", "sitemap-articles.xml", "sitemap-taxonomy.xml", "sitemap-animes.xml", "sitemap-quiz.xml", "sitemap-blog.xml", "sitemap-figurinhas.xml", "rss.xml"].map((f) =>
     route(f, "routes/feeds.ts", { id: `feed-${f}` }),
   ),
   route("api/health", "routes/api.health.ts"),

@@ -13,6 +13,7 @@ import { VISIBLE, latestPosts, postUrl, type PostType } from "../content/posts.s
 import { animeIdsForSitemap } from "../anime/anime.server";
 import { quizzesForSitemap } from "../quiz/quiz.server";
 import { blogForSitemap, blogRssItems } from "../blog/blog.server";
+import { albumsForSitemap } from "../stickers/stickers.server";
 
 export const xmlEscape = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[c]!);
@@ -27,6 +28,7 @@ export const STATIC_PAGES: { path: string; changefreq: string; priority: string 
   { path: "/otaku-tv", changefreq: "daily", priority: "0.8" },
   { path: "/quiz", changefreq: "weekly", priority: "0.7" },
   { path: "/blog", changefreq: "daily", priority: "0.8" },
+  { path: "/figurinhas", changefreq: "weekly", priority: "0.6" },
   { path: "/sobre", changefreq: "monthly", priority: "0.6" },
   { path: "/contato", changefreq: "monthly", priority: "0.4" },
   { path: "/como-instalar", changefreq: "monthly", priority: "0.4" },
@@ -38,7 +40,7 @@ export const STATIC_PAGES: { path: string; changefreq: string; priority: string 
   { path: "/legal/padroes-editoriais", changefreq: "monthly", priority: "0.4" },
 ];
 
-export const SITEMAPS = ["/sitemap-static.xml", "/sitemap-news.xml", "/sitemap-articles.xml", "/sitemap-taxonomy.xml", "/sitemap-animes.xml", "/sitemap-quiz.xml", "/sitemap-blog.xml"];
+export const SITEMAPS = ["/sitemap-static.xml", "/sitemap-news.xml", "/sitemap-articles.xml", "/sitemap-taxonomy.xml", "/sitemap-animes.xml", "/sitemap-quiz.xml", "/sitemap-blog.xml", "/sitemap-figurinhas.xml"];
 
 const urlset = (body: string[], extraNs = "") =>
   [`<?xml version="1.0" encoding="UTF-8"?>`, `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"${extraNs}>`, ...body, `</urlset>`].join("\n");
@@ -128,6 +130,11 @@ export async function sitemapAnimes() {
 export async function sitemapQuiz() {
   const rows = await quizzesForSitemap();
   return urlset(rows.map((r) => url(`/quiz/${r.slug}`, { lastmod: iso(r.updated_at ?? r.published_at), changefreq: "monthly", priority: "0.7" })));
+}
+
+export async function sitemapFigurinhas() {
+  const rows = await albumsForSitemap();
+  return urlset(rows.map((r) => url(`/figurinhas/${r.slug}`, { lastmod: iso(r.updated_at), changefreq: "weekly", priority: "0.5" })));
 }
 
 export async function sitemapBlog() {

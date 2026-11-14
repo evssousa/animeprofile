@@ -11,6 +11,7 @@ import { absoluteUrl } from "~/lib/site";
 import { getAnime } from "~/server/anime/anime.server";
 import { canFetchRemote } from "~/server/anime/remote-guard.server";
 import { latestPosts } from "~/server/content/posts.server";
+import { albumForAnime } from "~/server/stickers/stickers.server";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const id = Number(params.id);
@@ -23,8 +24,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw data(null, { status: 503, headers: { "Retry-After": "120" } });
   }
   if (!anime) throw data(null, { status: 404 });
-  const news = await latestPosts({ anilistId: id }, 4);
-  return { anime, news };
+  const [news, album] = await Promise.all([latestPosts({ anilistId: id }, 4), albumForAnime(id).catch(() => null)]);
+  return { anime, news, album };
 }
 
 export function meta({ loaderData: d }: Route.MetaArgs) {
@@ -53,7 +54,7 @@ export function meta({ loaderData: d }: Route.MetaArgs) {
 }
 
 export default function Anime({ loaderData }: Route.ComponentProps) {
-  const { anime: a, news } = loaderData;
+  const { anime: a, news, album } = loaderData;
   const facts = [
     a.format && ["Formato", FORMAT_PT[a.format] ?? a.format],
     a.episodes && ["Episódios", String(a.episodes)],
@@ -108,6 +109,15 @@ export default function Anime({ loaderData }: Route.ComponentProps) {
 
       <div className="mx-auto grid max-w-[1328px] gap-12 px-4 py-12 sm:px-8 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-14">
         <div className="flex min-w-0 flex-col gap-12">
+          {album && (
+            <Link to={`/figurinhas/${album.slug}`} className="flex items-center gap-4 rounded-[18px] bg-[#17141a] p-4 text-night-ink hover:brightness-110">
+              {album.image && <img src={album.image} alt="" className="h-20 w-14 rounded-lg object-cover" />}
+              <span>
+                <span className="block text-[0.8rem] font-bold text-glow">Figurinhas</span>
+                <span className="block font-extrabold">Colecione o álbum de {album.name}: {album.total} figurinhas</span>
+              </span>
+            </Link>
+          )}
           <section aria-labelledby="sinopse">
             <h2 id="sinopse" className="text-[1.5rem] font-extrabold">
               Sinopse

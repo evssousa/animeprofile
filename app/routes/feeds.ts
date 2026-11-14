@@ -2,7 +2,7 @@
 import { data } from "react-router";
 import type { Route } from "./+types/feeds";
 import { routePath } from "~/lib/route-path";
-import { rssFeed, sitemapAnimes, sitemapQuiz, sitemapBlog, sitemapArticles, sitemapIndex, sitemapNews, sitemapStatic, sitemapTaxonomy } from "~/server/seo/feeds.server";
+import { rssFeed, sitemapAnimes, sitemapQuiz, sitemapBlog, sitemapFigurinhas, sitemapArticles, sitemapIndex, sitemapNews, sitemapStatic, sitemapTaxonomy } from "~/server/seo/feeds.server";
 
 const FILES: Record<string, { build: () => string | Promise<string>; type: string; maxAge: number }> = {
   "/sitemap.xml": { build: () => sitemapIndex(), type: "application/xml", maxAge: 3600 },
@@ -13,6 +13,7 @@ const FILES: Record<string, { build: () => string | Promise<string>; type: strin
   "/sitemap-animes.xml": { build: sitemapAnimes, type: "application/xml", maxAge: 3600 },
   "/sitemap-quiz.xml": { build: sitemapQuiz, type: "application/xml", maxAge: 1800 },
   "/sitemap-blog.xml": { build: sitemapBlog, type: "application/xml", maxAge: 1800 },
+  "/sitemap-figurinhas.xml": { build: sitemapFigurinhas, type: "application/xml", maxAge: 3600 },
   "/rss.xml": { build: rssFeed, type: "application/rss+xml", maxAge: 600 },
 };
 

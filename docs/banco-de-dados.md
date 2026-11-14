@@ -18,6 +18,7 @@ que devolve JSON como texto (o helper `json()` trata os dois casos).
 | `006_personagens.sql` | `anime_characters`: ficha pronta de cada personagem (nomes, foto, descrição com spoilers separados, animes, dubladores), guardada por 7 dias | automática no deploy |
 | `007_comentarios.sql` | `post_comments`: comentários das matérias (com respostas). Por enquanto vêm do site antigo, só para leitura; autores em `post_authors` (kind `user`) | automática no deploy |
 | `008_otaku_tv.sql` | `post_videos`: vídeos do YouTube dentro das matérias (a tarefa `videos-materias` e a importação refazem a tabela) | automática no deploy |
+| `011_figurinhas.sql` | `sticker_albums`, `sticker_catalog` (raridade, imagem original e miniatura em `/media/figurinhas`) e `weekly_featured_album` (álbum da semana) | automática no deploy |
 | `010_blog.sql` | `blog_posts` (Markdown + HTML limpo), `blog_categories`, `blog_tags`, ligações e `blog_post_comments` (só leitura; reações e salvos ficam para as contas) | automática no deploy |
 | `009_quiz.sql` | `quizzes` (perguntas/resultados em JSON, gabarito só no servidor), `quiz_result_counts` (contagem por resultado, antiga + nova) e `quiz_plays` (partidas, sem conta, por hash de IP) | automática no deploy |
 

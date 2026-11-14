@@ -46,7 +46,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Redirecionamentos do que saiu (Clãs, Comunidades, jogos, `/en`, Faça parte) | ✅ |
 | 2 | Quiz sem login: `/quiz`, `/quiz/:slug`, pontuação no servidor, sitemap e seção da home ([plano](plano-quiz-blog-figurinhas.md) §1) | ✅ código pronto e testado; falta enviar os quizzes do site antigo (na virada) |
 | 2 | Blog da comunidade (só leitura): lista, post, autor, categoria, tag, RSS e sitemap ([plano](plano-quiz-blog-figurinhas.md) §2) | ✅ código pronto e testado; falta enviar o blog do site antigo (2026-11-16, depois das 15h) |
-| 2 | Catálogo de figurinhas (só ver), com as imagens copiadas para `/media` e a Coleção da home com dados reais ([plano](plano-quiz-blog-figurinhas.md) §3) | ⏳ |
+| 2 | Catálogo de figurinhas (só ver), com as imagens copiadas para `/media` e a Coleção da home com dados reais ([plano](plano-quiz-blog-figurinhas.md) §3) | ✅ código pronto e testado, figurinhas em silhueta; falta enviar o catálogo e as imagens do site antigo (2026-11-16, depois das 15h) |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
@@ -60,14 +60,28 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 - **Feito até aqui:**
   - notícias e artigos com barra lateral e comentários (leitura), sitemaps e RSS;
   - animes: catálogo, ficha, calendário e personagens, com o Top 10 com setas na home e em `/animes`.
-- **Próximos passos, sem precisar de contas** (planejados em
-  [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md), nesta ordem):
-  1. Quiz.
-  2. Leitura do blog.
-  3. Catálogo de figurinhas.
+- **Quiz, leitura do blog e catálogo de figurinhas:** prontos no código (migrations 009–011). Falta só enviar o conteúdo
+  do site antigo (ver "Próximos passos").
 - **Decisões de 2026-11-15:** figurinhas aparecem em silhueta (constante para trocar depois); a atualização do conteúdo
   do site de teste (notícias, artigos, quizzes, blog, figurinhas) fica para 2026-11-16 depois das 15h, tudo de uma vez.
 - **Migration 009 (quiz):** conferida no site de teste, rodou no deploy (`/quiz` responde 200 lendo a tabela).
+
+
+## Próximos passos
+
+1. 2026-11-16, depois das 15h: exportar tudo de uma vez (notícias, artigos, quizzes, blog e figurinhas com as imagens) e
+   conferir `/quiz`, `/blog`, `/figurinhas` e a seção da home no site de teste.
+2. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
+3. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
+   [deploy-hostinger.md](deploy-hostinger.md).
+
+## Pendências suas
+
+- Rodar a exportação amanhã depois das 15h (`CRON_TOKEN` está nas variáveis do app no hPanel) ou me avisar para eu
+  rodar. As migrations 009, 010 e 011 rodam sozinhas no deploy, não precisa fazer nada no banco.
+- Se quiser as figurinhas abertas em vez de silhueta: trocar `MOSTRAR_ABERTAS` para `true` em `app/lib/stickers.ts`.
+
+## Como atualizar o conteúdo do site de teste
 
 - **Para atualizar o conteúdo do site de teste** (matérias, comentários e sinopses):
   `CRON_TOKEN=... node scripts/exportar-conteudo-antigo.mjs ../animeprofile-old/.env`. O token está nas variáveis do
