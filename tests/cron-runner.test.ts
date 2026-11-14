@@ -49,7 +49,8 @@ describe("cron", () => {
     expect(after).toEqual({ next_run_at: "2026-11-13 07:30:00.000", locked_until: null, last_status: "ok" });
 
     // Antes da próxima hora, nada roda.
-    const late = await tick(new Date("2026-11-12T12:00:00Z"));
+    // 08:00 UTC: a limpeza já rodou e a dos animes (06:10 em Brasília = 09:10 UTC) ainda não chegou.
+    const late = await tick(new Date("2026-11-12T08:00:00Z"));
     expect(late.started).toEqual([]);
     await late.done;
   });
@@ -60,6 +61,6 @@ describe("cron", () => {
     expect(result && result.status).toBe("ok");
     const s = await status(5);
     expect(s.runs.filter((r) => (r as { job: string }).job === "limpeza").length).toBe(2);
-    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["limpeza"]);
+    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["animes-anilist", "limpeza"]);
   });
 });

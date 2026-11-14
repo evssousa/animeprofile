@@ -4,11 +4,13 @@
 //   /sitemap-news.xml      formato Google News: só notícias das últimas 48 h
 //   /sitemap-articles.xml  todas as notícias e artigos
 //   /sitemap-taxonomy.xml  categorias com matéria, tags com 3+ matérias e autores de IA
+//   /sitemap-animes.xml    fichas de anime guardadas no banco
 //   /rss.xml               as 30 matérias mais recentes (novo; o site antigo não tinha RSS de notícias)
-// Os sitemaps de animes, quiz, blog e perfis entram aqui quando essas áreas existirem no site novo.
+// Os sitemaps de quiz, blog e perfis entram aqui quando essas áreas existirem no site novo.
 import { SITE, absoluteUrl } from "~/lib/site";
 import { hasDatabase, iso, query } from "../db.server";
 import { VISIBLE, latestPosts, postUrl, type PostType } from "../content/posts.server";
+import { animeIdsForSitemap } from "../anime/anime.server";
 
 export const xmlEscape = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[c]!);
@@ -18,6 +20,8 @@ export const STATIC_PAGES: { path: string; changefreq: string; priority: string 
   { path: "/", changefreq: "daily", priority: "1.0" },
   { path: "/noticias", changefreq: "hourly", priority: "0.9" },
   { path: "/artigos", changefreq: "daily", priority: "0.8" },
+  { path: "/animes", changefreq: "daily", priority: "0.9" },
+  { path: "/animes/calendario", changefreq: "daily", priority: "0.8" },
   { path: "/sobre", changefreq: "monthly", priority: "0.6" },
   { path: "/contato", changefreq: "monthly", priority: "0.4" },
   { path: "/como-instalar", changefreq: "monthly", priority: "0.4" },
@@ -29,7 +33,7 @@ export const STATIC_PAGES: { path: string; changefreq: string; priority: string 
   { path: "/legal/padroes-editoriais", changefreq: "monthly", priority: "0.4" },
 ];
 
-export const SITEMAPS = ["/sitemap-static.xml", "/sitemap-news.xml", "/sitemap-articles.xml", "/sitemap-taxonomy.xml"];
+export const SITEMAPS = ["/sitemap-static.xml", "/sitemap-news.xml", "/sitemap-articles.xml", "/sitemap-taxonomy.xml", "/sitemap-animes.xml"];
 
 const urlset = (body: string[], extraNs = "") =>
   [`<?xml version="1.0" encoding="UTF-8"?>`, `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"${extraNs}>`, ...body, `</urlset>`].join("\n");
@@ -109,6 +113,11 @@ export async function sitemapTaxonomy() {
     ...tags.map((t) => url(`/tag/${t.slug}`, { changefreq: "weekly", priority: "0.5" })),
     ...authors.map((a) => url(`/autores/${a.slug}`, { changefreq: "weekly", priority: "0.4" })),
   ]);
+}
+
+export async function sitemapAnimes() {
+  const rows = await animeIdsForSitemap();
+  return urlset(rows.map((r) => url(`/animes/${r.anilist_id}`, { lastmod: iso(r.synced_at), changefreq: "weekly", priority: "0.6" })));
 }
 
 /** RSS 2.0 com as 30 matérias mais recentes (notícias e artigos). */

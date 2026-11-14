@@ -8,6 +8,7 @@
 // Na virada do domínio, uma última exportação traz o que foi publicado depois.
 import type { PoolConnection, RowDataPacket } from "mysql2/promise";
 import { query, tx } from "../db.server";
+import { importSynopses } from "../anime/anime.server";
 import { readingMinutes, sanitizePostHtml } from "./sanitize.server";
 
 export type OldPost = {
@@ -43,6 +44,8 @@ export type OldSnapshot = {
   post_categories: { post_id: string; category_id: string }[];
   post_tags: { post_id: string; tag_id: string }[];
   tag_redirects: { old_slug: string; tag_id: string }[];
+  /** Sinopses traduzidas do catálogo de animes (opcional: retratos antigos não têm). */
+  anime_catalog?: { anilist_id: number; title: string; synopsis_pt: string | null }[];
 };
 
 /** Confere o formato antes de gravar qualquer coisa. */
@@ -140,12 +143,14 @@ export async function applySnapshot(s: OldSnapshot) {
     for (let i = 0; i < gone.length; i += 500) await conn.query("DELETE FROM posts WHERE id IN (?)", [gone.slice(i, i + 500)]);
   });
 
+  const sinopses = s.anime_catalog ? await importSynopses(s.anime_catalog) : 0;
   const [count] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM posts WHERE status = 'published'");
   return {
     materias: Number(count?.n ?? 0),
     categorias: s.categories.length,
     tags: s.tags.length,
     autores: authors.length,
+    sinopsesDeAnime: sinopses,
     puladas: skipped.slice(0, 10),
   };
 }

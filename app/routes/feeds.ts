@@ -2,7 +2,7 @@
 import { data } from "react-router";
 import type { Route } from "./+types/feeds";
 import { routePath } from "~/lib/route-path";
-import { rssFeed, sitemapArticles, sitemapIndex, sitemapNews, sitemapStatic, sitemapTaxonomy } from "~/server/seo/feeds.server";
+import { rssFeed, sitemapAnimes, sitemapArticles, sitemapIndex, sitemapNews, sitemapStatic, sitemapTaxonomy } from "~/server/seo/feeds.server";
 
 const FILES: Record<string, { build: () => string | Promise<string>; type: string; maxAge: number }> = {
   "/sitemap.xml": { build: () => sitemapIndex(), type: "application/xml", maxAge: 3600 },
@@ -10,6 +10,7 @@ const FILES: Record<string, { build: () => string | Promise<string>; type: strin
   "/sitemap-news.xml": { build: sitemapNews, type: "application/xml", maxAge: 300 },
   "/sitemap-articles.xml": { build: sitemapArticles, type: "application/xml", maxAge: 3600 },
   "/sitemap-taxonomy.xml": { build: sitemapTaxonomy, type: "application/xml", maxAge: 3600 },
+  "/sitemap-animes.xml": { build: sitemapAnimes, type: "application/xml", maxAge: 3600 },
   "/rss.xml": { build: rssFeed, type: "application/rss+xml", maxAge: 600 },
 };
 

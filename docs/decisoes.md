@@ -2,6 +2,20 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-14 — Animes guardados no banco, vindos do AniList
+
+- **Decisão:**
+  - **De onde vêm os dados:**
+    - **Temporada, em alta e horários:** a tarefa `animes-anilist` busca no AniList, gratuito e sem chave, a cada
+      6 horas, e guarda no MySQL. São cerca de 15 pedidos, longe do limite.
+    - **Fichas de animes antigos:** são buscadas na primeira visita e renovadas a cada 3 dias.
+    - **No site antigo:** o navegador consultava o AniList a cada visita.
+  - **Sinopses em português:** as do site antigo, traduzidas pelo Gemini, vêm na exportação. Animes sem tradução
+    mostram a sinopse original em inglês, com aviso, até o robô de tradução existir.
+  - **Top 10 da semana:** por enquanto é o "em alta" do AniList, preferindo os que estão em streaming no Brasil,
+    como no site antigo. Os favoritos dos usuários entram quando as contas forem migradas.
+- **Por quê:** a página fica mais rápida, aparece para o Google e continua no ar se o AniList cair.
+
 ## 2026-11-13 — Sem "Faça parte"; o site novo não fala com o Supabase
 
 - **Decisão:**

@@ -133,6 +133,7 @@ Tarefas previstas, vindas do site antigo, sem as dos recursos que saem:
 
 | Tarefa | Quando |
 |---|---|
+| Animes do AniList (`animes-anilist`): temporada, em alta, episódios dos próximos 8 dias | a cada 6 h ✅ |
 | Notícias por IA (buscar, escrever e publicar) | de hora em hora, com o limite do dia |
 | Postagem no Instagram | a cada 15 min, se houver publicação na fila |
 | Fechar o ranking da semana e pagar os prêmios | segunda-feira |

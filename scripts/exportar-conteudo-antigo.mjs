@@ -55,6 +55,11 @@ const [posts, categories, tags, ai_news_authors, post_categories, post_tags, tag
   fetchAll("post_tags", "post_id,tag_id", "", "post_id,tag_id"),
   fetchAll("tag_redirects", "old_slug,tag_id", "", "old_slug").catch(() => []),
 ]);
+// Sinopses de anime traduzidas pelo site antigo (custaram chamadas ao Gemini; o resto o site novo busca no AniList).
+const anime_catalog = await fetchAll("anime_catalog", "anilist_id,title,synopsis_pt", "&synopsis_pt=not.is.null", "anilist_id").catch((e) => {
+  console.log(`Aviso: catálogo de animes não lido (${e.message}).`);
+  return [];
+});
 
 // Perfis só de quem assina matérias (autores humanos).
 const aiIds = new Set(ai_news_authors.map((a) => a.id));
@@ -88,12 +93,12 @@ for (let i = 0; i < withImage.length; i += 8) {
 }
 const measured = withImage.filter((p) => p.image_width).length;
 
-const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects };
+const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog };
 const gz = gzipSync(JSON.stringify(snapshot));
 mkdirSync(".import", { recursive: true });
 writeFileSync(".import/conteudo.json.gz", gz);
 console.log(
-  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado). Capas medidas: ${measured} de ${withImage.length}.`,
+  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado). Capas medidas: ${measured} de ${withImage.length}. Sinopses de anime: ${anime_catalog.length}.`,
 );
 
 if (!process.env.CRON_TOKEN) {

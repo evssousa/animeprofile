@@ -1,14 +1,16 @@
 // Página inicial, na divisão de seções do site atual (docs/design.md). As seções que dependem de dados
-// ainda não migrados (ranking, animes no ar, Top 10, temporada, Otaku TV, quiz, blog, comentários e feed)
-// entram quando cada área for construída.
+// ainda não migrados (ranking do mês, Otaku TV, quiz, blog, comentários e feed) entram quando cada área for construída.
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Award, MessagesSquare, Sofa, Sparkles } from "lucide-react";
 import type { Route } from "./+types/home";
+import { AiringPoster, AnimePoster, TopTen } from "~/components/anime";
 import { PostCard, PostOverlay, PostRow, SectionHead } from "~/components/posts";
+import { SEASON_PT, brDay } from "~/lib/anime";
 import { readingLabel } from "~/lib/format";
 import { seo } from "~/lib/seo";
 import { isWideImage } from "~/lib/images";
+import { airingBetween, seasonAnimes, trendingAnimes } from "~/server/anime/anime.server";
 import { latestPosts, mostRead, trendingTags, type PostCard as Card } from "~/server/content/posts.server";
 
 export async function loader() {
@@ -17,14 +19,18 @@ export async function loader() {
   const recent = (await latestPosts({}, 30)).filter((p) => p.image);
   const featured = [...recent.filter(isWideImage), ...recent.filter((p) => !isWideImage(p))].slice(0, 4);
   const exclude = featured.map((p) => p.id);
-  const [news, articles, topArticles, topAll, tags] = await Promise.all([
+  const dayStart = new Date(`${brDay(new Date())}T00:00:00-03:00`);
+  const [news, articles, topArticles, topAll, tags, airing, trending, season] = await Promise.all([
     latestPosts({ type: "news", excludeIds: exclude }, 8),
     latestPosts({ type: "article", excludeIds: exclude }, 5),
     mostRead(5, "article"),
     mostRead(4),
     trendingTags(14),
+    airingBetween(dayStart, new Date(dayStart.getTime() + 86400_000)),
+    trendingAnimes(10),
+    seasonAnimes(8),
   ]);
-  return { featured, news, articles, topArticles, topAll, tags };
+  return { featured, news, articles, topArticles, topAll, tags, airing: airing.slice(0, 8), trending, season };
 }
 
 export function meta() {
@@ -36,13 +42,47 @@ export function meta() {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { featured, news, articles, topArticles, topAll, tags } = loaderData;
+  const { featured, news, articles, topArticles, topAll, tags, airing, trending, season } = loaderData;
   const [leadArticle, ...moreArticles] = articles;
   return (
     <>
       {featured.length > 0 && <Hero slides={featured} />}
 
       <div className="mx-auto flex max-w-[1328px] flex-col gap-[72px] px-4 py-14 sm:px-8 lg:px-14">
+        {airing.length > 0 && (
+          <section aria-labelledby="no-ar" className="flex flex-col gap-6">
+            <SectionHead id="no-ar" label="Ao vivo" title="Animes no ar hoje" more={{ to: "/animes/calendario", text: "Calendário da semana" }} />
+            <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4 lg:grid-cols-8">
+              {airing.map((it) => (
+                <AiringPoster key={`${it.anime.id}-${it.episode}`} item={it} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {trending.length > 0 && (
+          <section aria-labelledby="top10" className="flex flex-col gap-6">
+            <SectionHead id="top10" label="Top 10 da semana" title="Os animes mais comentados agora" more={{ to: "/animes", text: "Ver animes" }} />
+            <TopTen items={trending} />
+          </section>
+        )}
+
+        {season.items.length > 0 && (
+          <section aria-labelledby="temporada" className="flex flex-col gap-6">
+            <SectionHead
+              id="temporada"
+              label="Temporada atual"
+              title={`Animes de ${SEASON_PT[season.season]} ${season.year}`}
+              more={{ to: "/animes#temporada", text: "Ver temporada" }}
+            />
+            <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4 lg:grid-cols-8">
+              {season.items.map((a) => (
+                <AnimePoster key={a.id} anime={a} />
+              ))}
+            </div>
+          </section>
+        )}
+
         {leadArticle && (
           <section aria-labelledby="artigos" className="flex flex-col gap-6">
             <SectionHead id="artigos" label="Artigos" title="Guias, listas e indicações para o verdadeiro otaku" more={{ to: "/artigos", text: "Todos os artigos" }} />

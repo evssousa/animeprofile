@@ -79,7 +79,7 @@ function toCard(r: CardRow): PostCard {
   };
 }
 
-export type ListFilter = { type?: PostType; categoryId?: string; tagId?: string; authorId?: string; search?: string; excludeIds?: string[] };
+export type ListFilter = { type?: PostType; categoryId?: string; tagId?: string; authorId?: string; anilistId?: number; search?: string; excludeIds?: string[] };
 
 function where(f: ListFilter): { sql: string; params: unknown[] } {
   const parts = [VISIBLE];
@@ -95,6 +95,10 @@ function where(f: ListFilter): { sql: string; params: unknown[] } {
   if (f.tagId) {
     parts.push("EXISTS (SELECT 1 FROM post_tags pt WHERE pt.post_id = p.id AND pt.tag_id = ?)");
     params.push(f.tagId);
+  }
+  if (f.anilistId) {
+    parts.push("p.anilist_id = ?");
+    params.push(f.anilistId);
   }
   if (f.authorId) {
     parts.push("p.author_id = ?");

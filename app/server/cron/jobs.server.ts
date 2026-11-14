@@ -1,5 +1,6 @@
 // Catálogo das tarefas agendadas. O horário mora aqui (versionado); o estado mora em cron_jobs.
 // Cada tarefa devolve um resumo curto (vai para cron_runs.stats) ou lança erro.
+import { syncAnimes } from "../anime/anime.server";
 import { exec } from "../db.server";
 
 export type JobStats = Record<string, unknown>;
@@ -24,6 +25,13 @@ export const JOBS: Job[] = [
       );
       return { execucoesApagadas: old.affected, execucoesTravadas: stuck.affected };
     },
+  },
+  {
+    // Temporada atual, em alta nesta semana e episódios dos próximos 8 dias, do AniList (gratuito, sem chave).
+    name: "animes-anilist",
+    schedule: "10 */6 * * *",
+    leaseMinutes: 10,
+    run: () => syncAnimes(),
   },
 ];
 
