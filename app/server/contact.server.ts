@@ -1,7 +1,7 @@
 // Mensagens dos formulários públicos (Contato e Faça parte). Sem conta: protegido por campo-isca
 // (robôs preenchem, pessoas não veem) e por limite de envios por IP. O Turnstile entra com as chaves.
-import { createHash } from "node:crypto";
 import { exec, hasDatabase, query } from "./db.server";
+import { clientIp, ipHash } from "./http.server";
 
 export type ContactKind = "contato" | "faca-parte";
 export type FieldErrors = Partial<Record<string, string>>;
@@ -9,17 +9,6 @@ export type ContactInput = { name: string; email: string; subject: string; body:
 
 const MAX_PER_HOUR = 5;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-export function clientIp(request: Request) {
-  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "";
-}
-
-/** Hash do IP com o dia: dá para contar envios repetidos sem guardar o IP de ninguém. */
-function ipHash(ip: string) {
-  if (!ip) return null;
-  const day = new Date().toISOString().slice(0, 10);
-  return createHash("sha256").update(`${ip}|${day}|${process.env.CRON_TOKEN ?? ""}`).digest("hex");
-}
 
 export function validate(input: ContactInput, { minBody = 10 } = {}): FieldErrors {
   const errors: FieldErrors = {};

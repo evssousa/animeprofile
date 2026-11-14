@@ -11,6 +11,7 @@ import { SITE, absoluteUrl } from "~/lib/site";
 import { hasDatabase, iso, query } from "../db.server";
 import { VISIBLE, latestPosts, postUrl, type PostType } from "../content/posts.server";
 import { animeIdsForSitemap } from "../anime/anime.server";
+import { quizzesForSitemap } from "../quiz/quiz.server";
 
 export const xmlEscape = (s: string) =>
   s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[c]!);
@@ -23,6 +24,7 @@ export const STATIC_PAGES: { path: string; changefreq: string; priority: string 
   { path: "/animes", changefreq: "daily", priority: "0.9" },
   { path: "/animes/calendario", changefreq: "daily", priority: "0.8" },
   { path: "/otaku-tv", changefreq: "daily", priority: "0.8" },
+  { path: "/quiz", changefreq: "weekly", priority: "0.7" },
   { path: "/sobre", changefreq: "monthly", priority: "0.6" },
   { path: "/contato", changefreq: "monthly", priority: "0.4" },
   { path: "/como-instalar", changefreq: "monthly", priority: "0.4" },
@@ -34,7 +36,7 @@ export const STATIC_PAGES: { path: string; changefreq: string; priority: string 
   { path: "/legal/padroes-editoriais", changefreq: "monthly", priority: "0.4" },
 ];
 
-export const SITEMAPS = ["/sitemap-static.xml", "/sitemap-news.xml", "/sitemap-articles.xml", "/sitemap-taxonomy.xml", "/sitemap-animes.xml"];
+export const SITEMAPS = ["/sitemap-static.xml", "/sitemap-news.xml", "/sitemap-articles.xml", "/sitemap-taxonomy.xml", "/sitemap-animes.xml", "/sitemap-quiz.xml"];
 
 const urlset = (body: string[], extraNs = "") =>
   [`<?xml version="1.0" encoding="UTF-8"?>`, `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"${extraNs}>`, ...body, `</urlset>`].join("\n");
@@ -119,6 +121,11 @@ export async function sitemapTaxonomy() {
 export async function sitemapAnimes() {
   const rows = await animeIdsForSitemap();
   return urlset(rows.map((r) => url(`/animes/${r.anilist_id}`, { lastmod: iso(r.synced_at), changefreq: "weekly", priority: "0.6" })));
+}
+
+export async function sitemapQuiz() {
+  const rows = await quizzesForSitemap();
+  return urlset(rows.map((r) => url(`/quiz/${r.slug}`, { lastmod: iso(r.updated_at ?? r.published_at), changefreq: "monthly", priority: "0.7" })));
 }
 
 /** RSS 2.0 com as 30 matérias mais recentes (notícias e artigos). */

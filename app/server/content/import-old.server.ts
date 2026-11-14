@@ -10,6 +10,7 @@ import type { PoolConnection, RowDataPacket } from "mysql2/promise";
 import { query, tx } from "../db.server";
 import { importSynopses } from "../anime/anime.server";
 import { rebuildPostVideos } from "../tv/tv.server";
+import { importQuizzes } from "../quiz/quiz.server";
 import { readingMinutes, sanitizePostHtml } from "./sanitize.server";
 
 export type OldPost = {
@@ -49,6 +50,9 @@ export type OldSnapshot = {
   anime_catalog?: { anilist_id: number; title: string; synopsis_pt: string | null }[];
   /** Comentários públicos (opcional: retratos antigos não têm). */
   post_comments?: { id: string; post_id: string; author_id: string; parent_id: string | null; content: string; created_at: string }[];
+  /** Quizzes publicados e a contagem por resultado (opcionais: retratos antigos não têm). */
+  quizzes?: { id: string; slug: string; title: string; description: string | null; cover_url: string | null; kind: "personalidade" | "conhecimento"; data: unknown; status: string; anilist_id: number | null; plays_count: number | null; published_at: string | null; created_at: string; updated_at: string }[];
+  quiz_result_counts?: { quiz_id: string; result_id: string; plays: number }[];
 };
 
 /** Confere o formato antes de gravar qualquer coisa. */
@@ -91,7 +95,7 @@ export function mapPost(p: OldPost) {
   };
 }
 
-async function upsert(conn: PoolConnection, table: string, rows: Record<string, unknown>[], keys: string[]) {
+export async function upsert(conn: PoolConnection, table: string, rows: Record<string, unknown>[], keys: string[]) {
   if (!rows.length) return;
   const cols = Object.keys(rows[0]);
   const updates = cols.filter((c) => !keys.includes(c)).map((c) => `${c} = VALUES(${c})`);
@@ -157,6 +161,7 @@ export async function applySnapshot(s: OldSnapshot) {
 
   const sinopses = s.anime_catalog ? await importSynopses(s.anime_catalog) : 0;
   const videos = await rebuildPostVideos();
+  const quiz = s.quizzes ? await importQuizzes(s) : undefined;
   const [count] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM posts WHERE status = 'published'");
   return {
     materias: Number(count?.n ?? 0),
@@ -165,6 +170,7 @@ export async function applySnapshot(s: OldSnapshot) {
     autores: authors.length,
     sinopsesDeAnime: sinopses,
     videosDasMaterias: videos.videos,
+    ...(quiz ? { quizzes: quiz.quizzes, partidasDeQuiz: quiz.partidas, quizzesPulados: quiz.pulados } : {}),
     comentarios: comments.length,
     puladas: skipped.slice(0, 10),
   };

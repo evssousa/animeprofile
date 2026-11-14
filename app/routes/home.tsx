@@ -11,8 +11,10 @@ import { readingLabel } from "~/lib/format";
 import { seo } from "~/lib/seo";
 import { isWideImage } from "~/lib/images";
 import { ytThumb } from "~/components/otaku-tv";
+import { QuizCard } from "~/components/quiz";
 import { airingBetween, seasonAnimes, trendingAnimes } from "~/server/anime/anime.server";
 import { latestTvVideos } from "~/server/tv/tv.server";
+import { listQuizzes } from "~/server/quiz/quiz.server";
 import { latestPosts, mostRead, trendingTags, type PostCard as Card } from "~/server/content/posts.server";
 
 export async function loader() {
@@ -22,7 +24,7 @@ export async function loader() {
   const featured = [...recent.filter(isWideImage), ...recent.filter((p) => !isWideImage(p))].slice(0, 4);
   const exclude = featured.map((p) => p.id);
   const dayStart = new Date(`${brDay(new Date())}T00:00:00-03:00`);
-  const [news, articles, topArticles, topAll, tags, airing, trending, season, tv] = await Promise.all([
+  const [news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes] = await Promise.all([
     latestPosts({ type: "news", excludeIds: exclude }, 8),
     latestPosts({ type: "article", excludeIds: exclude }, 5),
     mostRead(5, "article"),
@@ -32,8 +34,9 @@ export async function loader() {
     trendingAnimes(10),
     seasonAnimes(8),
     latestTvVideos(5),
+    listQuizzes({ order: "novos", limit: 4 }),
   ]);
-  return { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv };
+  return { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes };
 }
 
 export function meta() {
@@ -45,7 +48,7 @@ export function meta() {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv } = loaderData;
+  const { featured, news, articles, topArticles, topAll, tags, airing, trending, season, tv, quizzes } = loaderData;
   const [leadArticle, ...moreArticles] = articles;
   return (
     <>
@@ -127,6 +130,17 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         )}
 
         {tv.length > 0 && <OtakuTvPanel videos={tv} />}
+
+        {quizzes.length > 0 && (
+          <section aria-labelledby="quiz" className="flex flex-col gap-6">
+            <SectionHead id="quiz" label="Quiz" title="Descubra qual personagem você seria" more={{ to: "/quiz", text: "Todos os quizzes" }} />
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {quizzes.map((q) => (
+                <QuizCard key={q.id} quiz={q} />
+              ))}
+            </div>
+          </section>
+        )}
 
         <Collection />
 

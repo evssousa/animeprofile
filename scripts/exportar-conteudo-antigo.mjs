@@ -107,12 +107,43 @@ for (let i = 0; i < withImage.length; i += 8) {
 }
 const measured = withImage.filter((p) => p.image_width).length;
 
-const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog, post_comments };
+// Quizzes publicados e quantas pessoas tiveram cada resultado. A chave pública não lê quiz_plays; a contagem sai de
+// quiz_record_play chamada com um resultado que não existe: a função, nesse caso, não grava nada e só devolve a
+// contagem (conferido em 20261026110000_quizzes.sql: o INSERT/UPDATE fica dentro do IF EXISTS do resultado).
+const quizzes = await fetchAll(
+  "quizzes",
+  "id,slug,title,description,cover_url,kind,data,status,anilist_id,plays_count,published_at,created_at,updated_at",
+  "&status=eq.published",
+  "id",
+).catch((e) => {
+  console.log(`Aviso: quizzes não lidos (${e.message}).`);
+  return [];
+});
+const quiz_result_counts = [];
+for (let i = 0; i < quizzes.length; i += 5) {
+  await Promise.all(
+    quizzes.slice(i, i + 5).map(async (q) => {
+      try {
+        const res = await fetch(`${BASE}/rest/v1/rpc/quiz_record_play`, {
+          method: "POST",
+          headers: { apikey: KEY, Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ _quiz: q.id, _result: "__exportacao__", _score: null }),
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        for (const r of await res.json()) quiz_result_counts.push({ quiz_id: q.id, result_id: r.result_id, plays: Number(r.plays) });
+      } catch (e) {
+        console.log(`Aviso: contagem do quiz ${q.slug} não lida (${e.message}).`);
+      }
+    }),
+  );
+}
+
+const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog, post_comments, quizzes, quiz_result_counts };
 const gz = gzipSync(JSON.stringify(snapshot));
 mkdirSync(".import", { recursive: true });
 writeFileSync(".import/conteudo.json.gz", gz);
 console.log(
-  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado). Capas medidas: ${measured} de ${withImage.length}. Sinopses de anime: ${anime_catalog.length}. Comentários: ${post_comments.length}.`,
+  `Exportado: ${posts.length} matérias, ${categories.length} categorias, ${tags.length} tags, ${ai_news_authors.length + profiles.length} autores (${(gz.length / 1024 / 1024).toFixed(1)} MB compactado). Capas medidas: ${measured} de ${withImage.length}. Sinopses de anime: ${anime_catalog.length}. Comentários: ${post_comments.length}. Quizzes: ${quizzes.length} (partidas: ${quiz_result_counts.reduce((n, r) => n + r.plays, 0)}).`,
 );
 
 if (!process.env.CRON_TOKEN) {
