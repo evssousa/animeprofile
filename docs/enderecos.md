@@ -19,7 +19,7 @@ favoritos dos usuários. Levantado em 2026-11-12 nas 138 rotas do site antigo.
 | Social | `/feed`, `/feed/post/:id`, `/mensagens`, `/explorar`, `/quarto`, `/otaku-tv` |
 | Outros | `/reportar-bug` |
 | Admin | `/admin/*` (as telas dos recursos que saíram não voltam) |
-| Arquivos especiais | `/sitemap.xml` e os sitemaps por tipo, `/robots.txt`, `/firebase-messaging-sw.js` (mesmo nome: os celulares com notificação ativa continuam recebendo) |
+| Arquivos especiais | `/sitemap.xml` e os sitemaps por tipo (já no ar: static, news, articles, taxonomy; animes, quiz, blog e users entram com cada área), `/rss.xml` (novo), `/robots.txt`, `/firebase-messaging-sw.js` (mesmo nome: os celulares com notificação ativa continuam recebendo) |
 | Pagamento | `/api/public/payments/webhook` e `/api/public/payments/mercado-pago` (o Mercado Pago continua chamando o mesmo endereço) |
 
 ## Saem, com redirecionamento permanente (301)

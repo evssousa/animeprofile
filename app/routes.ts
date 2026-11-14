@@ -32,6 +32,9 @@ export default [
   route("contato", "routes/contato.tsx"),
   ...PENDING.map((path) => route(path, "routes/em-breve.tsx", { id: `em-breve-${path}` })),
   route("robots.txt", "routes/robots.ts"),
+  ...["sitemap.xml", "sitemap-static.xml", "sitemap-news.xml", "sitemap-articles.xml", "sitemap-taxonomy.xml", "rss.xml"].map((f) =>
+    route(f, "routes/feeds.ts", { id: `feed-${f}` }),
+  ),
   route("api/health", "routes/api.health.ts"),
   route("api/cron/:job", "routes/api.cron.ts"),
   route("api/importar/:what", "routes/api.importar.ts"),

@@ -8,6 +8,7 @@ import { createPool, setPool } from "~/server/db.server";
 import { applySnapshot, mapPost, validateSnapshot, type OldSnapshot } from "~/server/content/import-old.server";
 import { readingMinutes, sanitizePostHtml } from "~/server/content/sanitize.server";
 import { isWideImage } from "~/lib/images";
+import { rssFeed, sitemapArticles, sitemapIndex, sitemapNews, sitemapStatic, sitemapTaxonomy } from "~/server/seo/feeds.server";
 import { getPost, getTag, latestPosts, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
 
 let server: Awaited<ReturnType<typeof createDB>>;
@@ -160,5 +161,35 @@ describe("redirecionamentos do que saiu", () => {
     expect(redirectFor("/en")).toBe("/");
     expect(redirectFor("/noticias/qualquer")).toBeNull();
     expect(redirectFor("/entrar")).toBeNull();
+  });
+});
+
+describe("sitemaps e RSS", () => {
+  it("índice, páginas fixas, todas as matérias e Google News (só 48 h)", async () => {
+    await importOld(); // o teste anterior tirou e devolveu uma matéria
+    expect(sitemapIndex()).toContain("/sitemap-news.xml</loc>");
+    expect(sitemapStatic()).toContain("/legal/termos</loc>");
+    const all = await sitemapArticles();
+    expect(all).toContain("/noticias/sakamoto-days-arco-final</loc>");
+    expect(all).toContain("/artigos/onde-assistir-jujutsu-kaisen</loc>");
+    expect(all).not.toContain("materia-do-futuro");
+    const news = await sitemapNews();
+    expect(news).toContain('xmlns:news="http://www.google.com/schemas/sitemap-news/0.9"');
+    expect(news).toContain("sakamoto-days-arco-final"); // publicada há 1 dia
+    expect(news).not.toContain("bleach-arte-ichigo"); // publicada há 2 dias: fora da janela de 48 h
+  });
+
+  it("taxonomia: categorias com matéria, tags com 3+ matérias e autores de IA", async () => {
+    const tax = await sitemapTaxonomy();
+    expect(tax).toContain("/categoria/animes-e-mangas</loc>");
+    expect(tax).not.toContain("/tag/jump</loc>"); // só 2 matérias
+    expect(tax).toContain("/autores/lia</loc>");
+  });
+
+  it("RSS com título, link e texto escapado", async () => {
+    const rss = await rssFeed();
+    expect(rss).toContain("<rss version=\"2.0\"");
+    expect(rss).toContain("<title>SAKAMOTO DAYS entra no arco final</title>");
+    expect(rss).not.toContain("Agendada");
   });
 });

@@ -11,6 +11,7 @@ import { SITE } from "./lib/site";
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/favicon.png", type: "image/png" },
   { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+  { rel: "alternate", type: "application/rss+xml", title: "Anime Profile: notícias e artigos", href: "/rss.xml" },
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
   { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
   { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&display=swap" },

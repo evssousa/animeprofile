@@ -32,7 +32,7 @@ export type PostFull = PostCard & {
 export const postUrl = (type: PostType, slug: string) => `${type === "article" ? "/artigos" : "/noticias"}/${slug}`;
 export const authorUrl = (kind: string, slug: string) => (kind === "ai" ? `/autores/${slug}` : `/u/${slug}`);
 
-const VISIBLE = "p.status = 'published' AND p.published_at IS NOT NULL AND p.published_at <= UTC_TIMESTAMP(3)";
+export const VISIBLE = "p.status = 'published' AND p.published_at IS NOT NULL AND p.published_at <= UTC_TIMESTAMP(3)";
 
 // Categoria principal: a primeira do mesmo tipo da matéria (notícia ou artigo), por nome.
 const CARD_COLUMNS = `
