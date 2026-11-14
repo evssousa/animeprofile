@@ -2,6 +2,19 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-14 — Robôs não disparam buscas no AniList
+
+- **O que aconteceu:**
+  - **O robô:** um robô percorreu o sitemap do endereço de teste, ignorando o `robots.txt`.
+  - **O efeito:** cada ficha de anime aberta virou um pedido ao AniList, cerca de 1.400 em 20 minutos.
+- **Decisão:**
+  - **Robôs:** as buscas sob demanda (ficha de anime ou personagem ainda não guardada) não acontecem para robôs,
+    reconhecidos pelo `isbot`. Eles veem só o que já está guardado.
+  - **Limite:** cada processo faz no máximo 20 buscas por minuto (`app/server/anime/remote-guard.server.ts`).
+  - **Personagens:** ficam fora do sitemap.
+- **Por quê:**
+  - **Limite do AniList:** é de cerca de 90 pedidos por minuto. Estourar deixaria o site sem dados novos e lento.
+
 ## 2026-11-14 — Animes guardados no banco, vindos do AniList
 
 - **Decisão:**

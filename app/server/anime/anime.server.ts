@@ -189,12 +189,15 @@ const DETAILS_MAX_AGE_MS = 3 * 86400_000;
 /**
  * Ficha do anime. Lê do banco; se o anime não estiver guardado (link antigo, busca) ou a ficha completa estiver
  * velha, busca no AniList e guarda. Se o AniList falhar, mostra o que já tem.
+ * `remote: false` (robôs, ou limite de buscas por minuto atingido) nunca busca: usa só o que está guardado.
  */
-export async function getAnime(id: number): Promise<AnimeFull | null> {
+export async function getAnime(id: number, { remote = true }: { remote?: boolean } = {}): Promise<AnimeFull | null> {
   if (!hasDatabase() || !Number.isInteger(id) || id <= 0) return null;
   let row = await loadFull(id);
   const stale = !row || !row.details_at || Date.now() - new Date(iso(row.details_at)!).getTime() > DETAILS_MAX_AGE_MS;
-  if (stale) {
+  // Linha só com a sinopse antiga (sem dados do AniList) não vira página para quem não pode buscar.
+  if (!remote && row && !row.cover_url) return null;
+  if (stale && remote) {
     try {
       const media = await fetchDetails(id);
       if (!media) return null;

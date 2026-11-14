@@ -6,7 +6,9 @@ import { migrate } from "../db/migrate.mjs";
 import { brDay, cleanDescription, currentSeason, streamersFrom } from "~/lib/anime";
 import { createPool, query, setPool } from "~/server/db.server";
 import { mediaToRow, type AniMedia } from "~/server/anime/anilist.server";
-import { airingBetween, getAnime, importSynopses, seasonAnimes, syncAnimes, trendingAnimes, upsertMedia } from "~/server/anime/anime.server";
+import { getCharacter, splitAbout } from "~/server/anime/characters.server";
+import { canFetchRemote, resetRemoteGuard } from "~/server/anime/remote-guard.server";
+import { airingBetween, animeIdsForSitemap, getAnime, importSynopses, seasonAnimes, syncAnimes, trendingAnimes, upsertMedia } from "~/server/anime/anime.server";
 
 let server: Awaited<ReturnType<typeof createDB>>;
 let pool: mysql.Pool;
@@ -54,6 +56,19 @@ const fakeAniList = vi.fn(async (_url: string, init?: RequestInit) => {
   }
   if (q.includes("TRENDING_DESC")) return page({ Page: { pageInfo: { hasNextPage: false }, media: [media(3, { externalLinks: [] }), media(2), media(1)] } });
   if (q.includes("seasonYear: $year")) return page({ Page: { pageInfo: { hasNextPage: false }, media: [media(1), media(2), media(3)] } });
+  if (q.includes("Character(id: $id")) {
+    if (variables.id === 404) return page({ Character: null });
+    return page({ Character: {
+      id: variables.id, name: { full: "Maomao", native: "猫猫", alternative: ["Mao"] }, image: { large: "https://img.example/m.jpg" },
+      description: "Uma boticária.\n~!Ela é filha de Lakan.!~ Gosta de venenos.", gender: "Female", dateOfBirth: { year: null, month: 3, day: 14 },
+      age: "17", bloodType: null, favourites: 50000,
+      media: { edges: [
+        { characterRole: "MAIN", voiceActors: [{ id: 7, name: { full: "Aoi Yuuki", native: "悠木碧" }, image: { large: null } }], node: { id: 1, title: { userPreferred: "Kusuriya" }, coverImage: { large: null, color: null }, format: "TV", seasonYear: 2023, isAdult: false } },
+        { characterRole: "MAIN", voiceActors: [{ id: 7, name: { full: "Aoi Yuuki", native: "悠木碧" }, image: { large: null } }], node: { id: 2, title: { userPreferred: "Kusuriya 2" }, coverImage: null, format: "TV", seasonYear: 2025, isAdult: false } },
+        { characterRole: "MAIN", voiceActors: [], node: { id: 3, title: { userPreferred: "Adulto" }, coverImage: null, format: "OVA", seasonYear: 2024, isAdult: true } },
+      ] },
+    } });
+  }
   if (q.includes("Media(id: $id")) {
     if (variables.id === 404) return page({ Media: null });
     return page({ Media: { ...media(variables.id), characters: { edges: [
@@ -125,6 +140,8 @@ describe("banco e tarefa", () => {
     await upsertMedia([media(1)]);
     const a = await getAnime(1);
     expect(a).toMatchObject({ synopsis: "Uma história em português.", synopsisLang: "pt", streamers: ["crunchyroll"] });
+    // a linha criada só com a sinopse antiga (500) não entra no sitemap até ter ficha do AniList
+    expect((await animeIdsForSitemap()).map((r) => Number(r.anilist_id))).not.toContain(500);
   });
 
   it("ficha busca no AniList o que falta (personagens) e guarda; 404 vira null", async () => {
@@ -136,5 +153,43 @@ describe("banco e tarefa", () => {
     expect(fakeAniList.mock.calls.length).toBe(calls);
     expect(await getAnime(404)).toBeNull();
     expect(await getAnime(-1)).toBeNull();
+  });
+});
+
+describe("personagens e proteção contra robôs", () => {
+  it("separa os spoilers e limpa a marcação", () => {
+    expect(splitAbout("A __Altura:__ 1,50 m\n~!segredo!~ fim")).toEqual([
+      { text: "A Altura: 1,50 m", spoiler: false },
+      { text: "segredo", spoiler: true },
+      { text: "fim", spoiler: false },
+    ]);
+  });
+
+  it("ficha do personagem: busca uma vez, guarda, sem anime adulto, dubladores sem repetir", async () => {
+    resetRemoteGuard();
+    const c = await getCharacter(55);
+    expect(c).toMatchObject({ name: "Maomao", native: "猫猫", facts: [["Aniversário", "14 de março"], ["Idade", "17"], ["Gênero", "Feminino"], ["Favoritado por", "50.000 pessoas no AniList"]] });
+    expect(c!.appearances.map((a) => a.id)).toEqual([1, 2]);
+    expect(c!.voices).toEqual([{ id: 7, name: "Aoi Yuuki", native: "悠木碧", image: null }]);
+    expect(c!.about.some((s) => s.spoiler)).toBe(true);
+    const calls = fakeAniList.mock.calls.length;
+    expect(await getCharacter(55, { remote: false })).toMatchObject({ name: "Maomao" }); // do banco
+    expect(fakeAniList.mock.calls.length).toBe(calls);
+    expect(await getCharacter(56, { remote: false })).toBeNull(); // não guardado e sem permissão de buscar
+    expect(await getCharacter(404)).toBeNull();
+  });
+
+  it("robôs nunca buscam e há limite de 20 buscas por minuto", () => {
+    resetRemoteGuard();
+    const human = new Request("https://x/", { headers: { "user-agent": "Mozilla/5.0 (Windows NT 10.0) Chrome/130.0 Safari/537.36" } });
+    const bot = new Request("https://x/", { headers: { "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" } });
+    expect(canFetchRemote(bot, 1000)).toBe(false);
+    const ok = Array.from({ length: 25 }, () => canFetchRemote(human, 1000)).filter(Boolean).length;
+    expect(ok).toBe(20);
+    expect(canFetchRemote(human, 62_000)).toBe(true); // minuto seguinte
+  });
+
+  it("robô não transforma em página o anime que só tem a sinopse antiga", async () => {
+    expect(await getAnime(500, { remote: false })).toBeNull();
   });
 });

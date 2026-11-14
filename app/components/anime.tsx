@@ -1,5 +1,7 @@
 // Peças de anime: pôster, cartão de episódio (calendário / no ar hoje) e o Top 10 com números vazados.
+import { useEffect, useRef, useState } from "react";
 import { Link } from "react-router";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { FORMAT_PT, airTime, genrePt } from "~/lib/anime";
 import type { AiringItem, AnimeCard } from "~/server/anime/anime.server";
 
@@ -51,24 +53,57 @@ export function AiringPoster({ item }: { item: AiringItem }) {
   );
 }
 
-/** Top 10: números gigantes vazados atrás dos pôsteres (rola na horizontal no celular). */
+/**
+ * Top 10: números gigantes vazados atrás dos pôsteres. Rola na horizontal sem barra de rolagem: no celular
+ * com o dedo, no computador com as setas dos lados (como no site antigo), que somem no começo e no fim.
+ */
 export function TopTen({ items }: { items: AnimeCard[] }) {
+  const ref = useRef<HTMLOListElement>(null);
+  const [edges, setEdges] = useState({ left: false, right: true });
+  const update = () => {
+    const el = ref.current;
+    if (el) setEdges({ left: el.scrollLeft > 4, right: el.scrollLeft + el.clientWidth < el.scrollWidth - 4 });
+  };
+  useEffect(update, [items.length]);
+  const scroll = (dir: 1 | -1) => ref.current?.scrollBy({ left: dir * ref.current.clientWidth * 0.8, behavior: "smooth" });
+  const arrow = "absolute top-1/2 z-10 hidden size-12 -translate-y-1/2 place-items-center rounded-full bg-night/85 text-white shadow-lg backdrop-blur hover:bg-night md:grid";
   return (
-    <ol className="-mx-4 flex snap-x gap-5 overflow-x-auto px-4 pb-3 [scrollbar-width:thin] sm:-mx-8 sm:px-8 lg:-mx-14 lg:px-14">
-      {items.map((a, i) => (
-        <li key={a.id} className="group relative flex shrink-0 snap-start items-end">
-          <span
-            aria-hidden
-            className="mr-[-14px] text-[150px] leading-[.78] font-extrabold tracking-[-0.07em] text-paper [-webkit-text-stroke:2px_color-mix(in_oklab,var(--ink)_32%,transparent)] select-none sm:text-[168px]"
-          >
-            {i + 1}
-          </span>
-          <Link to={a.url} className="relative block w-[124px] sm:w-[140px]" aria-label={`${i + 1}º lugar: ${a.title}`}>
-            <Cover src={a.cover} color={a.color} className="aspect-[2/3] w-full rounded-[10px] shadow-[0_14px_28px_rgba(60,20,20,.25)] transition-transform group-hover:-translate-y-1" />
-          </Link>
-        </li>
-      ))}
-    </ol>
+    <div className="relative">
+      <ol
+        ref={ref}
+        onScroll={update}
+        className="-mx-4 flex snap-x gap-5 overflow-x-auto overflow-y-hidden px-4 pt-2 pb-3 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:-mx-14 lg:px-14 [&::-webkit-scrollbar]:hidden"
+      >
+        {items.map((a, i) => (
+          <li key={a.id} className="group relative flex shrink-0 snap-start items-end">
+            {/* O número fica alinhado ao pé da capa: a margem de baixo é a altura das 2 linhas do nome. */}
+            <span
+              aria-hidden
+              className="mr-[-14px] mb-[2.9rem] text-[150px] leading-[.78] font-extrabold tracking-[-0.07em] text-paper [-webkit-text-stroke:2px_color-mix(in_oklab,var(--ink)_32%,transparent)] select-none sm:text-[168px]"
+            >
+              {i + 1}
+            </span>
+            <div className="relative flex w-[124px] flex-col gap-2 sm:w-[140px]">
+              <Cover src={a.cover} color={a.color} className="aspect-[2/3] w-full rounded-[10px] shadow-[0_14px_28px_rgba(60,20,20,.25)] transition-transform group-hover:-translate-y-1" />
+              <Link to={a.url} className="line-clamp-2 h-[2.5rem] text-[0.85rem] leading-[1.25rem] font-semibold after:absolute after:inset-0 hover:underline">
+                <span className="sr-only">{i + 1}º lugar: </span>
+                {a.title}
+              </Link>
+            </div>
+          </li>
+        ))}
+      </ol>
+      {edges.left && (
+        <button type="button" onClick={() => scroll(-1)} className={`${arrow} -left-5`} aria-label="Ver os anteriores do Top 10">
+          <ChevronLeft className="size-6" aria-hidden />
+        </button>
+      )}
+      {edges.right && (
+        <button type="button" onClick={() => scroll(1)} className={`${arrow} -right-5`} aria-label="Ver os próximos do Top 10">
+          <ChevronRight className="size-6" aria-hidden />
+        </button>
+      )}
+    </div>
   );
 }
 

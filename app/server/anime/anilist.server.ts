@@ -169,3 +169,40 @@ export function charactersOf(m: AniMedia) {
 }
 
 export const airingSqlDate = sqlDate;
+
+export type AniCharacter = {
+  id: number;
+  name: { full: string | null; native: string | null; alternative: string[] | null };
+  image: { large: string | null } | null;
+  description: string | null;
+  gender: string | null;
+  dateOfBirth: { year: number | null; month: number | null; day: number | null } | null;
+  age: string | null;
+  bloodType: string | null;
+  favourites: number | null;
+  media: {
+    edges: {
+      characterRole: string;
+      voiceActors: { id: number; name: { full: string | null; native: string | null }; image: { large: string | null } | null }[];
+      node: { id: number; title: { userPreferred: string | null }; coverImage: { large: string | null; color: string | null } | null; format: string | null; seasonYear: number | null; isAdult: boolean | null };
+    }[];
+  } | null;
+};
+
+/** Ficha do personagem com os animes em que aparece e os dubladores japoneses. null se não existe. */
+export async function fetchCharacter(id: number): Promise<AniCharacter | null> {
+  try {
+    const d = await gql<{ Character: AniCharacter | null }>(
+      `query ($id: Int) { Character(id: $id) { id name { full native alternative } image { large } description(asHtml: false)
+        gender dateOfBirth { year month day } age bloodType favourites
+        media(type: ANIME, sort: POPULARITY_DESC, perPage: 25) { edges { characterRole
+          voiceActors(language: JAPANESE) { id name { full native } image { large } }
+          node { id title { userPreferred } coverImage { large color } format seasonYear isAdult } } } } }`,
+      { id },
+    );
+    return d.Character;
+  } catch (err) {
+    if ((err as { status?: number }).status === 404) return null;
+    throw err;
+  }
+}

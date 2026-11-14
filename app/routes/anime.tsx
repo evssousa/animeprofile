@@ -9,14 +9,15 @@ import { formatDateLong } from "~/lib/format";
 import { seo } from "~/lib/seo";
 import { absoluteUrl } from "~/lib/site";
 import { getAnime } from "~/server/anime/anime.server";
+import { canFetchRemote } from "~/server/anime/remote-guard.server";
 import { latestPosts } from "~/server/content/posts.server";
 
-export async function loader({ params }: Route.LoaderArgs) {
+export async function loader({ params, request }: Route.LoaderArgs) {
   const id = Number(params.id);
   if (!Number.isInteger(id) || id <= 0) throw data(null, { status: 404 });
   let anime;
   try {
-    anime = await getAnime(id);
+    anime = await getAnime(id, { remote: canFetchRemote(request) });
   } catch {
     throw data(null, { status: 503 });
   }
@@ -129,10 +130,14 @@ export default function Anime({ loaderData }: Route.ComponentProps) {
               </h2>
               <ul className="mt-5 grid gap-3 sm:grid-cols-2">
                 {a.characters.map((c) => (
-                  <li key={c.id} className="flex items-center gap-3 overflow-hidden rounded-[14px] border border-line bg-surface p-2.5">
+                  <li key={c.id} className="relative flex items-center gap-3 overflow-hidden rounded-[14px] border border-line bg-surface p-2.5 hover:border-ink-soft">
                     {c.image && <img src={c.image} alt="" loading="lazy" className="size-14 shrink-0 rounded-[10px] object-cover" />}
                     <div className="min-w-0 flex-1">
-                      <p className="truncate font-bold">{c.name}</p>
+                      <p className="truncate font-bold">
+                        <Link to={`/animes/personagem/${c.id}`} className="after:absolute after:inset-0 hover:underline">
+                          {c.name}
+                        </Link>
+                      </p>
                       <p className="text-[0.8rem] text-ink-soft">{c.role}</p>
                     </div>
                     {c.voice && (

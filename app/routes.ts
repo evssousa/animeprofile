@@ -16,7 +16,7 @@ const TEXT_PAGES = [
 
 // Endereços do menu que ainda não existem no site novo: mostram "em construção" com link para o
 // site atual. Cada um sai desta lista quando a página for construída.
-const PENDING = ["animes/favoritos", "animes/seguindo", "animes/personagem/:id", "otaku-tv", "quiz", "feed", "blog", "missoes", "ranking", "figurinhas", "quarto", "login", "cadastro", "u/:username"];
+const PENDING = ["animes/favoritos", "animes/seguindo", "otaku-tv", "quiz", "feed", "blog", "missoes", "ranking", "figurinhas", "quarto", "login", "cadastro", "u/:username"];
 
 export default [
   index("routes/home.tsx"),
@@ -30,6 +30,7 @@ export default [
   route("busca", "routes/busca.tsx"),
   route("animes", "routes/animes.tsx"),
   route("animes/calendario", "routes/animes-calendario.tsx"),
+  route("animes/personagem/:id", "routes/personagem.tsx"),
   route("animes/:id", "routes/anime.tsx"),
   ...TEXT_PAGES.map((path) => route(path, "routes/pagina.tsx", { id: `pagina-${path}` })),
   route("contato", "routes/contato.tsx"),

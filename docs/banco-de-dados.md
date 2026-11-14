@@ -15,6 +15,7 @@ que devolve JSON como texto (o helper `json()` trata os dois casos).
 | `003_conteudo.sql` | `posts` (HTML já limpo, mesmos IDs e slugs do site antigo), `post_authors` (IA e pessoas), `categories`, `tags`, `tag_redirects`, `post_categories`, `post_tags` | automática no deploy |
 | `004_imagem_dimensoes.sql` | `posts.image_width` e `image_height`: tamanho real da capa, medido na exportação. A capa grande da home só usa imagens com 1280 px ou mais; as menores aparecem desfocadas como fundo | automática no deploy |
 | `005_animes.sql` | `anime_catalog` (ficha do AniList + sinopse em português, streamings, personagens, posição em alta, próximo episódio) e `anime_airing` (horários dos próximos 8 dias) | automática no deploy |
+| `006_personagens.sql` | `anime_characters`: ficha pronta de cada personagem (nomes, foto, descrição com spoilers separados, animes, dubladores), guardada por 7 dias | automática no deploy |
 
 - **Produção:** são aplicadas automaticamente quando o app inicia (`db/migrate.mjs`), registradas em
   `schema_migrations`. O MySQL da Hostinger só aceita conexão local.
