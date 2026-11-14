@@ -65,6 +65,10 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
   1. Quiz.
   2. Leitura do blog.
   3. Catálogo de figurinhas.
+- **Decisões de 2026-11-15:** figurinhas aparecem em silhueta (constante para trocar depois); a atualização do conteúdo
+  do site de teste (notícias, artigos, quizzes, blog, figurinhas) fica para 2026-11-16 depois das 15h, tudo de uma vez.
+- **Migration 009 (quiz):** conferida no site de teste, rodou no deploy (`/quiz` responde 200 lendo a tabela).
+
 - **Para atualizar o conteúdo do site de teste** (matérias, comentários e sinopses):
   `CRON_TOKEN=... node scripts/exportar-conteudo-antigo.mjs ../animeprofile-old/.env`. O token está nas variáveis do
   app no hPanel.
