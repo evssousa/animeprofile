@@ -19,6 +19,7 @@ animeprofile.com.br só é ligado aqui no fim.
 | [enderecos.md](enderecos.md) | Endereços que continuam e redirecionamentos do que saiu |
 | [design.md](design.md) | Identidade visual: cores, tipografia, estrutura e componentes |
 | [deploy-hostinger.md](deploy-hostinger.md) | Como o app roda na Hostinger, endereço de teste e cuidados com o domínio |
+| [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md) | Plano (temporário): Quiz, leitura do Blog da comunidade e catálogo de figurinhas, com migrations 009–011, exportação e cópia das imagens |
 
 ## Status
 
@@ -43,6 +44,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Matéria com barra lateral (anime da matéria, destaque, últimas, comentários, índice e em alta), compartilhar e comentários (leitura) | ✅ |
 | 2 | Otaku TV: vídeos das matérias, trailers da temporada e aberturas/encerramentos (AnimeThemes, no navegador) | ✅ |
 | 2 | Redirecionamentos do que saiu (Clãs, Comunidades, jogos, `/en`, Faça parte) | ✅ |
+| 2 | Quiz sem login: `/quiz`, `/quiz/:slug`, pontuação no servidor, sitemap e seção da home ([plano](plano-quiz-blog-figurinhas.md) §1) | ⏳ próximo |
+| 2 | Blog da comunidade (só leitura): lista, post, autor, categoria, tag, RSS e sitemap ([plano](plano-quiz-blog-figurinhas.md) §2) | ⏳ |
+| 2 | Catálogo de figurinhas (só ver), com as imagens copiadas para `/media` e a Coleção da home com dados reais ([plano](plano-quiz-blog-figurinhas.md) §3) | ⏳ |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
@@ -56,8 +60,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 - **Feito até aqui:**
   - notícias e artigos com barra lateral e comentários (leitura), sitemaps e RSS;
   - animes: catálogo, ficha, calendário e personagens, com o Top 10 com setas na home e em `/animes`.
-- **Próximos passos, sem precisar de contas:**
-  1. Quiz e Otaku TV.
+- **Próximos passos, sem precisar de contas** (planejados em
+  [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md), nesta ordem):
+  1. Quiz.
   2. Leitura do blog.
   3. Catálogo de figurinhas.
 - **Para atualizar o conteúdo do site de teste** (matérias, comentários e sinopses):

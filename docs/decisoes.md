@@ -2,6 +2,37 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-14 (plano) — Quiz pontuado no servidor; blog público em `/blog`; figurinhas em `/media`
+
+Detalhes em [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md).
+
+- **Decisão:**
+  - **Quiz:**
+    - **Gabarito:** a página não recebe o gabarito (`correct`, `result`, `explain`, `minScore`). O servidor confere
+      cada resposta do quiz de conhecimento e calcula o resultado no fim.
+    - **Partidas:** são contadas sem login, no máximo uma por IP (só o hash) a cada 10 minutos por quiz, e as de
+      robô não contam.
+    - **Contagem do site antigo:** fica separada da nova (`plays_old` e `plays_new`). Importar de novo não apaga as
+      partidas jogadas aqui.
+  - **Blog:**
+    - **Lista pública:** `/blog` (no site antigo era só para admin; o público lia em `/news?tipo=blog`, que agora
+      leva a `/blog` com 301).
+    - **`/blog/criadores`:** vai para `/blog` (302) até a economia existir.
+    - **Texto:** o Markdown vira HTML na importação, com uma limpeza própria para conteúdo de usuário: sem iframe e
+      sem HTML cru, e os links externos com `nofollow ugc`.
+  - **Figurinhas:**
+    - **Cópia das imagens:** o script no PC copia o arquivo original, sem recompressão, para
+      `/media/figurinhas/<hash>`, por um endpoint protegido pelo `CRON_TOKEN`.
+    - **Miniatura:** uma WebP de 400 px para as grades, gerada no PC.
+    - **`season_albums`:** não vem (nenhuma tela usa, e `seasons` não vem).
+- **Por quê:**
+  - **Quiz:** no site antigo o gabarito ficava no código da página. Com a regra no servidor, as missões e as
+    recompensas das contas já nascem protegidas.
+  - **Blog:** `/blog` é o endereço que estava no sitemap, e o Google via só um carregamento.
+  - **Figurinhas:**
+    - **Pedido do dono:** as imagens não podem perder qualidade.
+    - **Supabase:** o servidor continua sem conhecer o Supabase.
+
 ## 2026-11-15 — Otaku TV: o que vem do nosso banco e o que vem do navegador
 
 - **Decisão:**
