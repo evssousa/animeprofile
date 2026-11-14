@@ -7,7 +7,7 @@ import { brDay, cleanDescription, currentSeason, streamersFrom } from "~/lib/ani
 import { createPool, query, setPool } from "~/server/db.server";
 import { mediaToRow, type AniMedia } from "~/server/anime/anilist.server";
 import { getCharacter, splitAbout } from "~/server/anime/characters.server";
-import { canFetchRemote, resetRemoteGuard } from "~/server/anime/remote-guard.server";
+import { canFetchRemote, RemoteUnavailable, resetRemoteGuard } from "~/server/anime/remote-guard.server";
 import { airingBetween, animeIdsForSitemap, getAnime, importSynopses, seasonAnimes, syncAnimes, trendingAnimes, upsertMedia } from "~/server/anime/anime.server";
 
 let server: Awaited<ReturnType<typeof createDB>>;
@@ -175,21 +175,20 @@ describe("personagens e proteção contra robôs", () => {
     const calls = fakeAniList.mock.calls.length;
     expect(await getCharacter(55, { remote: false })).toMatchObject({ name: "Maomao" }); // do banco
     expect(fakeAniList.mock.calls.length).toBe(calls);
-    expect(await getCharacter(56, { remote: false })).toBeNull(); // não guardado e sem permissão de buscar
+    await expect(getCharacter(56, { remote: false })).rejects.toThrow(RemoteUnavailable); // não guardado e sem cota: 503
     expect(await getCharacter(404)).toBeNull();
   });
 
-  it("robôs nunca buscam e há limite de 20 buscas por minuto", () => {
+  it("cota por minuto: 20 buscas para pessoas e 5 para robôs", () => {
     resetRemoteGuard();
     const human = new Request("https://x/", { headers: { "user-agent": "Mozilla/5.0 (Windows NT 10.0) Chrome/130.0 Safari/537.36" } });
     const bot = new Request("https://x/", { headers: { "user-agent": "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)" } });
-    expect(canFetchRemote(bot, 1000)).toBe(false);
-    const ok = Array.from({ length: 25 }, () => canFetchRemote(human, 1000)).filter(Boolean).length;
-    expect(ok).toBe(20);
+    expect(Array.from({ length: 8 }, () => canFetchRemote(bot, 1000)).filter(Boolean).length).toBe(5);
+    expect(Array.from({ length: 25 }, () => canFetchRemote(human, 1000)).filter(Boolean).length).toBe(20);
     expect(canFetchRemote(human, 62_000)).toBe(true); // minuto seguinte
   });
 
-  it("robô não transforma em página o anime que só tem a sinopse antiga", async () => {
-    expect(await getAnime(500, { remote: false })).toBeNull();
+  it("sem cota, anime só com a sinopse antiga responde 503 (não 404)", async () => {
+    await expect(getAnime(500, { remote: false })).rejects.toThrow(RemoteUnavailable);
   });
 });

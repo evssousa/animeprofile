@@ -19,7 +19,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   try {
     anime = await getAnime(id, { remote: canFetchRemote(request) });
   } catch {
-    throw data(null, { status: 503 });
+    // AniList fora do ar, ou ficha ainda não guardada e sem cota para buscar agora: "volte daqui a pouco".
+    throw data(null, { status: 503, headers: { "Retry-After": "120" } });
   }
   if (!anime) throw data(null, { status: 404 });
   const news = await latestPosts({ anilistId: id }, 4);

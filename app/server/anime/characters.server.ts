@@ -2,6 +2,7 @@
 import { FORMAT_PT } from "~/lib/anime";
 import { exec, hasDatabase, iso, json, query } from "../db.server";
 import { fetchCharacter, type AniCharacter } from "./anilist.server";
+import { RemoteUnavailable } from "./remote-guard.server";
 
 export type CharacterPage = {
   id: number;
@@ -81,7 +82,8 @@ export async function getCharacter(id: number, { remote = true }: { remote?: boo
   if (!hasDatabase() || !Number.isInteger(id) || id <= 0) return null;
   const [row] = await query<{ data: unknown; fetched_at: string }>("SELECT data, fetched_at FROM anime_characters WHERE id = ?", [id]);
   const fresh = row && Date.now() - new Date(iso(row.fetched_at)!).getTime() < MAX_AGE_MS;
-  if (fresh || !remote) return row ? json<CharacterPage | null>(row.data, null) : null;
+  if (fresh || (!remote && row)) return json<CharacterPage | null>(row.data, null);
+  if (!remote) throw new RemoteUnavailable();
   try {
     const c = await fetchCharacter(id);
     if (!c) return null;

@@ -1,6 +1,7 @@
 // Animes no MySQL: gravação do que vem do AniList (tarefa "animes-anilist") e as consultas das páginas.
 import { currentSeason, type Season, type StreamerKey } from "~/lib/anime";
 import { exec, hasDatabase, iso, json, query, tx } from "../db.server";
+import { RemoteUnavailable } from "./remote-guard.server";
 import { airingSqlDate, charactersOf, fetchAiring, fetchDetails, fetchSeason, fetchTrending, mediaToRow, searchAniList, type AniMedia } from "./anilist.server";
 
 export type AnimeCard = {
@@ -195,8 +196,8 @@ export async function getAnime(id: number, { remote = true }: { remote?: boolean
   if (!hasDatabase() || !Number.isInteger(id) || id <= 0) return null;
   let row = await loadFull(id);
   const stale = !row || !row.details_at || Date.now() - new Date(iso(row.details_at)!).getTime() > DETAILS_MAX_AGE_MS;
-  // Linha só com a sinopse antiga (sem dados do AniList) não vira página para quem não pode buscar.
-  if (!remote && row && !row.cover_url) return null;
+  // Sem ficha guardada (ou só com a sinopse antiga) e sem cota para buscar agora: 503, não 404.
+  if (!remote && (!row || !row.cover_url)) throw new RemoteUnavailable();
   if (stale && remote) {
     try {
       const media = await fetchDetails(id);

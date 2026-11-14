@@ -8,9 +8,11 @@ Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
   - **O robô:** um robô percorreu o sitemap do endereço de teste, ignorando o `robots.txt`.
   - **O efeito:** cada ficha de anime aberta virou um pedido ao AniList, cerca de 1.400 em 20 minutos.
 - **Decisão:**
-  - **Robôs:** as buscas sob demanda (ficha de anime ou personagem ainda não guardada) não acontecem para robôs,
-    reconhecidos pelo `isbot`. Eles veem só o que já está guardado.
-  - **Limite:** cada processo faz no máximo 20 buscas por minuto (`app/server/anime/remote-guard.server.ts`).
+  - **Cota de buscas por minuto e por processo:** fichas de anime ou personagem ainda não guardadas são buscadas no
+    AniList dentro de uma cota. Pessoas podem fazer até 20 buscas e robôs até 5, reconhecidos pelo `isbot`
+    (`app/server/anime/remote-guard.server.ts`).
+  - **Sem cota:** a página responde 503 com `Retry-After` ("volte daqui a pouco"), nunca 404. O Google tenta de novo
+    em vez de tirar a página do índice.
   - **Personagens:** ficam fora do sitemap.
 - **Por quê:**
   - **Limite do AniList:** é de cerca de 90 pedidos por minuto. Estourar deixaria o site sem dados novos e lento.
