@@ -72,7 +72,7 @@ export function TopTen({ items }: { items: AnimeCard[] }) {
       <ol
         ref={ref}
         onScroll={update}
-        className="-mx-4 flex snap-x gap-5 overflow-x-auto overflow-y-hidden px-4 pt-2 pb-3 [scrollbar-width:none] sm:-mx-8 sm:px-8 lg:-mx-14 lg:px-14 [&::-webkit-scrollbar]:hidden"
+        className="-mx-4 flex scroll-pl-4 snap-x gap-5 overflow-x-auto overflow-y-hidden px-4 pt-2 pb-3 [scrollbar-width:none] sm:-mx-8 sm:scroll-pl-8 sm:px-8 lg:-mx-14 lg:scroll-pl-14 lg:px-14 [&::-webkit-scrollbar]:hidden"
       >
         {items.map((a, i) => (
           <li key={a.id} className="group relative flex shrink-0 snap-start items-end">
@@ -92,6 +92,8 @@ export function TopTen({ items }: { items: AnimeCard[] }) {
             </div>
           </li>
         ))}
+        {/* O navegador ignora o espaço da direita numa lista que rola: este item garante que a última capa apareça inteira. */}
+        <li aria-hidden className="w-px shrink-0 sm:w-4 lg:w-10" />
       </ol>
       {edges.left && (
         <button type="button" onClick={() => scroll(-1)} className={`${arrow} -left-5`} aria-label="Ver os anteriores do Top 10">
