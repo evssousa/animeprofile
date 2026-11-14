@@ -34,7 +34,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 1 | Arquitetura, banco, endereços e deploy (no modelo do respawnou) | ✅ |
 | 2 | Esqueleto do app no ar em `novo.animeprofile.com.br` (build, banco, migrations, cron) | ✅ |
 | 2 | Layout novo "Top 10 claro" (topo, rodapé, cabeçalhos, tema claro e escuro) | ✅ |
-| 2 | Páginas institucionais e legais, formulários de Contato e Faça parte | ✅ |
+| 2 | Páginas institucionais e legais e formulário de Contato (a página "Faça parte" saiu em 2026-11-13) | ✅ |
 | 2 | Notícias e artigos: listas, matéria, categoria, tag, autor, busca e página inicial | ✅ |
 | 2 | Importação das matérias do site antigo pelo script `exportar-conteudo-antigo.mjs` (refazer na virada) | ✅ |
 | 2 | Sitemaps (índice, fixas, Google News, matérias, taxonomia) e RSS em `/rss.xml` | ✅ |
