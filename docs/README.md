@@ -51,11 +51,14 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 ## Onde paramos
 
-2026-11-13:
-- **Pausa** depois de notícias e artigos (lista única em `/noticias`, com `/news` redirecionando para ela).
-- **Para retomar:**
-  1. Sitemaps e RSS das matérias.
-  2. Animes.
-- **Para atualizar o conteúdo do site de teste:**
+2026-11-14:
+- **Feito até aqui:**
+  - notícias e artigos com barra lateral e comentários (leitura), sitemaps e RSS;
+  - animes: catálogo, ficha, calendário e personagens, com o Top 10 com setas na home e em `/animes`.
+- **Próximos passos, sem precisar de contas:**
+  1. Quiz e Otaku TV.
+  2. Leitura do blog.
+  3. Catálogo de figurinhas.
+- **Para atualizar o conteúdo do site de teste** (matérias, comentários e sinopses):
   `CRON_TOKEN=... node scripts/exportar-conteudo-antigo.mjs ../animeprofile-old/.env`. O token está nas variáveis do
   app no hPanel.
