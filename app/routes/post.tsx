@@ -129,13 +129,13 @@ export default function Post({ loaderData }: Route.ComponentProps) {
           <div className="mb-8">
             <ShareBar url={absoluteUrl(post.url)} title={post.title} />
           </div>
-          {showCover && post.image && <img src={post.image} alt="" className="mb-10 aspect-video w-full rounded-[18px] object-cover shadow-[0_20px_40px_rgba(60,20,20,.16)]" />}
+          {showCover && post.image && <img src={post.image} alt="" className="mb-10 -mx-4 aspect-video w-[calc(100%+2rem)] max-w-none rounded-none object-cover sm:mx-0 sm:w-full sm:rounded-[18px] sm:shadow-[0_20px_40px_rgba(60,20,20,.16)]" />}
           <div className="prose-ap max-w-none" dangerouslySetInnerHTML={{ __html: post.html }} />
 
           {post.tags.length > 0 && (
             <div className="mt-12 flex flex-wrap gap-2" aria-label="Assuntos">
               {post.tags.map((t) => (
-                <Link key={t.slug} to={`/tag/${t.slug}`} className="rounded-full border border-line bg-surface px-3.5 py-1.5 text-[0.85rem] font-semibold text-ink-soft hover:text-ink">
+                <Link key={t.slug} to={`/tag/${t.slug}`} className="rounded-full border border-line bg-surface px-3.5 py-2 text-[0.85rem] font-semibold text-ink-soft hover:text-ink">
                   #{t.name}
                 </Link>
               ))}

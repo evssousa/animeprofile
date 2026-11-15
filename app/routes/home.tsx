@@ -13,6 +13,7 @@ import { isWideImage } from "~/lib/images";
 import { ytThumb } from "~/components/otaku-tv";
 import { QuizCard } from "~/components/quiz";
 import { BlogTile } from "~/components/blog";
+import { MobileRow, MobileRowItem } from "~/components/MobileRow";
 import { airingBetween, seasonAnimes, trendingAnimes } from "~/server/anime/anime.server";
 import { latestTvVideos } from "~/server/tv/tv.server";
 import { listQuizzes } from "~/server/quiz/quiz.server";
@@ -59,15 +60,17 @@ export default function Home({ loaderData }: Route.ComponentProps) {
     <>
       {featured.length > 0 && <Hero slides={featured} />}
 
-      <div className="mx-auto flex max-w-[1328px] flex-col gap-[72px] px-4 py-14 sm:px-8 lg:px-14">
+      <div className="mx-auto flex max-w-[1328px] flex-col gap-12 px-4 py-8 sm:gap-[72px] sm:px-8 sm:py-14 lg:px-14">
         {airing.length > 0 && (
           <section aria-labelledby="no-ar" className="flex flex-col gap-6">
             <SectionHead id="no-ar" label="Ao vivo" title="Animes no ar hoje" more={{ to: "/animes/calendario", text: "Calendário da semana" }} />
-            <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4 lg:grid-cols-8">
+            <MobileRow label="Animes no ar hoje" className="sm:grid-cols-4 lg:grid-cols-8">
               {airing.map((it) => (
-                <AiringPoster key={`${it.anime.id}-${it.episode}`} item={it} />
+                <MobileRowItem key={`${it.anime.id}-${it.episode}`} poster>
+                  <AiringPoster item={it} />
+                </MobileRowItem>
               ))}
-            </div>
+            </MobileRow>
           </section>
         )}
 
@@ -86,11 +89,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
               title={`Animes de ${SEASON_PT[season.season]} ${season.year}`}
               more={{ to: "/animes#temporada", text: "Ver temporada" }}
             />
-            <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-4 lg:grid-cols-8">
+            <MobileRow label="Animes da temporada" className="sm:grid-cols-4 lg:grid-cols-8">
               {season.items.map((a) => (
-                <AnimePoster key={a.id} anime={a} />
+                <MobileRowItem key={a.id} poster>
+                  <AnimePoster anime={a} />
+                </MobileRowItem>
               ))}
-            </div>
+            </MobileRow>
           </section>
         )}
 
@@ -98,12 +103,14 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           <section aria-labelledby="artigos" className="flex flex-col gap-6">
             <SectionHead id="artigos" label="Artigos" title="Guias, listas e indicações para o verdadeiro otaku" more={{ to: "/artigos", text: "Todos os artigos" }} />
             <div className="grid gap-6 lg:grid-cols-12">
-              <PostOverlay post={leadArticle} className="min-h-[420px] lg:col-span-5" titleClass="text-[1.5rem] sm:text-[1.7rem]" />
-              <div className="grid gap-x-4 gap-y-6 sm:grid-cols-2 lg:col-span-4">
+              <PostOverlay post={leadArticle} className="min-h-[320px] sm:min-h-[420px] lg:col-span-5" titleClass="text-[1.5rem] sm:text-[1.7rem]" />
+              <MobileRow label="Mais artigos" className="sm:grid-cols-2 lg:col-span-4">
                 {moreArticles.map((p) => (
-                  <PostCard key={p.id} post={p} />
+                  <MobileRowItem key={p.id}>
+                    <PostCard post={p} />
+                  </MobileRowItem>
                 ))}
-              </div>
+              </MobileRow>
               {topArticles.length > 0 && (
                 <aside className="rounded-[18px] border border-line bg-surface p-5 lg:col-span-3">
                   <h3 className="text-[1.05rem] font-extrabold">Mais lidos do mês</h3>
@@ -126,11 +133,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         {news.length > 0 && (
           <section aria-labelledby="noticias" className="flex flex-col gap-6">
             <SectionHead id="noticias" label="Notícias" title="O que está acontecendo agora" more={{ to: "/noticias?tipo=noticias", text: "Todas as notícias" }} />
-            <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
+            <MobileRow label="Últimas notícias" className="sm:grid-cols-2 lg:grid-cols-4">
               {news.map((p) => (
-                <PostCard key={p.id} post={p} />
+                <MobileRowItem key={p.id}>
+                  <PostCard post={p} />
+                </MobileRowItem>
               ))}
-            </div>
+            </MobileRow>
           </section>
         )}
 
@@ -139,11 +148,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         {quizzes.length > 0 && (
           <section aria-labelledby="quiz" className="flex flex-col gap-6">
             <SectionHead id="quiz" label="Quiz" title="Descubra qual personagem você seria" more={{ to: "/quiz", text: "Todos os quizzes" }} />
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <MobileRow label="Quizzes" className="sm:grid-cols-2 lg:grid-cols-4">
               {quizzes.map((q) => (
-                <QuizCard key={q.id} quiz={q} />
+                <MobileRowItem key={q.id}>
+                  <QuizCard quiz={q} />
+                </MobileRowItem>
               ))}
-            </div>
+            </MobileRow>
           </section>
         )}
 
@@ -152,31 +163,31 @@ export default function Home({ loaderData }: Route.ComponentProps) {
         {blog.length > 0 && (
           <section aria-labelledby="blog" className="flex flex-col gap-6">
             <SectionHead id="blog" label="Blog da comunidade" title="Posts pessoais dos otakus" more={{ to: "/blog", text: "Ver tudo" }} />
-            <div className="-mx-4 flex snap-x gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+            <MobileRow label="Posts do blog" className="sm:grid-cols-2 lg:grid-cols-3">
               {blog.map((p) => (
-                <div key={p.id} className="w-[75%] shrink-0 snap-start sm:w-auto">
+                <MobileRowItem key={p.id}>
                   <BlogTile post={p} />
-                </div>
+                </MobileRowItem>
               ))}
-            </div>
+            </MobileRow>
           </section>
         )}
 
         <section aria-labelledby="diferencial" className="flex flex-col gap-6">
           <div className="text-center">
             <p className="text-[0.82rem] font-bold text-brand">O diferencial</p>
-            <h2 id="diferencial" className="mt-1.5 text-[1.9rem] font-extrabold tracking-[-0.025em]">
+            <h2 id="diferencial" className="mt-1.5 text-[1.6rem] sm:text-[1.9rem] font-extrabold tracking-[-0.025em]">
               Muito mais que notícias
             </h2>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
             {FEATURES.map(({ icon: Icon, title, text }) => (
-              <div key={title} className="rounded-[18px] border border-line bg-surface p-6">
+              <div key={title} className="rounded-[18px] border border-line bg-surface p-4 sm:p-6">
                 <span className="grid size-12 place-items-center rounded-xl bg-brand-soft text-brand">
                   <Icon className="size-[22px]" aria-hidden />
                 </span>
-                <h3 className="mt-4 text-[1.05rem] font-extrabold">{title}</h3>
-                <p className="mt-2 text-[0.92rem] leading-relaxed text-ink-soft">{text}</p>
+                <h3 className="mt-3 text-[0.98rem] font-extrabold sm:mt-4 sm:text-[1.05rem]">{title}</h3>
+                <p className="mt-2 hidden text-[0.92rem] leading-relaxed text-ink-soft sm:block">{text}</p>
               </div>
             ))}
           </div>

@@ -16,7 +16,7 @@ export function Header() {
   const { pathname } = useLocation();
   return (
     <header className="sticky top-0 z-30 bg-night/95 text-night-ink backdrop-blur-md">
-      <div className="flex h-[72px] items-center gap-3 px-4 sm:gap-5 sm:px-6 lg:px-5">
+      <div className="flex h-[60px] items-center gap-3 lg:h-[72px] px-4 sm:gap-5 sm:px-6 lg:px-5">
         <MobileMenu />
         <Logo />
         {HEADER_LINKS.length > 0 && (
@@ -57,7 +57,8 @@ export function Header() {
             Entrar
           </Link>
           <Link to="/login" className="rounded-[9px] bg-brand px-3.5 py-2.5 text-[0.9rem] font-bold whitespace-nowrap sm:px-4 sm:text-[0.95rem] text-brand-ink shadow-[0_8px_24px_rgba(194,53,43,.35)] hover:brightness-110">
-            Contas em breve
+            <span className="min-[400px]:hidden">Em breve</span>
+            <span className="hidden min-[400px]:inline">Contas em breve</span>
           </Link>
         </div>
       </div>
@@ -75,24 +76,25 @@ function MobileMenu() {
       <button
         type="button"
         onClick={() => ref.current?.showModal()}
-        className="-ml-2 grid size-11 place-items-center rounded-full hover:bg-white/10 xl:hidden"
+        id="abrir-menu" className="-ml-2 hidden size-11 place-items-center rounded-full hover:bg-white/10 lg:grid xl:hidden"
         aria-label="Abrir menu"
       >
         <Menu className="size-6" aria-hidden />
       </button>
       <dialog
         ref={ref}
+        id="menu-gaveta"
         onClick={(e) => e.target === ref.current && close()}
         className="m-0 h-dvh max-h-none w-[min(21rem,88vw)] max-w-none bg-surface text-ink backdrop:bg-black/60"
         aria-label="Menu"
       >
-        <div className="flex h-[72px] items-center justify-between bg-night px-4 text-night-ink">
+        <div className="flex h-[60px] items-center justify-between bg-night px-4 text-night-ink lg:h-[72px]">
           <Logo />
           <button type="button" onClick={close} className="grid size-11 place-items-center rounded-full hover:bg-white/10" aria-label="Fechar menu">
             <X className="size-6" aria-hidden />
           </button>
         </div>
-        <div className="flex h-[calc(100dvh-72px)] flex-col gap-6 overflow-y-auto px-3 py-5">
+        <div className="flex h-[calc(100dvh-60px)] flex-col gap-6 overflow-y-auto px-3 py-5 lg:h-[calc(100dvh-72px)]">
           <Form method="get" action="/busca" role="search" className="relative">
             <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-soft" aria-hidden />
             <input

@@ -36,8 +36,8 @@ function SideAnime({ block }: { block: Extract<SideBlockData, { kind: "anime" }>
   const { anime, guide, guideTitle } = block;
   const guideList = guide.length > 0 && (
     <div className={anime ? "border-t border-line px-5 py-4" : ""}>
-      <h3 className="text-[0.82rem] font-bold text-brand">{guideTitle}</h3>
-      <ul className="mt-3 flex flex-col gap-2.5">
+      {anime && <h3 className="text-[0.82rem] font-bold text-brand">{guideTitle}</h3>}
+      <ul className={`flex flex-col gap-2.5 ${anime ? "mt-3" : ""}`}>
         {guide.map((g) => (
           <li key={g.url} className="flex items-start gap-2">
             {g.type === "article" ? <BookOpen className="mt-0.5 size-4 shrink-0 text-ink-soft" aria-hidden /> : <Newspaper className="mt-0.5 size-4 shrink-0 text-ink-soft" aria-hidden />}
@@ -49,7 +49,7 @@ function SideAnime({ block }: { block: Extract<SideBlockData, { kind: "anime" }>
       </ul>
     </div>
   );
-  if (!anime) return <SideCard title={guideTitle}>{guide.length > 0 && <div className="-mt-4">{guideList}</div>}</SideCard>;
+  if (!anime) return <SideCard title={guideTitle}>{guideList}</SideCard>;
   return (
     <section className="overflow-hidden rounded-[18px] border border-line bg-surface">
       <div className="flex gap-4 p-5">

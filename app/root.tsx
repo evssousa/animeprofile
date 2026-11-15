@@ -4,6 +4,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { Footer } from "./components/layout/Footer";
 import { AvisoContas } from "./components/layout/AvisoContas";
+import { BottomNav } from "./components/layout/BottomNav";
 import { Header } from "./components/layout/Header";
 import { SideNav, sidebarBootstrap } from "./components/layout/SideNav";
 import { themeBootstrap } from "./components/layout/ThemeToggle";
@@ -24,7 +25,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
     <html lang="pt-BR" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#0d0d10" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: sidebarBootstrap }} />
@@ -41,7 +42,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Header />
         <div className="flex flex-1">
           <SideNav />
-          <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex min-w-0 flex-1 flex-col overflow-x-clip pb-[calc(4rem+env(safe-area-inset-bottom))] lg:pb-0">
             <AvisoContas />
             <main id="conteudo" className="flex-1">
               {children}
@@ -49,6 +50,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <Footer />
           </div>
         </div>
+        <BottomNav />
         <ScrollRestoration />
         <Scripts />
       </body>

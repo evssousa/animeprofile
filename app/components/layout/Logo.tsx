@@ -4,7 +4,7 @@ import { Link } from "react-router";
 export function Logo({ compact = false }: { compact?: boolean }) {
   return (
     <Link to="/" className="flex shrink-0 items-center gap-2.5 rounded-lg" aria-label="Anime Profile, página inicial">
-      <img src="/logo-192.png" alt="" width={38} height={38} className="size-[38px] rounded-[10px]" />
+      <img src="/logo-192.png" alt="" width={38} height={38} className="size-8 rounded-[10px] lg:size-[38px]" />
       {!compact && <span className="hidden text-[1.2rem] leading-none font-extrabold tracking-[-0.02em] min-[420px]:inline">Anime Profile</span>}
     </Link>
   );

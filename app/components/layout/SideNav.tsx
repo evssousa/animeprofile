@@ -20,7 +20,7 @@ export function NavGroups({ variant, onNavigate }: { variant: Variant; onNavigat
   const { pathname } = useLocation();
   const rail = variant === "rail";
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       {NAV.map((group, gi) => (
         <div key={group.label}>
           <p className={`px-3 pb-1.5 text-[0.75rem] font-bold tracking-[0.14em] text-ink-soft uppercase ${rail ? "lg:sr-only xl:not-sr-only xl:mini:sr-only" : ""}`}>{group.label}</p>
@@ -35,7 +35,7 @@ export function NavGroups({ variant, onNavigate }: { variant: Variant; onNavigat
                     onClick={onNavigate}
                     title={soon ? `${label} (em breve)` : label}
                     aria-current={active ? "page" : undefined}
-                    className={`relative flex h-11 items-center gap-3 rounded-xl px-3 text-[0.95rem] font-semibold ${
+                    className={`relative flex h-10 items-center gap-3 rounded-xl px-3 text-[0.95rem] font-semibold ${
                       rail ? "lg:justify-center lg:px-0 xl:justify-start xl:px-3 xl:mini:justify-center xl:mini:px-0" : ""
                     } ${
                       active
@@ -44,7 +44,7 @@ export function NavGroups({ variant, onNavigate }: { variant: Variant; onNavigat
                     }`}
                   >
                     <Icon className={`size-5 shrink-0 ${active ? "" : "text-ink-soft"}`} aria-hidden />
-                    <span className={`truncate ${rail ? "lg:sr-only xl:not-sr-only xl:mini:sr-only" : ""}`}>{label}</span>
+                    <span className={`min-w-0 truncate ${rail ? "lg:sr-only xl:not-sr-only xl:mini:sr-only" : ""}`}>{label}</span>
                     {soon && (
                       <span className={`ml-auto shrink-0 rounded-full bg-sunken px-1.5 py-0.5 text-[0.65rem] font-bold whitespace-nowrap text-ink-soft ${rail ? "lg:hidden xl:inline xl:mini:hidden" : ""}`}>em breve</span>
                     )}

@@ -126,7 +126,7 @@ export function QuizPlayer({ quiz, challenge, next }: { quiz: PublicQuiz; challe
               </p>
             )}
             <p className="text-[0.85rem] text-ink-soft">{total} perguntas{quiz.plays > 0 ? ` · ${quiz.plays.toLocaleString("pt-BR")} pessoas já fizeram` : ""}</p>
-            <button type="button" onClick={() => setStep(0)} className="rounded-[10px] bg-brand px-7 py-3.5 font-extrabold text-brand-ink shadow-[0_10px_30px_rgba(194,53,43,.35)] hover:brightness-110">
+            <button type="button" onClick={() => setStep(0)} className="w-full rounded-[10px] bg-brand px-7 py-3.5 font-extrabold text-brand-ink shadow-[0_10px_30px_rgba(194,53,43,.35)] hover:brightness-110 sm:w-auto">
               Começar o quiz
             </button>
           </div>
@@ -155,7 +155,7 @@ export function QuizPlayer({ quiz, challenge, next }: { quiz: PublicQuiz; challe
                     disabled={Boolean(picked)}
                     onClick={() => pick(o.id)}
                     aria-pressed={o.id === picked}
-                    className={`flex w-full items-center gap-3 rounded-[14px] border-2 p-4 text-left font-semibold transition-colors ${
+                    className={`flex min-h-[52px] w-full items-center gap-3 rounded-[14px] border-2 p-4 text-left font-semibold transition-colors ${
                       state === "certa"
                         ? "border-[#2e9e5b] bg-[#2e9e5b]/12"
                         : state === "errada"

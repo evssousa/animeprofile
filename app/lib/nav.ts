@@ -54,6 +54,14 @@ export const NAV: NavGroup[] = [
   },
 ];
 
+/** Barra inferior do celular (abaixo de 1024 px). "Menu" abre a gaveta; quando as contas voltarem, Quiz dá lugar a Perfil. */
+export const BOTTOM_NAV: { label: string; to: string; icon: LucideIcon }[] = [
+  { label: "Início", to: "/", icon: Home },
+  { label: "Notícias", to: "/noticias", icon: Newspaper },
+  { label: "Animes", to: "/animes", icon: Tv },
+  { label: "Quiz", to: "/quiz", icon: Puzzle },
+];
+
 /** Menus extras do topo (ao lado do logo, a partir de `lg`). O menu principal fica na lateral esquerda. */
 export const HEADER_LINKS: { label: string; to: string; badge?: string; external?: boolean }[] = [{ label: "Calendário", to: "/animes/calendario" }];
 

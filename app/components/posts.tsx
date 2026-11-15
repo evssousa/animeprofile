@@ -98,7 +98,7 @@ export function PostRow({ post, index, meta }: { post: Card; index?: number; met
 
 export function PostGrid({ posts, cols = 4 }: { posts: Card[]; cols?: 3 | 4 }) {
   return (
-    <div className={`grid gap-x-5 gap-y-8 sm:grid-cols-2 ${cols === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
+    <div className={`grid gap-x-5 gap-y-6 sm:gap-y-8 sm:grid-cols-2 ${cols === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
       {posts.map((p, i) => (
         <PostCard key={p.id} post={p} priority={i < 4} />
       ))}
