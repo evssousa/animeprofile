@@ -10,7 +10,7 @@ export function sanitizePostHtml(html: string): string {
       "p", "br", "hr", "h2", "h3", "h4", "strong", "b", "em", "i", "u", "s", "mark", "small", "sub", "sup",
       "a", "ul", "ol", "li", "blockquote", "q", "cite", "code", "pre", "span", "div",
       "figure", "figcaption", "img", "picture", "source", "iframe",
-      "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption",
+      "table", "thead", "tbody", "tfoot", "tr", "th", "td", "caption", "details", "summary",
     ],
     allowedAttributes: {
       a: ["href", "title", "target", "rel"],

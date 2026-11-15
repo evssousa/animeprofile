@@ -122,6 +122,27 @@
 .prose-ap a:hover {
   text-decoration-thickness: 2px;
 }
+
+/* Spoiler das matérias (<details class="spoiler-box">): fechado por padrão, abre com clique ou Enter. */
+.prose-ap details.spoiler-box {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--sunken);
+}
+.prose-ap details.spoiler-box > summary {
+  cursor: pointer;
+  padding: 0.75rem 1rem;
+  font-weight: 600;
+}
+.prose-ap details.spoiler-box > :not(summary) {
+  padding: 0 1rem;
+}
+.prose-ap details.spoiler-box > :last-child {
+  padding-bottom: 1rem;
+}
+.prose-ap details.spoiler-box[open] {
+  border-color: var(--brand);
+}
 .prose-ap strong {
   font-weight: 700;
 }

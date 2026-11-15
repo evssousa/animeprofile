@@ -112,7 +112,8 @@ export async function upsert(conn: PoolConnection, table: string, rows: Record<s
 }
 
 async function replaceLinks(conn: PoolConnection, table: "post_categories" | "post_tags", col: string, rows: { post_id: string; id: string }[]) {
-  await conn.query(`DELETE FROM ${table}`);
+  // Só os vínculos das matérias do site antigo: as publicadas pelo robô (origin = 'robo') ficam como estão.
+  await conn.query(`DELETE t FROM ${table} t JOIN posts p ON p.id = t.post_id WHERE p.origin = 'old'`);
   for (let i = 0; i < rows.length; i += 500) {
     const chunk = rows.slice(i, i + 500);
     await conn.query(`INSERT IGNORE INTO ${table} (post_id, ${col}) VALUES ${chunk.map(() => "(?, ?)").join(", ")}`, chunk.flatMap((r) => [r.post_id, r.id]));
@@ -163,7 +164,7 @@ export async function applySnapshot(s: OldSnapshot) {
     await conn.query("DELETE FROM tag_redirects");
     await upsert(conn, "tag_redirects", s.tag_redirects, ["old_slug"]);
     // O que deixou de estar publicado no site antigo sai daqui também.
-    const [existing] = await conn.query<RowDataPacket[]>("SELECT id FROM posts");
+    const [existing] = await conn.query<RowDataPacket[]>("SELECT id FROM posts WHERE origin = 'old'");
     const gone = existing.map((r) => r.id as string).filter((id) => !postIds.has(id));
     for (let i = 0; i < gone.length; i += 500) await conn.query("DELETE FROM posts WHERE id IN (?)", [gone.slice(i, i + 500)]);
   });
