@@ -95,8 +95,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 ## Pendências suas
 
 - **URGENTE (virada parcial, [plano](plano-virada-parcial.md)):**
-  - **Dia 1 (feito até aqui):** banco e storage guardados em `C:\Users\evsli\animeprofile-backup\`. **Falta:** baixar
-    o TTL do DNS para 300 s (ou me autorizar a fazer pelo MCP), conferir a propriedade do Search Console (tipo Domínio),
+  - **Dia 1 (feito até aqui):** banco e storage guardados em `C:\Users\evsli\animeprofile-backup\`. TTL do DNS já em 300 s (feito).
+    **Falta:** conferir a propriedade do Search Console (tipo Domínio),
     baixar a lista de páginas do Search Console para `.import/gsc-paginas.csv` e tirar foto da zona DNS e da tela de
     domínio do Lovable (já anotei os valores do DNS em [plano-virada-parcial.md](plano-virada-parcial.md)).
   - **Dia 2:** "backup ok" e `.7z` cifrado em 2 cópias, SMTP no hPanel (opcional), UptimeRobot e aviso nas redes.

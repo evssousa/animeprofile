@@ -686,3 +686,6 @@ avise" do 2.2. Nunca cortar: 0.x, 2.1, 2.2 (sem o "Me avise"), 2.3, 2.4, 2.5, 2.
   obrigatória do 0.4 falta. `storage.objects`: 6.734 arquivos, 672 MB, listados em `storage-objetos.tsv`.
 - **Conferência de endereços** (`scripts/conferir-enderecos.mjs`) contra o `novo.`: 1.898 endereços do sitemap antigo;
   achou `/en/articles/<slug>` (32) e `/animes/ranking` (404); ambos já têm redirecionamento. Rodar de novo no dia 2.
+- **TTL baixado em 2026-11-15 (autorizado pelo dono):** `@` e `www` (A e AAAA) em 300 s. Os valores continuam os do Lovable
+  (`A 185.158.133.1`, `AAAA 2a07:8240::1` e `::2`); só o TTL dos dois AAAA mudou (era 14400). MX, TXT, DKIM e `comunidade`
+  intactos. O site antigo seguiu respondendo 200 depois da mudança.
