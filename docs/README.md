@@ -74,6 +74,19 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 - **Migration 009 (quiz):** conferida no site de teste, rodou no deploy (`/quiz` responde 200 lendo a tabela).
 
 
+## Feito em 2026-11-15 (além do dia 1 da virada)
+
+- **Barras laterais da direita** ([plano-sidebars.md](plano-sidebars.md), passos 1 a 8 e 10): matéria (com "Mais sobre o
+  anime" e "Ver tudo"), Central `/noticias` e `/artigos`, categoria e tag, blog, "A seguir" na Otaku TV e lateral fixa
+  no quiz. Cache em memória de 5 a 10 min. O passo 9 (cartão "Em breve") ficou de fora, como o dono recomendou.
+- **Menu lateral esquerdo e celular** ([plano-sidebar-esquerda.md](plano-sidebar-esquerda.md), passos 1 a 4, 6 a 13):
+  lateral clara de 256/72 px que se recolhe, gaveta no celular, topo com busca e espaço para menus extras
+  (`HEADER_LINKS`), barra inferior no celular, topo de 60 px, faixas que rolam na home e rodapé em 2 colunas. A dica
+  flutuante (passo 5) ficou como `title` nativo.
+- **E-mail do Contato** por SMTP (sem as variáveis `SMTP_*` só grava no banco).
+- **Robô de notícias, passos 1 a 3** ([plano-robo-noticias.md](plano-robo-noticias.md)): migration 012 no ar, a importação
+  do site antigo não apaga o que o robô publicar (`posts.origin`) e o spoiler passou a sobreviver à limpeza do HTML.
+
 ## Próximos passos
 
 0. **URGENTE: [plano-virada-parcial.md](plano-virada-parcial.md)**, na ordem do cronograma:
@@ -95,6 +108,13 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
    Fica para depois da virada do domínio; reaproveitar o que o criasite (piloto) fizer.
 
 ## Pendências suas
+
+- **Robô de notícias (urgente para o SEO depois da virada):** responder as 4 perguntas do fim do
+  [plano-robo-noticias.md](plano-robo-noticias.md) (recomendação: sim nas 4), rodar a consulta do passo 7 no editor SQL do
+  Lovable e salvar o resultado em `C:\Users\evsli\animeprofile-backup\robo-config.json` (não colar no chat), e
+  cadastrar `GEMINI_API_KEY` no hPanel.
+- **SMTP do Contato (opcional):** cadastrar `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e `MAIL_FROM` no hPanel
+  (caixa `contato@`). Sem isso, as mensagens só ficam no banco (`SELECT ... FROM contact_messages`).
 
 - **URGENTE (virada parcial, [plano](plano-virada-parcial.md)):**
   - **Dia 1 (feito até aqui):** banco e storage guardados em `C:\Users\evsli\animeprofile-backup\`. TTL do DNS já em 300 s (feito).
