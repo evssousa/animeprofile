@@ -61,6 +61,15 @@ async function main() {
   // Arquivos enviados (fora da pasta do app, sobrevivem aos deploys). Nome nunca é reaproveitado.
   app.use("/media", express.static(mediaDir(), { immutable: true, maxAge: "1y", index: false }));
 
+  // Páginas públicas (sem sessão nem cookie): a CDN pode guardar 60 s e servir a versão antiga por mais 2 min enquanto
+  // busca a nova. Aguenta a virada do domínio sem pesar no banco. Notícia nova demora no máximo ~1 min para aparecer.
+  app.use((req, res, next) => {
+    if ((req.method === "GET" || req.method === "HEAD") && !res.getHeader("Cache-Control") && !/^\/(api|admin|unsubscribe)\b/.test(req.path)) {
+      res.setHeader("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=120");
+    }
+    next();
+  });
+
   const build = await import("./build/server/index.js");
   app.use(createRequestHandler({ build, mode: process.env.NODE_ENV }));
 
