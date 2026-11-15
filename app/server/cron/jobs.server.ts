@@ -3,6 +3,7 @@
 import { syncAnimes } from "../anime/anime.server";
 import { rebuildPostVideos } from "../tv/tv.server";
 import { exec } from "../db.server";
+import { runRobot } from "../robot/run.server";
 
 export type JobStats = Record<string, unknown>;
 export type Job = {
@@ -24,8 +25,18 @@ export const JOBS: Job[] = [
       const stuck = await exec(
         "UPDATE cron_runs SET status = 'error', finished_at = UTC_TIMESTAMP(3), message = 'não terminou (processo reiniciado?)' WHERE status = 'running' AND started_at < UTC_TIMESTAMP(3) - INTERVAL 1 DAY",
       );
-      return { execucoesApagadas: old.affected, execucoesTravadas: stuck.affected };
+      const cands = await exec("DELETE FROM ai_news_candidates WHERE created_at < UTC_TIMESTAMP(3) - INTERVAL 30 DAY AND status NOT IN ('published', 'draft')");
+      const usage = await exec("DELETE FROM ai_news_usage WHERE created_at < UTC_TIMESTAMP(3) - INTERVAL 60 DAY");
+      const runs = await exec("DELETE FROM ai_news_runs WHERE started_at < UTC_TIMESTAMP(3) - INTERVAL 60 DAY");
+      return { execucoesApagadas: old.affected, execucoesTravadas: stuck.affected, candidatosApagados: cands.affected, usoApagado: usage.affected, rodadasApagadas: runs.affected };
     },
+  },
+  {
+    // Robô de notícias. Minuto 20: não cruza com animes-anilist (:10) nem videos-materias (:40). Com modo "desligado" não faz nada.
+    name: "robo-noticias",
+    schedule: "20 * * * *",
+    leaseMinutes: 15,
+    run: () => runRobot({}),
   },
   {
     // Vídeos do YouTube dentro das matérias (Otaku TV). A importação também refaz a tabela.

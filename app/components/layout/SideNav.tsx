@@ -2,7 +2,7 @@
 // A partir de 1280 px o visitante escolhe (botão no pé, salvo em localStorage "ap-sidebar"); de 1024 a 1279 px fica sempre
 // recolhida; abaixo disso some e o menu abre na gaveta do topo. O servidor manda sempre o HTML expandido e um script no
 // <head> aplica a escolha antes da primeira pintura (sem cookie, então o cache de 60 s da CDN não atrapalha).
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import { NAV, isActive } from "~/lib/nav";
@@ -84,6 +84,36 @@ export function MenuFooter({ variant }: { variant: Variant }) {
   );
 }
 
+/**
+ * Rolagem do menu sem barra: as bordas desvanecem quando há mais itens para cima ou para baixo (some no fim).
+ * A roda e o toque continuam rolando; o teclado também (os links recebem foco e a lista acompanha).
+ */
+function FadeScroll({ children, label }: { children: ReactNode; label: string }) {
+  const ref = useRef<HTMLElement>(null);
+  const [edge, setEdge] = useState({ top: false, bottom: false });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const update = () => setEdge({ top: el.scrollTop > 4, bottom: el.scrollTop + el.clientHeight < el.scrollHeight - 4 });
+    update();
+    el.addEventListener("scroll", update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => {
+      el.removeEventListener("scroll", update);
+      ro.disconnect();
+    };
+  }, []);
+  const a = edge.top ? "transparent 0, #000 28px" : "#000 0, #000 0";
+  const b = edge.bottom ? "#000 calc(100% - 36px), transparent 100%" : "#000 100%, #000 100%";
+  const mask = `linear-gradient(to bottom, ${a}, ${b})`;
+  return (
+    <nav ref={ref} aria-label={label} style={{ maskImage: mask, WebkitMaskImage: mask }} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {children}
+    </nav>
+  );
+}
+
 export function SideNav() {
   const [mini, setMini] = useState(false);
   useEffect(() => setMini(document.documentElement.dataset.sidebar === "mini"), []);
@@ -104,9 +134,9 @@ export function SideNav() {
       className="hidden shrink-0 border-r border-line bg-surface lg:block lg:w-[72px] xl:w-64 xl:mini:w-[72px] motion-safe:transition-[width] motion-safe:duration-200"
     >
       <div className="sticky top-[72px] z-20 flex h-[calc(100dvh-72px)] flex-col">
-        <nav aria-label="Menu principal" className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
+        <FadeScroll label="Menu principal">
           <NavGroups variant="rail" />
-        </nav>
+        </FadeScroll>
         <div className="flex flex-col gap-1 border-t border-line px-3 py-3">
           <MenuFooter variant="rail" />
           <button

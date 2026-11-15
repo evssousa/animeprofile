@@ -64,4 +64,5 @@ export default [
   route("api/health", "routes/api.health.ts"),
   route("api/cron/:job", "routes/api.cron.ts"),
   route("api/importar/:what", "routes/api.importar.ts"),
+  route("api/robo/:acao", "routes/api.robo.ts"),
 ] satisfies RouteConfig;

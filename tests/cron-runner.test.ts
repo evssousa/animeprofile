@@ -38,11 +38,12 @@ describe("cron", () => {
     // Dois ticks ao mesmo tempo (dois processos do LiteSpeed): só um reserva.
     const t1 = new Date("2026-11-12T07:31:00Z");
     const [a, b] = await Promise.all([tick(t1), tick(t1)]);
-    expect([...a.started, ...b.started]).toEqual(["limpeza"]);
+    // O robô (minuto 20 de cada hora) também estava na hora; desligado, ele só responde { modo: "desligado" }.
+    expect([...a.started, ...b.started].sort()).toEqual(["limpeza", "robo-noticias"]);
     await Promise.all([a.done, b.done]);
 
     const runs = await query<{ job: string; status: string }>("SELECT job, status FROM cron_runs ORDER BY job");
-    expect(runs).toEqual([{ job: "limpeza", status: "ok" }]);
+    expect(runs).toEqual([{ job: "limpeza", status: "ok" }, { job: "robo-noticias", status: "ok" }]);
     const [after] = await query<{ next_run_at: string; locked_until: string | null; last_status: string }>(
       "SELECT next_run_at, locked_until, last_status FROM cron_jobs WHERE name = 'limpeza'",
     );
@@ -61,6 +62,6 @@ describe("cron", () => {
     expect(result && result.status).toBe("ok");
     const s = await status(5);
     expect(s.runs.filter((r) => (r as { job: string }).job === "limpeza").length).toBe(2);
-    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["animes-anilist", "limpeza", "videos-materias"]);
+    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["animes-anilist", "limpeza", "robo-noticias", "videos-materias"]);
   });
 });
