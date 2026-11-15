@@ -87,7 +87,7 @@ export default function QuizPage({ loaderData }: Route.ComponentProps) {
         {shared && <p className="rounded-xl bg-brand-soft px-4 py-3 font-semibold">Alguém tirou “{shared.title}” neste quiz. E você?</p>}
         <QuizPlayer key={quiz.id} quiz={quiz} challenge={challenge} next={more[0] ?? null} />
       </main>
-      <aside aria-label="Mais quizzes" className="flex flex-col gap-4">
+      <aside aria-label="Mais quizzes" className="flex flex-col gap-4 lg:sticky lg:top-[92px] lg:self-start">
         <h2 className="text-[1.15rem] font-extrabold">Continue jogando</h2>
         <div className="grid gap-4">
           {more.slice(0, 4).map((q) => (

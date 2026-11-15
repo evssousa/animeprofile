@@ -3,7 +3,8 @@
 import { Form, Link } from "react-router";
 import { Clapperboard, Music, Newspaper, Search } from "lucide-react";
 import type { Route } from "./+types/otaku-tv";
-import { ThemesTab, VideoCard, YoutubePlayer } from "~/components/otaku-tv";
+import { ThemesTab, VideoCard, YoutubePlayer, ytThumb } from "~/components/otaku-tv";
+import { SideCard } from "~/components/sidebar";
 import { PageHeader } from "~/components/PageHeader";
 import { Pagination } from "~/components/posts";
 import { seo } from "~/lib/seo";
@@ -84,6 +85,28 @@ export default function OtakuTv({ loaderData }: Route.ComponentProps) {
                   </Link>
                 )}
               </div>
+              {list && list.items.filter((v) => v.id !== selected.id).length > 0 && (
+                <div className="mt-4">
+                  <SideCard title="A seguir">
+                    <ul className="flex flex-col gap-3">
+                      {list.items
+                        .filter((v) => v.id !== selected.id)
+                        .slice(0, 5)
+                        .map((v) => (
+                          <li key={v.id}>
+                            <Link to={cardHref(v.id)} className="-m-1.5 flex items-center gap-3 rounded-[10px] p-1.5 hover:bg-sunken">
+                              <img src={ytThumb(v.id)} alt="" loading="lazy" className="aspect-video w-28 shrink-0 rounded-lg object-cover" />
+                              <span className="min-w-0">
+                                <span className="line-clamp-2 block text-[0.88rem] leading-snug font-semibold">{v.title}</span>
+                                <span className="mt-0.5 block text-[0.78rem] text-ink-soft">{v.subtitle}</span>
+                              </span>
+                            </Link>
+                          </li>
+                        ))}
+                    </ul>
+                  </SideCard>
+                </div>
+              )}
             </div>
           </section>
         )}

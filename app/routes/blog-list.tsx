@@ -2,12 +2,14 @@
 import { Form, Link } from "react-router";
 import { Rss, Search } from "lucide-react";
 import type { Route } from "./+types/blog-list";
-import { BlogRow, BlogSidebar } from "~/components/blog";
+import { BlogRow } from "~/components/blog";
 import { PageHeader } from "~/components/PageHeader";
 import { Pagination } from "~/components/posts";
+import { Sidebar } from "~/components/sidebar";
 import { seo } from "~/lib/seo";
 import { absoluteUrl } from "~/lib/site";
-import { blogSidebar, listBlogPosts, type BlogOrder } from "~/server/blog/blog.server";
+import { listBlogPosts, type BlogOrder } from "~/server/blog/blog.server";
+import { loadSidebar } from "~/server/sidebar.server";
 
 const ORDER_LABEL: Record<BlogOrder, string> = { recentes: "Mais recentes", populares: "Mais curtidos", comentados: "Mais comentados" };
 
@@ -17,7 +19,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const order: BlogOrder = o === "populares" || o === "comentados" ? o : "recentes";
   const q = (url.searchParams.get("q") ?? "").trim().slice(0, 80);
   const page = Math.max(1, Number(url.searchParams.get("pagina")) || 1);
-  const [list, side] = await Promise.all([listBlogPosts({ order, q }, page), blogSidebar()]);
+  const [list, side] = await Promise.all([listBlogPosts({ order, q }, page), loadSidebar("blog", { now: new Date() })]);
   return { list, side, order, q, now: new Date().toISOString() };
 }
 
@@ -49,7 +51,7 @@ export default function BlogList({ loaderData }: Route.ComponentProps) {
           <Rss className="size-4" aria-hidden /> RSS do blog
         </a>
       </PageHeader>
-      <div className="mx-auto grid max-w-[1328px] gap-10 px-4 py-10 sm:px-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-14">
+      <div className="mx-auto grid max-w-[1328px] gap-10 px-4 py-10 sm:px-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-14">
         <section aria-label="Posts" className="flex min-w-0 flex-col gap-6">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <nav aria-label="Ordem" className="flex flex-wrap gap-2">
@@ -79,9 +81,7 @@ export default function BlogList({ loaderData }: Route.ComponentProps) {
           )}
           <Pagination page={list.page} pages={list.pages} basePath="/blog" query={{ ...(order !== "recentes" ? { ordem: order } : {}), ...(q ? { q } : {}) }} />
         </section>
-        <aside aria-label="Mais do blog">
-          <BlogSidebar {...side} />
-        </aside>
+        <Sidebar blocks={side} label="Mais do blog" />
       </div>
     </>
   );

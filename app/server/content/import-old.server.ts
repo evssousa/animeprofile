@@ -13,6 +13,7 @@ import { rebuildPostVideos } from "../tv/tv.server";
 import { importQuizzes } from "../quiz/quiz.server";
 import { importBlog, type OldBlogSnapshot } from "../blog/blog.server";
 import { importStickers, type OldStickerSnapshot } from "../stickers/stickers.server";
+import { clearCache } from "../cache.server";
 import { readingMinutes, sanitizePostHtml } from "./sanitize.server";
 
 export type OldPost = {
@@ -172,6 +173,7 @@ export async function applySnapshot(s: OldSnapshot) {
   const quiz = s.quizzes ? await importQuizzes(s) : undefined;
   const blog = s.blog_posts ? await importBlog(s) : undefined;
   const stickers = s.sticker_albums ? await importStickers(s) : undefined;
+  clearCache(); // as barras laterais passam a mostrar o que acabou de entrar
   const [count] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM posts WHERE status = 'published'");
   return {
     materias: Number(count?.n ?? 0),

@@ -3,9 +3,11 @@ import { data, redirect } from "react-router";
 import type { Route } from "./+types/taxonomia";
 import { PageHeader } from "~/components/PageHeader";
 import { Pagination, PostGrid } from "~/components/posts";
+import { Sidebar } from "~/components/sidebar";
 import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
 import { getAiAuthor, getCategory, getTag, listPosts, type ListFilter } from "~/server/content/posts.server";
+import { loadSidebar } from "~/server/sidebar.server";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const url = new URL(request.url);
@@ -15,17 +17,20 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const slug = params.slug;
   let filter: ListFilter;
   let head: { label: string; title: string; intro?: string; avatar?: string | null };
+  let side: Parameters<typeof loadSidebar>[1] | null = null;
 
   if (kind === "categoria") {
     const c = await getCategory(slug);
     if (!c) throw data(null, { status: 404 });
     filter = { categoryId: c.id };
+    side = { now: new Date(), categoryId: c.id, categorySlug: c.slug, type: c.kind === "article" ? "article" : "news" };
     head = { label: c.kind === "article" ? "Artigos" : "Notícias", title: c.name, intro: c.description ?? undefined };
   } else if (kind === "tag") {
     const t = await getTag(slug);
     if (!t) throw data(null, { status: 404 });
     if (t.redirectTo) throw redirect(`/tag/${t.redirectTo}`, 301);
     filter = { tagId: t.id };
+    side = { now: new Date(), tagId: t.id };
     head = { label: "Assunto", title: `#${t.name}`, intro: `Todas as notícias e artigos sobre ${t.name}.` };
   } else {
     const a = await getAiAuthor(slug);
@@ -34,9 +39,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     head = { label: "Autor da redação", title: a.name, intro: a.bio ?? "Autor de IA da redação do Anime Profile. Todo texto passa por revisão humana.", avatar: a.avatar_url };
   }
 
-  const list = await listPosts(filter, page, 24);
+  const [list, sidebar] = await Promise.all([listPosts(filter, page, 24), side ? loadSidebar("taxonomia", side) : []]);
   if (page > list.pages && list.total > 0) throw data(null, { status: 404 });
-  return { kind, path, head, list };
+  return { kind, path, head, list, sidebar };
 }
 
 export function meta({ loaderData: d }: Route.MetaArgs) {
@@ -52,15 +57,18 @@ export function meta({ loaderData: d }: Route.MetaArgs) {
 }
 
 export default function Taxonomia({ loaderData }: Route.ComponentProps) {
-  const { path, head, list } = loaderData;
+  const { path, head, list, sidebar } = loaderData;
   return (
     <>
       <PageHeader label={head.label} title={head.title} intro={head.intro}>
         <p className="mt-5 text-[0.9rem] text-white/60">{list.total === 1 ? "1 matéria" : `${list.total.toLocaleString("pt-BR")} matérias`}</p>
       </PageHeader>
-      <div className="mx-auto flex max-w-[1328px] flex-col gap-12 px-4 py-10 sm:px-8 sm:py-12 lg:px-14">
-        {list.items.length ? <PostGrid posts={list.items} /> : <p className="text-ink-soft">Ainda não há matérias aqui.</p>}
-        <Pagination page={list.page} pages={list.pages} basePath={path} />
+      <div className={`mx-auto max-w-[1328px] px-4 py-10 sm:px-8 sm:py-12 lg:px-14 ${sidebar.length ? "grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px]" : "flex flex-col gap-12"}`}>
+        <div className="flex min-w-0 flex-col gap-12">
+          {list.items.length ? <PostGrid posts={list.items} cols={sidebar.length ? 3 : 4} /> : <p className="text-ink-soft">Ainda não há matérias aqui.</p>}
+          <Pagination page={list.page} pages={list.pages} basePath={path} />
+        </div>
+        <Sidebar blocks={sidebar} label="Mais do Anime Profile" />
       </div>
     </>
   );

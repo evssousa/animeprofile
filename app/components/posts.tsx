@@ -78,7 +78,7 @@ export function PostOverlay({ post, className = "", titleClass = "text-[1.6rem]"
 }
 
 /** Linha compacta: miniatura à esquerda (listas laterais, busca). */
-export function PostRow({ post, index }: { post: Card; index?: number }) {
+export function PostRow({ post, index, meta }: { post: Card; index?: number; meta?: string }) {
   return (
     <article className="group relative flex items-center gap-3.5">
       {index !== undefined && <span className="w-7 shrink-0 text-[1.6rem] leading-none font-extrabold text-brand/25">{index}</span>}
@@ -90,6 +90,7 @@ export function PostRow({ post, index }: { post: Card; index?: number }) {
             {post.title}
           </Link>
         </h3>
+        {meta && <p className="mt-1 text-[0.78rem] text-ink-soft">{meta}</p>}
       </div>
     </article>
   );

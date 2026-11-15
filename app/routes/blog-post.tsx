@@ -2,22 +2,24 @@
 import { data, Link, redirect } from "react-router";
 import { Eye, Heart, Sparkles } from "lucide-react";
 import type { Route } from "./+types/blog-post";
-import { BlogAvatar, BlogSidebar, BlogTile } from "~/components/blog";
+import { BlogAvatar, BlogTile } from "~/components/blog";
+import { Sidebar } from "~/components/sidebar";
 import { Comments, ShareBar } from "~/components/post-extras";
 import { blogAuthorUrl, stripMarkdown } from "~/lib/blog";
 import { formatDateLong, formatDateTime, readingLabel, timeAgo } from "~/lib/format";
 import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
 import { SITE, absoluteUrl } from "~/lib/site";
-import { blogComments, blogSidebar, getBlogPost, relatedBlogPosts } from "~/server/blog/blog.server";
+import { blogComments, getBlogPost, relatedBlogPosts } from "~/server/blog/blog.server";
+import { loadSidebar } from "~/server/sidebar.server";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const post = await getBlogPost(params.slug);
   if (!post) throw data(null, { status: 404 });
   // O endereço certo leva o username do autor; qualquer outro vai para ele (301).
   if (routePath(request) !== post.url) throw redirect(post.url, 301);
-  const [comments, related, side] = await Promise.all([blogComments(post.id), relatedBlogPosts(post, 3), blogSidebar()]);
   const now = new Date();
+  const [comments, related, side] = await Promise.all([blogComments(post.id), relatedBlogPosts(post, 3), loadSidebar("blog", { now })]);
   const label = <T extends { createdAt: string }>(c: T) => ({ ...c, ago: timeAgo(c.createdAt, now) });
   const { contentMd, ...rest } = post;
   return {
@@ -169,9 +171,7 @@ export default function BlogPost({ loaderData }: Route.ComponentProps) {
 
             <Comments items={comments} />
           </div>
-          <aside aria-label="Mais do blog">
-            <BlogSidebar {...side} />
-          </aside>
+          <Sidebar blocks={side} label="Mais do blog" />
         </div>
 
         {related.length > 0 && (

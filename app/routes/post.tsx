@@ -2,7 +2,8 @@
 // Se o tipo do endereço não bater (artigo aberto em /noticias), redireciona para o certo.
 import { data, Link, redirect } from "react-router";
 import type { Route } from "./+types/post";
-import { Comments, PostSidebar, ShareBar } from "~/components/post-extras";
+import { Comments, ShareBar } from "~/components/post-extras";
+import { Sidebar } from "~/components/sidebar";
 import { PostCard } from "~/components/posts";
 import { formatDateLong, formatDateTime, readingLabel, timeAgo } from "~/lib/format";
 import { routePath } from "~/lib/route-path";
@@ -10,7 +11,8 @@ import { seo } from "~/lib/seo";
 import { SITE, absoluteUrl } from "~/lib/site";
 import { isWideImage } from "~/lib/images";
 import { getAnime } from "~/server/anime/anime.server";
-import { getPost, latestComments, latestPosts, postComments, relatedPosts, trendingPosts, withToc } from "~/server/content/posts.server";
+import { getPost, postComments, relatedPosts, withToc } from "~/server/content/posts.server";
+import { loadSidebar } from "~/server/sidebar.server";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const post = await getPost(params.slug);
@@ -22,25 +24,21 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const showCover = Boolean(post.image) && !(coverFile && post.html.includes(coverFile.replace(/\.\w+$/, "")));
   const { html, toc } = withToc(post.html);
 
-  // Barra lateral (como no site antigo): anime da matéria, destaque, últimas, comentários, índice e em alta.
-  // O anime vem só do banco (sem buscar no AniList), para a matéria abrir rápido.
-  const [related, recent, sideComments, trending, comments, anime] = await Promise.all([
-    relatedPosts(post, 4),
-    latestPosts({ type: post.type, excludeIds: [post.id] }, 8),
-    latestComments(post.type, 5),
-    trendingPosts(post.type, post.id, 5),
-    postComments(post.id),
-    post.anilistId ? getAnime(post.anilistId, { remote: false }).catch(() => null) : null,
-  ]);
-  const featured = recent.find((p) => p.image) ?? null;
-  const latest = recent.filter((p) => p.id !== featured?.id).slice(0, 6);
+  // Barra lateral (como no site antigo): anime da matéria, destaque, últimas, comentários, índice e em alta
+  // (docs/plano-sidebars.md). O anime vem só do banco (sem buscar no AniList), para a matéria abrir rápido.
   const now = new Date();
+  const anime = post.anilistId ? await getAnime(post.anilistId, { remote: false }).catch(() => null) : null;
+  const [related, comments, sidebar] = await Promise.all([
+    relatedPosts(post, 4),
+    postComments(post.id),
+    loadSidebar("materia", { now, type: post.type, excludeId: post.id, anilistId: post.anilistId, anime, toc }),
+  ]);
   const label = <T extends { createdAt: string }>(c: T) => ({ ...c, ago: timeAgo(c.createdAt, now) });
   return {
     post: { ...post, html },
     related,
     showCover,
-    sidebar: { anime, featured, latest, comments: sideComments.map(label), toc, trending },
+    sidebar,
     comments: comments.map((c) => ({ ...label(c), replies: c.replies.map(label) })),
   };
 }
@@ -173,9 +171,7 @@ export default function Post({ loaderData }: Route.ComponentProps) {
           <Comments items={comments} />
         </div>
 
-        <aside aria-label="Mais do Anime Profile">
-          <PostSidebar {...sidebar} kindLabel={post.type === "news" ? "notícias" : "artigos"} />
-        </aside>
+        <Sidebar blocks={sidebar} label="Mais do Anime Profile" />
         </div>
 
         {related.length > 0 && (

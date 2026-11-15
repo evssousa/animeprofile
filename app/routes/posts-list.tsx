@@ -3,10 +3,12 @@
 import { data } from "react-router";
 import type { Route } from "./+types/posts-list";
 import { PageHeader } from "~/components/PageHeader";
-import { Chips, Pagination, PostGrid, PostOverlay, PostRow } from "~/components/posts";
+import { Chips, Pagination, PostGrid, PostOverlay } from "~/components/posts";
+import { Sidebar } from "~/components/sidebar";
 import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
-import { listCategories, listPosts, mostRead, type PostType } from "~/server/content/posts.server";
+import { listCategories, listPosts, type PostType } from "~/server/content/posts.server";
+import { loadSidebar } from "~/server/sidebar.server";
 
 const PAGES: Record<string, { type?: PostType; label: string; title: string; intro: string; description: string }> = {
   "/noticias": {
@@ -38,9 +40,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   const cfg = PAGES[path];
   if (!cfg) throw data(null, { status: 404 });
   const page = Math.max(1, Number(url.searchParams.get("pagina")) || 1);
-  const [list, categories, top] = await Promise.all([listPosts({ type: cfg.type }, page, 24), listCategories(cfg.type), page === 1 ? mostRead(5, cfg.type) : []]);
+  const [list, categories, sidebar] = await Promise.all([listPosts({ type: cfg.type }, page, 24), listCategories(cfg.type), loadSidebar("central", { now: new Date(), type: cfg.type })]);
   if (page > list.pages && list.total > 0) throw data(null, { status: 404 });
-  return { path, cfg, list, categories: categories.slice(0, 12), top };
+  return { path, cfg, list, categories: categories.slice(0, 12), sidebar };
 }
 
 export function meta({ loaderData: d }: Route.MetaArgs) {
@@ -54,7 +56,7 @@ export function meta({ loaderData: d }: Route.MetaArgs) {
 }
 
 export default function PostsList({ loaderData }: Route.ComponentProps) {
-  const { path, cfg, list, categories, top } = loaderData;
+  const { path, cfg, list, categories, sidebar } = loaderData;
   const first = list.page === 1;
   const [lead, ...rest] = list.items;
   const tabs = [
@@ -82,28 +84,20 @@ export default function PostsList({ loaderData }: Route.ComponentProps) {
       <div className="mx-auto flex max-w-[1328px] flex-col gap-12 px-4 py-10 sm:px-8 sm:py-12 lg:px-14">
         {categories.length > 0 && <Chips items={categories.map((c) => ({ label: c.name, to: `/categoria/${c.slug}` }))} />}
 
-        {list.items.length === 0 ? (
-          <p className="text-ink-soft">Ainda não há matérias publicadas aqui.</p>
-        ) : first && lead ? (
-          <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-            <PostOverlay post={lead} className="min-h-[420px]" titleClass="text-[1.7rem] sm:text-[2.1rem]" />
-            {top.length > 0 && (
-              <aside className="rounded-[18px] border border-line bg-surface p-5">
-                <h2 className="text-[1.05rem] font-extrabold">Mais lidas</h2>
-                <ol className="mt-4 flex flex-col gap-4">
-                  {top.map((p, i) => (
-                    <li key={p.id}>
-                      <PostRow post={p} index={i + 1} />
-                    </li>
-                  ))}
-                </ol>
-              </aside>
+        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
+          <div className="flex min-w-0 flex-col gap-10">
+            {list.items.length === 0 ? (
+              <p className="text-ink-soft">Ainda não há matérias publicadas aqui.</p>
+            ) : (
+              <>
+                {first && lead && <PostOverlay post={lead} className="min-h-[420px]" titleClass="text-[1.7rem] sm:text-[2.1rem]" />}
+                <PostGrid posts={first ? rest : list.items} cols={3} />
+              </>
             )}
+            <Pagination page={list.page} pages={list.pages} basePath={path.split("?")[0]} query={path.includes("?") ? { tipo: "noticias" } : {}} />
           </div>
-        ) : null}
-
-        <PostGrid posts={first ? rest : list.items} />
-        <Pagination page={list.page} pages={list.pages} basePath={path.split("?")[0]} query={path.includes("?") ? { tipo: "noticias" } : {}} />
+          <Sidebar blocks={sidebar} label="Mais do Anime Profile" />
+        </div>
       </div>
     </>
   );

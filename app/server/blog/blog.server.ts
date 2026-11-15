@@ -325,3 +325,26 @@ export async function importBlog(s: OldBlogSnapshot) {
   });
   return { posts: rows.length, comentarios: comments.length, pulados: skipped.slice(0, 10) };
 }
+
+// ------------------------------------------------------------------------------------- barras laterais
+
+/** Destaques da semana: posts dos últimos 7 dias, pela nota de qualidade e leituras. Vazio se não houve post. */
+export async function blogBestOfWeek(limit = 5) {
+  if (!hasDatabase()) return [];
+  const rows = await query<CardRow>(
+    `SELECT ${CARD_COLS} ${FROM} WHERE ${VISIBLE_BLOG} AND b.published_at > UTC_TIMESTAMP(3) - INTERVAL 7 DAY
+     ORDER BY b.quality_score DESC, b.views_count DESC, b.published_at DESC LIMIT ?`,
+    [limit],
+  );
+  return rows.map(toCard);
+}
+
+/** Mais comentados de sempre (com poucos posts, a janela de 7 dias ficaria quase sempre vazia). */
+export async function blogMostCommented(limit = 5) {
+  if (!hasDatabase()) return [];
+  const rows = await query<CardRow>(
+    `SELECT ${CARD_COLS} ${FROM} WHERE ${VISIBLE_BLOG} AND b.comments_count > 0 ORDER BY b.comments_count DESC, b.published_at DESC LIMIT ?`,
+    [limit],
+  );
+  return rows.map(toCard);
+}

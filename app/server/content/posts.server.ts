@@ -326,3 +326,55 @@ export function withToc(html: string) {
   });
   return { html: out, toc };
 }
+
+// ------------------------------------------------------------------------------------- barras laterais
+
+/** Mais lidas nos últimos `days` dias (a contagem de leituras é a do site antigo; o filtro é pela data de publicação). */
+export async function mostReadSince(days: number, limit: number, type?: PostType) {
+  if (!hasDatabase()) return [];
+  const w = where({ type });
+  const rows = await query<CardRow>(
+    `SELECT ${CARD_COLUMNS} FROM posts p LEFT JOIN post_authors a ON a.id = p.author_id
+     WHERE ${w.sql} AND p.published_at > UTC_TIMESTAMP(3) - INTERVAL ? DAY ORDER BY p.views_count DESC, p.published_at DESC LIMIT ?`,
+    [...w.params, days, limit],
+  );
+  return rows.map(toCard);
+}
+
+/** Matérias mais comentadas nos últimos `days` dias, com a contagem. */
+export async function mostCommentedSince(days: number, limit: number, type?: PostType): Promise<(PostCard & { comments: number })[]> {
+  if (!hasDatabase()) return [];
+  const w = where({ type });
+  const rows = await query<CardRow & { comments_n: number }>(
+    `SELECT ${CARD_COLUMNS}, x.n AS comments_n FROM (
+       SELECT c.post_id, COUNT(*) AS n FROM post_comments c WHERE c.created_at > UTC_TIMESTAMP(3) - INTERVAL ? DAY GROUP BY c.post_id
+     ) x JOIN posts p ON p.id = x.post_id LEFT JOIN post_authors a ON a.id = p.author_id
+     WHERE ${w.sql} ORDER BY x.n DESC, p.published_at DESC LIMIT ?`,
+    [days, ...w.params, limit],
+  );
+  return rows.map((r) => ({ ...toCard(r), comments: Number(r.comments_n) }));
+}
+
+/** Tags que aparecem em 2 ou mais das 120 matérias mais recentes da seleção (sem a própria tag). */
+export async function relatedTags(filter: ListFilter, limit = 14, ignoreTagId = "") {
+  if (!hasDatabase()) return [];
+  const w = where(filter);
+  return query<{ name: string; slug: string; total: number }>(
+    `SELECT t.name, t.slug, COUNT(*) AS total FROM post_tags pt JOIN tags t ON t.id = pt.tag_id
+     JOIN (SELECT p.id FROM posts p WHERE ${w.sql} ORDER BY p.published_at DESC LIMIT 120) s ON s.id = pt.post_id
+     WHERE t.id <> ? GROUP BY t.id HAVING total >= 2 ORDER BY total DESC, t.name LIMIT ?`,
+    [...w.params, ignoreTagId, limit],
+  );
+}
+
+/** Categorias em que a tag aparece (nas 120 matérias mais recentes dela), sem "sem-categoria". */
+export async function categoriesOfTag(tagId: string, limit = 6) {
+  if (!hasDatabase()) return [];
+  const w = where({ tagId });
+  return query<{ name: string; slug: string; total: number }>(
+    `SELECT c.name, c.slug, COUNT(*) AS total FROM post_categories pc JOIN categories c ON c.id = pc.category_id
+     JOIN (SELECT p.id FROM posts p WHERE ${w.sql} ORDER BY p.published_at DESC LIMIT 120) s ON s.id = pc.post_id
+     WHERE c.slug <> 'sem-categoria' GROUP BY c.id ORDER BY total DESC, c.name LIMIT ?`,
+    [...w.params, limit],
+  );
+}

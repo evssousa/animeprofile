@@ -2,6 +2,7 @@
 // (robôs preenchem, pessoas não veem) e por limite de envios por IP. O Turnstile entra com as chaves.
 import { exec, hasDatabase, query } from "./db.server";
 import { clientIp, ipHash } from "./http.server";
+import { sendSiteMail } from "./mail.server";
 
 export type ContactKind = "contato" | "faca-parte" | "avisar-contas";
 export type FieldErrors = Partial<Record<string, string>>;
@@ -42,6 +43,15 @@ export async function saveMessage(kind: ContactKind, input: ContactInput, reques
     input.extra ? JSON.stringify(input.extra) : null,
     hash,
   ]);
+  // Cópia para a caixa do site (só mensagens de pessoas; o aviso de contas voltando não precisa). Não atrasa nem derruba o envio.
+  if (kind !== "avisar-contas") {
+    const extra = input.extra ? `\n\n${Object.entries(input.extra).map(([k, v]) => `${k}: ${v}`).join("\n")}` : "";
+    await sendSiteMail({
+      replyTo: input.email,
+      subject: `[Anime Profile · ${kind}] ${input.subject}`,
+      text: `De: ${input.name} <${input.email}>\nAssunto: ${input.subject}\n\n${input.body}${extra}\n`,
+    });
+  }
   return { ok: true };
 }
 

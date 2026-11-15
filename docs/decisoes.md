@@ -2,6 +2,26 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-15 (plano) — Robô de notícias volta antes das contas, no cron do próprio site
+
+Detalhes em [plano-robo-noticias.md](plano-robo-noticias.md).
+
+- **Decisão:**
+  - **Ordem (resposta do dono à pergunta 2 da virada):** a fase A (robô de notícias) vem antes das contas. Isso
+    substitui o "durante a lacuna o robô fica parado" da decisão abaixo: a meta é ligar no dia da virada (17/11).
+  - **Onde roda (plano):** tarefa `robo-noticias` no cron do site novo (Node + MySQL), sem GitHub Actions. A única
+    chave é `GEMINI_API_KEY` (plano grátis, projeto sem faturamento), cadastrada pelo dono no hPanel.
+  - **Ligar e desligar:** pelo modo em `system_config.robo` (`desligado`, `ensaio`, `rascunho`, `publicar`), trocado
+    por `/api/robo/modo` com o `CRON_TOKEN`. Só liga `publicar` depois de um ensaio com prévias aprovadas.
+  - **Proteção do que o robô publicar:** as matérias ganham `origin` (`old` ou `robo`), e a importação do site antigo
+    passa a apagar e religar só as `old`.
+- **Por quê:**
+  - **SEO:** notícia nova é o que mantém o Google e o Google Notícias.
+  - **Opção A em vez de GitHub Actions:** o repositório é público (os logs das Actions seriam públicos), o
+    agendamento do GitHub já falhou neste projeto, e a tarefa roda depois do `202`, sem o limite de ~55 s da CDN.
+- **Pendente:** as 4 perguntas do fim do plano (guia editorial fora do git, teto do primeiro dia, Firecrawl, cota
+  fora de anime).
+
 ## 2026-11-15 — Virada parcial em 4 dias, sem contas
 
 Detalhes em [plano-virada-parcial.md](plano-virada-parcial.md).

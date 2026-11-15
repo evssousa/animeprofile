@@ -1,13 +1,15 @@
 // Categoria ou tag do blog (/blog/categoria/:slug e /blog/tag/:slug). O id da rota diz qual.
 import { data } from "react-router";
 import type { Route } from "./+types/blog-taxonomia";
-import { BlogRow, BlogSidebar } from "~/components/blog";
+import { BlogRow } from "~/components/blog";
 import { PageHeader } from "~/components/PageHeader";
 import { Pagination } from "~/components/posts";
+import { Sidebar } from "~/components/sidebar";
 import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
 import { absoluteUrl } from "~/lib/site";
-import { blogSidebar, blogTaxonomy, listBlogPosts } from "~/server/blog/blog.server";
+import { blogTaxonomy, listBlogPosts } from "~/server/blog/blog.server";
+import { loadSidebar } from "~/server/sidebar.server";
 
 const kindOf = (request: Request) => (routePath(request).startsWith("/blog/categoria/") ? ("categoria" as const) : ("tag" as const));
 
@@ -17,7 +19,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   if (!info) throw data(null, { status: 404 });
   const page = Math.max(1, Number(new URL(request.url).searchParams.get("pagina")) || 1);
   const filter = kind === "categoria" ? { categorySlug: params.slug } : { tagSlug: params.slug };
-  const [list, side] = await Promise.all([listBlogPosts(filter, page), blogSidebar()]);
+  const [list, side] = await Promise.all([listBlogPosts(filter, page), loadSidebar("blog", { now: new Date() })]);
   return { kind, slug: params.slug, name: info.name, total: info.total, list, side, now: new Date().toISOString() };
 }
 
@@ -45,16 +47,14 @@ export default function BlogTaxonomy({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <PageHeader label={kind === "categoria" ? "Categoria do blog" : "Tag do blog"} title={kind === "tag" ? `#${name}` : name} intro={`${total} ${total === 1 ? "post" : "posts"}`} />
-      <div className="mx-auto grid max-w-[1328px] gap-10 px-4 py-10 sm:px-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-14">
+      <div className="mx-auto grid max-w-[1328px] gap-10 px-4 py-10 sm:px-8 sm:py-12 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-14">
         <section aria-label="Posts" className="flex min-w-0 flex-col gap-4">
           {list.items.map((p) => (
             <BlogRow key={p.id} post={p} now={now} />
           ))}
           <Pagination page={list.page} pages={list.pages} basePath={`/blog/${kind}/${slug}`} />
         </section>
-        <aside aria-label="Mais do blog">
-          <BlogSidebar {...side} />
-        </aside>
+        <Sidebar blocks={side} label="Mais do blog" />
       </div>
     </>
   );

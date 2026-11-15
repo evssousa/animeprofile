@@ -22,6 +22,8 @@ Lovable Cloud. Por isso, o domínio animeprofile.com.br passa para cá numa **vi
 | [deploy-hostinger.md](deploy-hostinger.md) | Como o app roda na Hostinger, endereço de teste e cuidados com o domínio |
 | [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md) | Plano (temporário): Quiz, leitura do Blog da comunidade e catálogo de figurinhas, com migrations 009–011, exportação e cópia das imagens |
 | [plano-virada-parcial.md](plano-virada-parcial.md) | **Plano urgente (temporário):** resgate dos dados do Lovable Cloud e virada parcial do domínio em 4 dias (sem contas), com cronograma por dia, o que é do dono e as fases depois da virada |
+| [plano-sidebar-esquerda.md](plano-sidebar-esquerda.md) | Plano (temporário): menu lateral esquerdo como no site antigo (recolhível, sem piscar), topo com slot de menus extras e o celular no estilo do antigo (barra inferior, faixas que rolam, topo compacto, rodapé em 2 colunas) |
+| [plano-robo-noticias.md](plano-robo-noticias.md) | Plano (temporário): robô de notícias por IA no cron do site novo (fase A, antes das contas), com inventário do robô antigo, migration 012, ensaio sem publicar e ligação na virada |
 | [plano-sidebars.md](plano-sidebars.md) | Plano (temporário): inventário das barras laterais do site antigo e o sistema único de lateral (blocos por página, cache curto) para a matéria, Central, categoria/tag, blog, Otaku TV e quiz |
 
 ## Status
