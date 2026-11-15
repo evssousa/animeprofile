@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { migrate } from "../db/migrate.mjs";
 import { createPool, query, setPool } from "~/server/db.server";
 import { applySnapshot, type OldSnapshot } from "~/server/content/import-old.server";
-import { MediaError, saveImportedMedia } from "~/server/content/media-import.server";
+import { MediaError, isMediaName, saveImportedMedia } from "~/server/content/media-import.server";
 import { albumForAnime, collectionTeaser, getAlbum, isoWeekKey, listAlbums, weeklyFeaturedAlbum } from "~/server/stickers/stickers.server";
 import { sitemapFigurinhas } from "~/server/seo/feeds.server";
 
@@ -107,6 +107,11 @@ describe("mídia importada", () => {
     await expect(saveImportedMedia("../x.png", png)).rejects.toBeInstanceOf(MediaError);
     await expect(saveImportedMedia(`outra/${"a".repeat(24)}.png`, png)).rejects.toBeInstanceOf(MediaError);
     await expect(saveImportedMedia(name, Buffer.from("isto não é imagem, é texto puro"))).rejects.toBeInstanceOf(MediaError);
+  });
+  it("aceita imagens do Storage antigo só nos buckets e caminhos simples", () => {
+    expect(isMediaName("post-images/ai-news/2026/abc-123.webp")).toBe(true);
+    expect(isMediaName("profile-media/avatars/u1/foto_1.jpg")).toBe(true);
+    for (const bad of ["post-images/../x.png", "post-images/.oculto.png", "bug-reports/x.png", "database_export_23_08_26/x.backup", "post-images/a.svg", "post-images/a b.png", "post-images/a.png/", "post-images/x.html", "/post-images/a.png", "post-images/a\b.png"]) expect(isMediaName(bad), bad).toBe(false);
   });
   it("grava uma vez e não sobrescreve", async () => {
     expect(await saveImportedMedia(name, png)).toEqual({ existia: false });

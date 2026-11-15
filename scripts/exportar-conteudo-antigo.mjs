@@ -13,7 +13,12 @@ import { createHash } from "node:crypto";
 import { gzipSync } from "node:zlib";
 import { imageSize } from "image-size";
 
-const [envPath, target = "https://novo.animeprofile.com.br"] = process.argv.slice(2);
+// --midia <pasta>: pasta com os arquivos do Storage já baixados (scripts/baixar-storage.mjs); sem ela, baixa do Supabase.
+const rawArgs = process.argv.slice(2);
+const midiaIdx = rawArgs.indexOf("--midia");
+const MIDIA_DIR = midiaIdx >= 0 ? rawArgs[midiaIdx + 1] : null;
+if (midiaIdx >= 0) rawArgs.splice(midiaIdx, 2);
+const [envPath, target = "https://novo.animeprofile.com.br"] = rawArgs;
 if (!envPath) {
   console.error("Informe o caminho do .env do site antigo.");
   process.exit(1);
@@ -232,7 +237,56 @@ for (const c of sticker_catalog) {
 console.log(`Figurinhas: ${sticker_albums.length} álbuns, ${sticker_catalog.length} figurinhas, ${urls.length} imagens (${(mediaBytes / 1024 / 1024).toFixed(1)} MB; ${mediaSent} arquivos novos enviados).`);
 
 const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_categories, post_tags, tag_redirects, anime_catalog, post_comments, quizzes, quiz_result_counts, blog_posts, blog_categories, blog_tags, blog_post_categories, blog_post_tags, blog_post_comments, sticker_albums, sticker_catalog, weekly_featured_album };
-const gz = gzipSync(JSON.stringify(snapshot));
+// Imagens do Storage do site antigo (matérias, quiz, blog, avatares): copia para /media/<bucket>/<caminho> e troca os
+// endereços no retrato. Sem CRON_TOKEN nada é enviado nem trocado. Se um arquivo falhar, fica o endereço antigo.
+let snapshotJson = JSON.stringify(snapshot);
+{
+  // Os dois formatos (object e render/image) levam ao mesmo objeto <bucket>/<caminho>; a query (?width=...) some.
+  const URL_RE = /https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/(?:object|render\/image)\/public\/(post-images|profile-media|images|feed-images)\/([A-Za-z0-9_.\/-]+?\.(?:png|jpe?g|webp|gif|avif))(?:\?[^"\s\\)<>,]*)?/g;
+  const found = new Map();
+  for (const m of snapshotJson.matchAll(URL_RE)) found.set(`${m[1]}/${m[2]}`, true);
+  const names = [...found.keys()];
+  const stats = { enviados: 0, jaExistiam: 0, falhas: [] };
+  const okNames = new Set();
+  if (process.env.CRON_TOKEN) {
+    const base = target.replace(/\/$/, "");
+    const copy = async (name) => {
+      try {
+        const head = await fetch(`${base}/media/${name}`, { method: "HEAD" });
+        if (head.ok) {
+          stats.jaExistiam++;
+          return okNames.add(name);
+        }
+        let bytes;
+        const local = MIDIA_DIR ? join(MIDIA_DIR, ...name.split("/")) : null;
+        if (local && existsSync(local)) bytes = readFileSync(local);
+        else {
+          const res = await fetch(`${BASE}/storage/v1/object/public/${name.split("/").map(encodeURIComponent).join("/")}`);
+          if (!res.ok) throw new Error(`origem HTTP ${res.status}`);
+          bytes = Buffer.from(await res.arrayBuffer());
+        }
+        const type = imageSize(bytes).type;
+        const mime = type === "jpg" ? "image/jpeg" : `image/${type}`;
+        const up = await fetch(`${base}/api/importar/midia`, { method: "POST", headers: { "x-cron-token": process.env.CRON_TOKEN, "x-media-name": name, "Content-Type": mime }, body: bytes });
+        if (!up.ok) throw new Error(`envio HTTP ${up.status}`);
+        stats.enviados++;
+        okNames.add(name);
+      } catch (e) {
+        stats.falhas.push(`${name} (${e.message})`);
+      }
+    };
+    const queue = [...names];
+    await Promise.all(
+      Array.from({ length: 4 }, async () => {
+        for (let n = queue.shift(); n; n = queue.shift()) await copy(n);
+      }),
+    );
+    snapshotJson = snapshotJson.replace(URL_RE, (all, bucket, path) => (okNames.has(`${bucket}/${path}`) ? `/media/${bucket}/${path}` : all));
+  }
+  console.log(`Mídia: ${names.length} imagens no conteúdo; ${stats.enviados} enviadas, ${stats.jaExistiam} já existiam, ${stats.falhas.length} falhas${process.env.CRON_TOKEN ? "" : " (sem CRON_TOKEN: nada enviado nem trocado)"}.`);
+  for (const f of stats.falhas.slice(0, 30)) console.log(`  falhou: ${f}`);
+}
+const gz = gzipSync(snapshotJson);
 mkdirSync(".import", { recursive: true });
 writeFileSync(".import/conteudo.json.gz", gz);
 console.log(
