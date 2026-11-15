@@ -38,3 +38,26 @@ export async function saveImportedMedia(name: string, bytes: Buffer): Promise<{ 
   await rename(tmp, target);
   return { existia: false };
 }
+
+const ROBOT_KEY = /^[a-f0-9]{24}$/;
+
+/**
+ * Imagens das matérias do robô: /media/robo/<24 hex>.webp e <24 hex>-640.webp. O nome vem do sha1 do endereço da
+ * fonte, então rodar de novo não duplica. Devolve o endereço público da imagem principal.
+ */
+export async function saveRobotMedia(key: string, main: Buffer, thumb: Buffer): Promise<string> {
+  if (!ROBOT_KEY.test(key)) throw new MediaError("chave inválida");
+  for (const b of [main, thumb]) {
+    if (b.length > MAX_MEDIA_BYTES) throw new MediaError("arquivo grande demais");
+    if (b.length < 12 || b.toString("latin1", 0, 4) !== "RIFF" || b.toString("latin1", 8, 12) !== "WEBP") throw new MediaError("não é WebP");
+  }
+  const dir = join(mediaDir(), "robo");
+  await mkdir(dir, { recursive: true });
+  for (const [name, bytes] of [[`${key}.webp`, main], [`${key}-640.webp`, thumb]] as const) {
+    const target = join(dir, name);
+    const tmp = `${target}.${randomUUID()}.tmp`;
+    await writeFile(tmp, bytes);
+    await rename(tmp, target);
+  }
+  return `/media/robo/${key}.webp`;
+}
