@@ -26,8 +26,8 @@ export function NavGroups({ variant, onNavigate }: { variant: Variant; onNavigat
           <p className={`px-3 pb-1.5 text-[0.75rem] font-bold tracking-[0.14em] text-ink-soft uppercase ${rail ? "lg:sr-only xl:not-sr-only xl:mini:sr-only" : ""}`}>{group.label}</p>
           {rail && gi > 0 && <span aria-hidden className="mx-auto my-1 hidden h-px w-8 bg-line lg:block xl:hidden xl:mini:block" />}
           <ul className="flex flex-col gap-0.5">
-            {group.items.map(({ label, to, icon: Icon, soon }) => {
-              const active = isActive(pathname, to);
+            {group.items.map(({ label, to, icon: Icon, soon, also }) => {
+              const active = isActive(pathname, to, also);
               return (
                 <li key={to}>
                   <NavLink

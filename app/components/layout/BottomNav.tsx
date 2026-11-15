@@ -9,8 +9,8 @@ export function BottomNav() {
   return (
     <nav aria-label="Navegação rápida" className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 pb-[env(safe-area-inset-bottom)] backdrop-blur-md lg:hidden">
       <ul className="grid h-16 grid-cols-5">
-        {BOTTOM_NAV.map(({ label, to, icon: Icon }) => {
-          const active = isActive(pathname, to);
+        {BOTTOM_NAV.map(({ label, to, icon: Icon, also }) => {
+          const active = isActive(pathname, to, also);
           return (
             <li key={to}>
               <Link to={to} aria-current={active ? "page" : undefined} className={`${item} ${active ? "text-brand dark:text-glow" : "text-ink-soft"}`}>

@@ -1,6 +1,7 @@
 // /animes/calendario: episódios dos próximos 7 dias, por dia, no horário de Brasília.
 import type { Route } from "./+types/animes-calendario";
 import { AiringPoster, PosterGrid } from "~/components/anime";
+import { AnimeTabs } from "~/components/AnimeTabs";
 import { PageHeader } from "~/components/PageHeader";
 import { brDay, brDayLabel } from "~/lib/anime";
 import { seo } from "~/lib/seo";
@@ -30,6 +31,7 @@ export default function Calendario({ loaderData }: Route.ComponentProps) {
   return (
     <>
       <PageHeader label="Animes" title="Calendário da semana" intro="Os episódios dos próximos 7 dias, no horário de Brasília. O horário é o da exibição no Japão; no streaming pode chegar algumas horas depois." />
+      <AnimeTabs />
       <div className="mx-auto flex max-w-[1328px] flex-col gap-12 px-4 py-12 sm:px-8 lg:px-14">
         {loaderData.days.map((day) => (
           <section key={day.key} aria-labelledby={`dia-${day.key}`} className="flex flex-col gap-5">

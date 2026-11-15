@@ -16,7 +16,8 @@ import {
 } from "lucide-react";
 
 /** `soon`: depende de conta; o item continua no menu e leva à página "volta em breve". */
-export type NavItem = { label: string; to: string; icon: LucideIcon; soon?: true };
+/** `also`: outros prefixos que mantêm o item ativo (ex.: News fica ativo em /noticias e em /artigos). */
+export type NavItem = { label: string; to: string; icon: LucideIcon; soon?: true; also?: string[] };
 export type NavGroup = { label: string; items: NavItem[] };
 
 export const NAV: NavGroup[] = [
@@ -24,8 +25,7 @@ export const NAV: NavGroup[] = [
     label: "Descobrir",
     items: [
       { label: "Início", to: "/", icon: Home },
-      { label: "Notícias", to: "/noticias", icon: Newspaper },
-      { label: "Artigos", to: "/artigos", icon: BookOpen },
+      { label: "News", to: "/noticias", icon: Newspaper, also: ["/artigos"] },
       { label: "Animes", to: "/animes", icon: Tv },
       { label: "Otaku TV", to: "/otaku-tv", icon: MonitorPlay },
       { label: "Quiz", to: "/quiz", icon: Puzzle },
@@ -55,15 +55,15 @@ export const NAV: NavGroup[] = [
 ];
 
 /** Barra inferior do celular (abaixo de 1024 px). "Menu" abre a gaveta; quando as contas voltarem, Quiz dá lugar a Perfil. */
-export const BOTTOM_NAV: { label: string; to: string; icon: LucideIcon }[] = [
+export const BOTTOM_NAV: { label: string; to: string; icon: LucideIcon; also?: string[] }[] = [
   { label: "Início", to: "/", icon: Home },
-  { label: "Notícias", to: "/noticias", icon: Newspaper },
+  { label: "News", to: "/noticias", icon: Newspaper, also: ["/artigos"] },
   { label: "Animes", to: "/animes", icon: Tv },
   { label: "Quiz", to: "/quiz", icon: Puzzle },
 ];
 
 /** Menus extras do topo (ao lado do logo, a partir de `lg`). O menu principal fica na lateral esquerda. */
-export const HEADER_LINKS: { label: string; to: string; badge?: string; external?: boolean }[] = [{ label: "Calendário", to: "/animes/calendario" }];
+export const HEADER_LINKS: { label: string; to: string; badge?: string; external?: boolean }[] = [];
 
 export const FOOTER_LINKS: NavGroup[] = [
   {
@@ -108,7 +108,7 @@ export const SOCIAL = [
 ];
 
 /** Ativo quando a rota é a do item ou uma sub-rota dele. "/" só vale exato. */
-export function isActive(pathname: string, to: string) {
+export function isActive(pathname: string, to: string, also: string[] = []) {
   if (to === "/") return pathname === "/";
-  return pathname === to || pathname.startsWith(`${to}/`);
+  return [to, ...also].some((t) => pathname === t || pathname.startsWith(`${t}/`));
 }

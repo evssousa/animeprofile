@@ -3,6 +3,7 @@ import { Form } from "react-router";
 import { Search } from "lucide-react";
 import type { Route } from "./+types/animes";
 import { AiringPoster, AnimePoster, PosterGrid, TopTen } from "~/components/anime";
+import { AnimeTabs } from "~/components/AnimeTabs";
 import { PageHeader } from "~/components/PageHeader";
 import { Pagination, SectionHead } from "~/components/posts";
 import { SEASON_PT, brDay } from "~/lib/anime";
@@ -62,6 +63,7 @@ export default function Animes({ loaderData: d }: Route.ComponentProps) {
           </button>
         </Form>
       </PageHeader>
+      <AnimeTabs />
 
       <div className="mx-auto flex max-w-[1328px] flex-col gap-16 px-4 py-12 sm:px-8 lg:px-14">
         {d.mode === "busca" ? (

@@ -9,6 +9,8 @@ describe("nav", () => {
     expect(isActive("/", "/")).toBe(true);
     expect(isActive("/noticias/x", "/")).toBe(false);
     expect(isActive("/noticias/x", "/noticias")).toBe(true);
+    expect(isActive("/artigos/x", "/noticias", ["/artigos"])).toBe(true);
+    expect(isActive("/artigos/x", "/noticias")).toBe(false);
     expect(isActive("/quizz", "/quiz")).toBe(false);
   });
   it("todo endereço do menu é único e os 'em breve' são páginas de contas", () => {
