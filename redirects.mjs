@@ -11,6 +11,7 @@ const RULES = [
   [/^\/privacidade\/?$/, () => "/legal/privacidade"],
   [/^\/(ajuda(\/.*)?|reportar-bug)\/?$/, () => ({ to: "/contato", status: 302 })],
   [/^\/links\/?$/, () => ({ to: "/", status: 302 })],
+  [/^\/animes\/ranking\/?$/, () => ({ to: "/animes", status: 302 })],
   [/^\/clas(\/.*)?$/, () => "/ranking"],
   [/^\/comunidades(\/.*)?$/, () => "/feed"],
   [/^\/eventos\/?$/, () => "/"],
@@ -19,6 +20,7 @@ const RULES = [
   [/^\/membros\/?$/, () => "/explorar"],
   [/^\/sitemap-en\.xml$/, () => "/sitemap.xml"],
   [/^\/en\/news\/(.+)$/, (m) => `/noticias/${m[1]}`],
+  [/^\/en\/articles\/(.+)$/, (m) => `/artigos/${m[1]}`],
   [/^\/en(\/.*)?$/, (m) => m[1] || "/"],
 ];
 

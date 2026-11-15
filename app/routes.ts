@@ -58,6 +58,9 @@ export default [
   ...["sitemap.xml", "sitemap-static.xml", "sitemap-news.xml", "sitemap-articles.xml", "sitemap-taxonomy.xml", "sitemap-animes.xml", "sitemap-quiz.xml", "sitemap-blog.xml", "sitemap-figurinhas.xml", "rss.xml"].map((f) =>
     route(f, "routes/feeds.ts", { id: `feed-${f}` }),
   ),
+  route("unsubscribe", "routes/unsubscribe.tsx"),
+  route("api/public/payments/webhook", "routes/api.mp-webhook.ts", { id: "mp-webhook" }),
+  route("api/public/payments/mercado-pago", "routes/api.mp-webhook.ts", { id: "mp-webhook-2" }),
   route("api/health", "routes/api.health.ts"),
   route("api/cron/:job", "routes/api.cron.ts"),
   route("api/importar/:what", "routes/api.importar.ts"),

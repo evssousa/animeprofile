@@ -175,6 +175,8 @@ describe("redirecionamentos do que saiu", () => {
     expect(redirectFor("/noticias/qualquer")).toBeNull();
     expect(redirectFor("/entrar")).toBeNull();
     expect(redirectFor("/privacidade")).toBe("/legal/privacidade");
+    expect(redirectFor("/en/articles/algum-artigo")).toBe("/artigos/algum-artigo");
+    expect(redirectInfo("/animes/ranking")).toEqual({ to: "/animes", status: 302 });
     expect(redirectInfo("/ajuda/123")).toEqual({ to: "/contato", status: 302 });
     expect(redirectInfo("/reportar-bug")).toEqual({ to: "/contato", status: 302 });
     expect(redirectInfo("/links")).toEqual({ to: "/", status: 302 });
