@@ -69,8 +69,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 ## Próximos passos
 
-1. 2026-11-16, depois das 15h: exportar tudo de uma vez (notícias, artigos, quizzes, blog e figurinhas com as imagens) e
-   conferir `/quiz`, `/blog`, `/figurinhas` e a seção da home no site de teste.
+1. Conferir no navegador `/quiz`, `/blog`, `/figurinhas`, a home e a ficha de um anime com álbum (exportação feita em 2026-11-15).
 2. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
 3. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
    [deploy-hostinger.md](deploy-hostinger.md).
@@ -80,8 +79,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 ## Pendências suas
 
-- Rodar a exportação amanhã depois das 15h (`CRON_TOKEN` está nas variáveis do app no hPanel) ou me avisar para eu
-  rodar. As migrations 009, 010 e 011 rodam sozinhas no deploy, não precisa fazer nada no banco.
+- Exportação feita em 2026-11-15 (950 matérias, 14 quizzes, 13 posts do blog, 224 figurinhas). Na virada, rodar de novo. O token apareceu no chat: troque `CRON_TOKEN` no hPanel se quiser.
 - Se quiser as figurinhas abertas em vez de silhueta: trocar `MOSTRAR_ABERTAS` para `true` em `app/lib/stickers.ts`.
 
 ## Como atualizar o conteúdo do site de teste
