@@ -2,6 +2,53 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-15 — Virada parcial em 4 dias, sem contas
+
+Detalhes em [plano-virada-parcial.md](plano-virada-parcial.md).
+
+- **Decisão:**
+  - **Prazo e escopo (decisão do dono):** o domínio passa ao site novo só com o que já existe: notícias, artigos,
+    animes, personagens, Otaku TV, quiz, blog e figurinhas em leitura, páginas legais e contato. Login, moedas, chat,
+    quarto, comentar e admin voltam depois, em fases.
+  - **Antes de tudo, o resgate:** backup completo do Lovable Cloud (banco, `auth.users` com o hash bcrypt,
+    `auth.identities`, lista e arquivos do storage, contagens). Fica fora do repositório, num `.7z` cifrado com
+    AES-256, em 2 cópias.
+  - **Dois dumps:** um no dia 1, como garantia, e o **dump final** no dia 4, depois da virada. As contas e os saldos
+    são importados do dump final.
+  - **Imagens:** todas as que o conteúdo usa vão para `/media/<bucket>/<caminho>`, sem recompressão, antes da
+    virada. Os endereços são trocados no retrato da exportação.
+  - **Páginas que dependem de conta:** dizem "volta em breve" (200 + `noindex`), sem link para o site antigo. Uma
+    faixa em todas as páginas e a página `/site-novo` explicam a mudança.
+  - **Mercado Pago e descadastro:** as notificações do Mercado Pago e os pedidos de `/unsubscribe` são só guardados,
+    para processar depois.
+  - **Hora da virada:** dia 3 (17/11) de manhã, deixando o dia 4 de margem para o rollback pelo DNS.
+  - **Durante a lacuna:** o robô de notícias fica parado (os workflows do site antigo são desativados).
+- **Por quê:**
+  - **O prazo:** o Lovable Cloud passou a cobrar créditos, e o site antigo sai do ar no fim de 2026-11-18. Depois
+    disso, não há rollback nem como recuperar dados ou imagens.
+  - **Fazer as contas a tempo:** em 4 dias não dá para construir contas e economia com segurança. O que os usuários
+    não podem perder (saldo, coleção, senha) fica garantido pelo backup.
+
+## 2026-11-15 (plano) — Um sistema só de barra lateral, lido no servidor e com cache curto
+
+Detalhes em [plano-sidebars.md](plano-sidebars.md).
+
+- **Decisão:**
+  - **Componentes únicos:** as laterais (matéria, Central, categoria/tag, blog) usam os mesmos blocos de
+    `app/components/sidebar.tsx`, escolhidos por tipo de página numa tabela (`SIDEBAR_PRESETS` em `app/lib/sidebar.ts`)
+    e lidos no `loader` por `app/server/sidebar.server.ts`.
+  - **Cache em memória de 5 a 10 minutos** para os blocos iguais para todo mundo; a importação do conteúdo limpa o
+    cache.
+  - **Quadro vazio não aparece**, e cada página tem no máximo 5 quadros (a matéria, 6 contando os fixos).
+  - **Fica para depois:** o que depende de contas, economia ou feed (ranking, check-in, estatísticas, histórico de
+    pulls, lateral do feed) e o anúncio lateral (espera AdSense e banner de cookies). Comunidades, clãs e eventos não
+    voltam.
+  - **Menu à esquerda do site antigo:** não volta como lateral; ele já virou o topo.
+- **Por quê:**
+  - **Pedido do dono:** os elementos das laterais do site antigo são importantes, mesmo com o layout novo.
+  - **Velocidade e SEO:** dados no HTML do servidor (sem pular a tela ao carregar) e sem uma consulta extra por
+    quadro a cada visita.
+
 ## 2026-11-14 (plano) — Quiz pontuado no servidor; blog público em `/blog`; figurinhas em `/media`
 
 Detalhes em [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md).

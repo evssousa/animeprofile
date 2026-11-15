@@ -7,3 +7,7 @@ node_modules
 *.log
 /.import/
 .DS_Store
+
+# Backups e exportações sensíveis nunca entram no repositório
+export-temp/
+*.backup

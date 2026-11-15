@@ -5,8 +5,9 @@ pessoa (ou o Claude, depois de perder o contexto) saiba onde estamos e o que vem
 
 **Regra:** toda tarefa concluída atualiza o status abaixo e o documento da área.
 
-O site antigo (repositório privado `animeprofile-old`) continua no ar, sem mudanças, até este ficar pronto. O domínio
-animeprofile.com.br só é ligado aqui no fim.
+O site antigo (repositório privado `animeprofile-old`) sai do ar no fim de 2026-11-18, quando acabam os créditos do
+Lovable Cloud. Por isso, o domínio animeprofile.com.br passa para cá numa **virada parcial**, sem contas, em
+2026-11-17 ([plano-virada-parcial.md](plano-virada-parcial.md)).
 
 ## Documentos
 
@@ -20,6 +21,8 @@ animeprofile.com.br só é ligado aqui no fim.
 | [design.md](design.md) | Identidade visual: cores, tipografia, estrutura e componentes |
 | [deploy-hostinger.md](deploy-hostinger.md) | Como o app roda na Hostinger, endereço de teste e cuidados com o domínio |
 | [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md) | Plano (temporário): Quiz, leitura do Blog da comunidade e catálogo de figurinhas, com migrations 009–011, exportação e cópia das imagens |
+| [plano-virada-parcial.md](plano-virada-parcial.md) | **Plano urgente (temporário):** resgate dos dados do Lovable Cloud e virada parcial do domínio em 4 dias (sem contas), com cronograma por dia, o que é do dono e as fases depois da virada |
+| [plano-sidebars.md](plano-sidebars.md) | Plano (temporário): inventário das barras laterais do site antigo e o sistema único de lateral (blocos por página, cache curto) para a matéria, Central, categoria/tag, blog, Otaku TV e quiz |
 
 ## Status
 
@@ -47,12 +50,14 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Quiz sem login: `/quiz`, `/quiz/:slug`, pontuação no servidor, sitemap e seção da home ([plano](plano-quiz-blog-figurinhas.md) §1) | ✅ código pronto e testado; falta enviar os quizzes do site antigo (na virada) |
 | 2 | Blog da comunidade (só leitura): lista, post, autor, categoria, tag, RSS e sitemap ([plano](plano-quiz-blog-figurinhas.md) §2) | ✅ código pronto e testado; falta enviar o blog do site antigo (2026-11-16, depois das 15h) |
 | 2 | Catálogo de figurinhas (só ver), com as imagens copiadas para `/media` e a Coleção da home com dados reais ([plano](plano-quiz-blog-figurinhas.md) §3) | ✅ código pronto e testado, figurinhas em silhueta; falta enviar o catálogo e as imagens do site antigo (2026-11-16, depois das 15h) |
+| 2 | Barras laterais do site antigo: sistema único de lateral na matéria, Central, categoria/tag, blog, Otaku TV ("A seguir") e quiz ([plano](plano-sidebars.md)) | ⏳ plano pronto (2026-11-15); 3 perguntas para o dono |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
 | 4 | Social: Feed, mensagens, blog, comentários, quarto otaku, Otaku TV | 💤 |
 | 5 | Painel admin e robôs (notícias por IA, redes sociais) | 💤 |
-| 6 | Importação dos dados, ensaio completo e virada do domínio | 💤 |
+| 6 | **Virada parcial (sem contas) em 4 dias:** backup completo do Lovable Cloud, imagens no `/media`, páginas das contas honestas, ensaio e DNS ([plano](plano-virada-parcial.md)) | ⏳ urgente: plano pronto (2026-11-15); site antigo sai do ar no fim do dia 4 (18/11) |
+| 6 | Importação das contas e da economia a partir do dump final, em fases (A robô, B contas, C perfil e comentar, D economia, E figurinhas e missões, F resto) | 💤 depois da virada |
 
 ## Onde paramos
 
@@ -69,17 +74,38 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 ## Próximos passos
 
+0. **URGENTE: [plano-virada-parcial.md](plano-virada-parcial.md)**, na ordem do cronograma:
+   - dia 1 (15/11): backup e download das imagens;
+   - dia 2 (16/11): imagens no `/media`, páginas das contas, conferência de endereços e ensaio;
+   - dia 3 (17/11): virada às 7h;
+   - dia 4 (18/11): dump final.
+
+   Tudo o que não estiver nesse plano espera.
 1. Conferir no navegador `/quiz`, `/blog`, `/figurinhas`, a home e a ficha de um anime com álbum (exportação feita em 2026-11-15).
-2. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
-3. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
+2. Barras laterais: executar [plano-sidebars.md](plano-sidebars.md) passo a passo (10 passos, P/M; dá para fazer em
+   Sonnet), depois das respostas do dono às perguntas do fim do plano. **Depois da virada.**
+3. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
+4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
    [deploy-hostinger.md](deploy-hostinger.md).
-4. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
+5. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
    regras de conteúdo patrocinado, versão para baixar/imprimir e contato. Outra fonte de renda, vale para todos os sites.
    Fica para depois da virada do domínio; reaproveitar o que o criasite (piloto) fizer.
 
 ## Pendências suas
 
+- **URGENTE (virada parcial, [plano](plano-virada-parcial.md)):**
+  - **Dia 1:** exportar tudo do Lovable Cloud (passo 0.2: banco, `auth.users` com hash e `auth.identities`, lista do
+    storage, contagens, nomes dos segredos, fotos do DNS) para `C:\Users\evsli\animeprofile-backup\`, fora do
+    repositório. Baixar o TTL do DNS para 300 s. Conferir a propriedade do Search Console (tipo Domínio).
+  - **Dia 2:** "backup ok" e `.7z` cifrado em 2 cópias, SMTP no hPanel (opcional), UptimeRobot e aviso nas redes.
+  - **Dia 3:** hora H às 7h (desativar os workflows antigos, trocar `VITE_SITE_URL` e apagar `SITE_NOINDEX`, ligar o
+    domínio, trocar o cron, enviar o sitemap).
+  - **Dia 4:** dump final.
+  - **Responder as 5 perguntas do fim do plano.**
 - Exportação feita em 2026-11-15 (950 matérias, 14 quizzes, 13 posts do blog, 224 figurinhas). Na virada, rodar de novo. O token apareceu no chat: troque `CRON_TOKEN` no hPanel se quiser.
+- Responder as 3 perguntas do fim de [plano-sidebars.md](plano-sidebars.md): placeholder "Em breve: com a sua conta"
+  na lateral (recomendado: não), lateral da Central em todas as páginas da lista (recomendado: sim) e Guia do anime na
+  lateral ou no meio do texto (recomendado: lateral).
 - Se quiser as figurinhas abertas em vez de silhueta: trocar `MOSTRAR_ABERTAS` para `true` em `app/lib/stickers.ts`.
 
 ## Como atualizar o conteúdo do site de teste
