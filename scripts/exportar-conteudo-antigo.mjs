@@ -8,8 +8,9 @@
 //   CRON_TOKEN=... node scripts/exportar-conteudo-antigo.mjs <caminho do .env do site antigo> [endereço do site novo]
 //   (endereço padrão: https://novo.animeprofile.com.br)
 //   Sem CRON_TOKEN, só gera .import/conteudo.json.gz e não envia.
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
+import { join } from "node:path";
 import { gzipSync } from "node:zlib";
 import { imageSize } from "image-size";
 
@@ -242,10 +243,12 @@ const snapshot = { posts, categories, tags, ai_news_authors, profiles, post_cate
 let snapshotJson = JSON.stringify(snapshot);
 {
   // Os dois formatos (object e render/image) levam ao mesmo objeto <bucket>/<caminho>; a query (?width=...) some.
-  const URL_RE = /https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/(?:object|render\/image)\/public\/(post-images|profile-media|images|feed-images)\/([A-Za-z0-9_.\/-]+?\.(?:png|jpe?g|webp|gif|avif))(?:\?[^"\s\\)<>,]*)?/g;
+  const URL_RE = /https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/(?:object|render\/image)\/public\/(post-images|profile-media|images|feed-images)\/([A-Za-z0-9_.\/-]+?\.(?:png|jpe?g|webp|gif|avif))(?:\?[^"\s\\)<>,]*)?/gi;
   const found = new Map();
   for (const m of snapshotJson.matchAll(URL_RE)) found.set(`${m[1]}/${m[2]}`, true);
   const names = [...found.keys()];
+  // Links no texto para o endereço de teste do Lovable viram o domínio de verdade.
+  snapshotJson = snapshotJson.replace(/https?:\/\/(?:www\.)?animeprofile\.lovable\.app/gi, "https://animeprofile.com.br");
   const stats = { enviados: 0, jaExistiam: 0, falhas: [] };
   const okNames = new Set();
   if (process.env.CRON_TOKEN) {

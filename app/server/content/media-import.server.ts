@@ -10,7 +10,7 @@ export const MAX_MEDIA_BYTES = 15 * 1024 * 1024;
 const EXT = "(png|jpe?g|webp|gif|avif)";
 const NAME_FIGURINHA = new RegExp(`^figurinhas/[a-f0-9]{24}(-w400)?\\.${EXT}$`);
 // Segmentos sem ponto no começo (nada de ".." nem arquivo oculto) e só caracteres simples.
-const NAME_STORAGE = new RegExp(`^(post-images|profile-media|images|feed-images)(/[A-Za-z0-9_-][A-Za-z0-9._-]{0,150}){1,6}\\.${EXT}$`);
+const NAME_STORAGE = new RegExp(`^(post-images|profile-media|images|feed-images)(/[A-Za-z0-9_-][A-Za-z0-9._-]{0,150}){1,6}\\.${EXT}$`, "i");
 export const isMediaName = (name: string) => name.length <= 400 && !name.includes("..") && (NAME_FIGURINHA.test(name) || NAME_STORAGE.test(name));
 
 /** Assinatura dos bytes: PNG, JPEG, WebP, GIF ou AVIF. */
