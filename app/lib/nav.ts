@@ -15,7 +15,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 
-export type NavItem = { label: string; to: string; icon: LucideIcon };
+/** `soon`: depende de conta; o item continua no menu e leva à página "volta em breve". */
+export type NavItem = { label: string; to: string; icon: LucideIcon; soon?: true };
 export type NavGroup = { label: string; items: NavItem[] };
 
 export const NAV: NavGroup[] = [
@@ -33,36 +34,28 @@ export const NAV: NavGroup[] = [
   {
     label: "Comunidade",
     items: [
-      { label: "Feed", to: "/feed", icon: MessagesSquare },
+      { label: "Feed", to: "/feed", icon: MessagesSquare, soon: true },
       { label: "Blog", to: "/blog", icon: PenSquare },
     ],
   },
   {
     label: "Recompensas",
     items: [
-      { label: "Missões", to: "/missoes", icon: Award },
-      { label: "Ranking", to: "/ranking", icon: Trophy },
+      { label: "Missões", to: "/missoes", icon: Award, soon: true },
+      { label: "Ranking", to: "/ranking", icon: Trophy, soon: true },
     ],
   },
   {
     label: "Coleção",
     items: [
       { label: "Figurinhas", to: "/figurinhas", icon: Sparkles },
-      { label: "Quarto Otaku", to: "/quarto", icon: Sofa },
+      { label: "Quarto Otaku", to: "/quarto", icon: Sofa, soon: true },
     ],
   },
 ];
 
-/** Menu do topo (computador). O celular usa os grupos completos de NAV. */
-export const TOP_NAV: { label: string; to: string }[] = [
-  { label: "Início", to: "/" },
-  { label: "Notícias", to: "/noticias" },
-  { label: "Animes", to: "/animes" },
-  { label: "Otaku TV", to: "/otaku-tv" },
-  { label: "Quiz", to: "/quiz" },
-  { label: "Figurinhas", to: "/figurinhas" },
-  { label: "Comunidade", to: "/feed" },
-];
+/** Menus extras do topo (ao lado do logo, a partir de `lg`). O menu principal fica na lateral esquerda. */
+export const HEADER_LINKS: { label: string; to: string; badge?: string; external?: boolean }[] = [{ label: "Calendário", to: "/animes/calendario" }];
 
 export const FOOTER_LINKS: NavGroup[] = [
   {

@@ -5,6 +5,7 @@ import "./app.css";
 import { Footer } from "./components/layout/Footer";
 import { AvisoContas } from "./components/layout/AvisoContas";
 import { Header } from "./components/layout/Header";
+import { SideNav, sidebarBootstrap } from "./components/layout/SideNav";
 import { themeBootstrap } from "./components/layout/ThemeToggle";
 import { PageHeader } from "./components/PageHeader";
 import { SITE } from "./lib/site";
@@ -26,6 +27,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="theme-color" content="#0d0d10" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
+        <script dangerouslySetInnerHTML={{ __html: sidebarBootstrap }} />
         <Meta />
         <Links />
       </head>
@@ -37,11 +39,16 @@ export function Layout({ children }: { children: React.ReactNode }) {
           Pular para o conteúdo
         </a>
         <Header />
-        <AvisoContas />
-        <main id="conteudo" className="flex-1">
-          {children}
-        </main>
-        <Footer />
+        <div className="flex flex-1">
+          <SideNav />
+          <div className="flex min-w-0 flex-1 flex-col">
+            <AvisoContas />
+            <main id="conteudo" className="flex-1">
+              {children}
+            </main>
+            <Footer />
+          </div>
+        </div>
         <ScrollRestoration />
         <Scripts />
       </body>
