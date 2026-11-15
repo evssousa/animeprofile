@@ -74,6 +74,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 2. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
 3. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
    [deploy-hostinger.md](deploy-hostinger.md).
+4. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
+   regras de conteúdo patrocinado, versão para baixar/imprimir e contato. Outra fonte de renda, vale para todos os sites.
+   Fica para depois da virada do domínio; reaproveitar o que o criasite (piloto) fizer.
 
 ## Pendências suas
 
