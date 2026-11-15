@@ -56,7 +56,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
 | 4 | Social: Feed, mensagens, blog, comentários, quarto otaku, Otaku TV | 💤 |
 | 5 | Painel admin e robôs (notícias por IA, redes sociais) | 💤 |
-| 6 | **Virada parcial (sem contas) em 4 dias:** backup completo do Lovable Cloud, imagens no `/media`, páginas das contas honestas, ensaio e DNS ([plano](plano-virada-parcial.md)) | ⏳ urgente: plano pronto (2026-11-15); site antigo sai do ar no fim do dia 4 (18/11) |
+| 6 | **Virada parcial (sem contas) em 4 dias:** backup completo do Lovable Cloud, imagens no `/media`, páginas das contas honestas, ensaio e DNS ([plano](plano-virada-parcial.md)) | 🔄 urgente. **Dia 1 (15/11) feito:** backup do banco validado, storage inteiro baixado (6.757 arquivos), 2.436 imagens no `/media`, páginas das contas, faixa, `/site-novo`, redirects, arquivos públicos, Mercado Pago/descadastro guardados, conferência de 1.898 endereços com zero falhas, cache de 60 s para a CDN. Faltam o ensaio e a DNS (dias 2 e 3). Site antigo sai do ar no fim do dia 4 (18/11) |
 | 6 | Importação das contas e da economia a partir do dump final, em fases (A robô, B contas, C perfil e comentar, D economia, E figurinhas e missões, F resto) | 💤 depois da virada |
 
 ## Onde paramos
@@ -75,8 +75,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 ## Próximos passos
 
 0. **URGENTE: [plano-virada-parcial.md](plano-virada-parcial.md)**, na ordem do cronograma:
-   - dia 1 (15/11): backup e download das imagens;
-   - dia 2 (16/11): imagens no `/media`, páginas das contas, conferência de endereços e ensaio;
+   - dia 1 (15/11): **feito** (backup, imagens, páginas das contas, redirects, arquivos públicos, conferência);
+   - dia 2 (16/11): conferir no navegador (375 e 1440 px, claro e escuro), SMTP do contato (opcional), ensaio, descobrir
+     como ligar o domínio no teste e decidir ir ou não;
    - dia 3 (17/11): virada às 7h;
    - dia 4 (18/11): dump final.
 
@@ -94,9 +95,10 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 ## Pendências suas
 
 - **URGENTE (virada parcial, [plano](plano-virada-parcial.md)):**
-  - **Dia 1:** exportar tudo do Lovable Cloud (passo 0.2: banco, `auth.users` com hash e `auth.identities`, lista do
-    storage, contagens, nomes dos segredos, fotos do DNS) para `C:\Users\evsli\animeprofile-backup\`, fora do
-    repositório. Baixar o TTL do DNS para 300 s. Conferir a propriedade do Search Console (tipo Domínio).
+  - **Dia 1 (feito até aqui):** banco e storage guardados em `C:\Users\evsli\animeprofile-backup\`. **Falta:** baixar
+    o TTL do DNS para 300 s (ou me autorizar a fazer pelo MCP), conferir a propriedade do Search Console (tipo Domínio),
+    baixar a lista de páginas do Search Console para `.import/gsc-paginas.csv` e tirar foto da zona DNS e da tela de
+    domínio do Lovable (já anotei os valores do DNS em [plano-virada-parcial.md](plano-virada-parcial.md)).
   - **Dia 2:** "backup ok" e `.7z` cifrado em 2 cópias, SMTP no hPanel (opcional), UptimeRobot e aviso nas redes.
   - **Dia 3:** hora H às 7h (desativar os workflows antigos, trocar `VITE_SITE_URL` e apagar `SITE_NOINDEX`, ligar o
     domínio, trocar o cron, enviar o sitemap).
