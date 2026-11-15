@@ -3,7 +3,7 @@ import { createDB } from "mysql-memory-server";
 import type mysql from "mysql2/promise";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { migrate } from "../db/migrate.mjs";
-import { redirectFor } from "../redirects.mjs";
+import { redirectFor, redirectInfo } from "../redirects.mjs";
 import { createPool, setPool } from "~/server/db.server";
 import { applySnapshot, mapPost, validateSnapshot, type OldSnapshot } from "~/server/content/import-old.server";
 import { readingMinutes, sanitizePostHtml } from "~/server/content/sanitize.server";
@@ -174,6 +174,11 @@ describe("redirecionamentos do que saiu", () => {
     expect(redirectFor("/en")).toBe("/");
     expect(redirectFor("/noticias/qualquer")).toBeNull();
     expect(redirectFor("/entrar")).toBeNull();
+    expect(redirectFor("/privacidade")).toBe("/legal/privacidade");
+    expect(redirectInfo("/ajuda/123")).toEqual({ to: "/contato", status: 302 });
+    expect(redirectInfo("/reportar-bug")).toEqual({ to: "/contato", status: 302 });
+    expect(redirectInfo("/links")).toEqual({ to: "/", status: 302 });
+    expect(redirectInfo("/privacidade")?.status).toBe(301);
   });
 });
 

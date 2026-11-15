@@ -218,13 +218,13 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           <h2 className="max-w-[24ch] text-[1.9rem] leading-tight font-extrabold tracking-[-0.025em] sm:text-[2.3rem]">
             Notícias, artigos e uma comunidade otaku gamificada esperando por você
           </h2>
-          <p className="max-w-[56ch] text-white/85">Crie a conta grátis, ganhe seu primeiro pacote de figurinhas e suba no ranking lendo o que você já gosta.</p>
+          <p className="max-w-[56ch] text-white/85">As contas voltam em breve, com AP Coins, figurinhas e ranking. Enquanto isso, leia, jogue um quiz e conheça os álbuns.</p>
           <div className="mt-2 flex flex-wrap justify-center gap-3">
-            <Link to="/cadastro" className="rounded-[9px] bg-white px-6 py-3.5 font-extrabold text-brand">
-              Criar conta grátis
+            <Link to="/site-novo" className="rounded-[9px] bg-white px-6 py-3.5 font-extrabold text-brand">
+              Contas voltam em breve
             </Link>
-            <Link to="/login" className="rounded-[9px] bg-white/15 px-6 py-3.5 font-bold hover:bg-white/25">
-              Já tenho conta
+            <Link to="/quiz" className="rounded-[9px] bg-white/15 px-6 py-3.5 font-bold hover:bg-white/25">
+              Jogar um quiz
             </Link>
           </div>
         </section>

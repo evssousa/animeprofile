@@ -12,11 +12,17 @@ const TEXT_PAGES = [
   "legal/dmca",
   "legal/menores",
   "legal/padroes-editoriais",
+  "site-novo",
 ];
 
-// Endereços do menu que ainda não existem no site novo: mostram "em construção" com link para o
-// site atual. Cada um sai desta lista quando a página for construída.
-const PENDING = ["animes/favoritos", "animes/seguindo", "feed", "blog/editor", "blog/dashboard", "missoes", "ranking", "quarto", "login", "cadastro", "u/:username"];
+// Endereços que dependem de conta (login, perfil, economia, feed...): mostram "volta em breve" (200, noindex) até as
+// contas voltarem. Cada um sai desta lista quando a página for construída.
+const ACCOUNT_PENDING = [
+  "login", "cadastro", "esqueci-senha", "redefinir-senha", "configuracoes", "perfil", "notificacoes", "salvos", "u/:username",
+  "check-in", "missoes", "conquistas", "ranking", "loja", "premium", "rubi", "pagamentos", "convidar", "indicacoes",
+  "convite/:code", "w/:code", "feed", "feed/post/:id", "mensagens", "explorar", "quarto", "animes/favoritos", "animes/seguindo",
+  "blog/editor", "blog/dashboard", "admin/*",
+];
 
 export default [
   index("routes/home.tsx"),
@@ -47,7 +53,7 @@ export default [
   route("animes/:id", "routes/anime.tsx"),
   ...TEXT_PAGES.map((path) => route(path, "routes/pagina.tsx", { id: `pagina-${path}` })),
   route("contato", "routes/contato.tsx"),
-  ...PENDING.map((path) => route(path, "routes/em-breve.tsx", { id: `em-breve-${path}` })),
+  ...ACCOUNT_PENDING.map((path) => route(path, "routes/contas-em-breve.tsx", { id: `contas-${path}` })),
   route("robots.txt", "routes/robots.ts"),
   ...["sitemap.xml", "sitemap-static.xml", "sitemap-news.xml", "sitemap-articles.xml", "sitemap-taxonomy.xml", "sitemap-animes.xml", "sitemap-quiz.xml", "sitemap-blog.xml", "sitemap-figurinhas.xml", "rss.xml"].map((f) =>
     route(f, "routes/feeds.ts", { id: `feed-${f}` }),

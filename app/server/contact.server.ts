@@ -3,7 +3,7 @@
 import { exec, hasDatabase, query } from "./db.server";
 import { clientIp, ipHash } from "./http.server";
 
-export type ContactKind = "contato" | "faca-parte";
+export type ContactKind = "contato" | "faca-parte" | "avisar-contas";
 export type FieldErrors = Partial<Record<string, string>>;
 export type ContactInput = { name: string; email: string; subject: string; body: string; extra?: Record<string, string> };
 

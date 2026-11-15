@@ -1,0 +1,21 @@
+# Anime Profile
+
+> Comunidade otaku brasileira gamificada: notícias e artigos de anime e mangá, animes, quiz, blog de usuários e figurinhas colecionáveis.
+
+O Anime Profile publica notícias e conteúdo editorial sobre anime, mangá, filmes e games, e oferece uma camada de comunidade com gamificação (XP, missões, conquistas, coleções e ranking). Conteúdo em português do Brasil.
+
+## Páginas
+
+- [Início](/): Destaques, últimas notícias e visão geral da comunidade.
+- [Notícias](/noticias): Últimas notícias do mundo otaku e da indústria de anime.
+- [Artigos](/artigos): Listas, reviews, análises e guias atemporais.
+- [Blog da comunidade](/blog): Posts escritos pelos usuários.
+- [Animes](/animes): Catálogo de animes, calendário de lançamentos e rankings.
+- [Figurinhas](/figurinhas): Álbuns de figurinhas colecionáveis por anime.
+- [Ranking](/ranking): Leaderboard de XP, conquistas e sequências.
+- [Contato](/contato): Suporte, parcerias e imprensa.
+
+## Optional
+
+- [Como instalar](/como-instalar): Como instalar o app (PWA) no celular.
+- [Premium](/premium): Planos Rubi Premium e benefícios.

@@ -189,10 +189,12 @@ export function Comments({ items }: { items: (Labeled<CommentItem> & { replies: 
         {total === 0 ? "Comentários" : total === 1 ? "1 comentário" : `${total} comentários`}
       </h2>
       <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-line bg-surface p-4">
-        <p className="text-[0.92rem] text-ink-soft">{total === 0 ? "Ninguém comentou ainda. Entre na sua conta e seja o primeiro." : "Entre na sua conta para participar da conversa."}</p>
-        <Link to="/login" className="rounded-[9px] bg-brand px-4 py-2.5 text-[0.9rem] font-bold text-brand-ink hover:brightness-110">
-          Entrar para comentar
-        </Link>
+        <p className="text-[0.92rem] text-ink-soft">
+          Comentar volta junto com as contas. {total > 0 && "Os comentários abaixo vieram do site anterior. "}
+          <Link to="/site-novo" className="font-semibold text-link underline">
+            Saiba mais
+          </Link>
+        </p>
       </div>
       {total > 0 && (
         <ul className="mt-6 flex flex-col gap-6">

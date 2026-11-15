@@ -40,8 +40,8 @@ export function Header() {
           <Link to="/login" className="hidden px-2 py-2 font-semibold hover:text-glow sm:inline-block">
             Entrar
           </Link>
-          <Link to="/cadastro" className="rounded-[9px] bg-brand px-3.5 py-2.5 text-[0.9rem] font-bold whitespace-nowrap sm:px-4 sm:text-[0.95rem] text-brand-ink shadow-[0_8px_24px_rgba(194,53,43,.35)] hover:brightness-110">
-            Criar conta
+          <Link to="/login" className="rounded-[9px] bg-brand px-3.5 py-2.5 text-[0.9rem] font-bold whitespace-nowrap sm:px-4 sm:text-[0.95rem] text-brand-ink shadow-[0_8px_24px_rgba(194,53,43,.35)] hover:brightness-110">
+            Contas em breve
           </Link>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { isRouteErrorResponse, Link, Links, Meta, Outlet, Scripts, ScrollRestora
 import type { Route } from "./+types/root";
 import "./app.css";
 import { Footer } from "./components/layout/Footer";
+import { AvisoContas } from "./components/layout/AvisoContas";
 import { Header } from "./components/layout/Header";
 import { themeBootstrap } from "./components/layout/ThemeToggle";
 import { PageHeader } from "./components/PageHeader";
@@ -36,6 +37,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
           Pular para o conteúdo
         </a>
         <Header />
+        <AvisoContas />
         <main id="conteudo" className="flex-1">
           {children}
         </main>

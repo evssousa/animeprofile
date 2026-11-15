@@ -1,0 +1,88 @@
+{
+  "name": "Anime Profile",
+  "short_name": "AnimeProfile",
+  "description": "Comunidade otaku gamificada: notícias, feed, figurinhas, quarto otaku e muito mais.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#141414",
+  "theme_color": "#6d28d9",
+  "lang": "pt-BR",
+  "categories": [
+    "entertainment",
+    "social",
+    "news"
+  ],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Meu Feed",
+      "short_name": "Feed",
+      "url": "/feed",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Quarto Otaku",
+      "short_name": "Quarto",
+      "url": "/quarto",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Figurinhas",
+      "short_name": "Figurinhas",
+      "url": "/figurinhas",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "App e notificações",
+      "short_name": "Notificações",
+      "url": "/notificacoes",
+      "icons": [
+        {
+          "src": "/icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "id": "/",
+  "display_override": [
+    "standalone",
+    "minimal-ui"
+  ]
+}
