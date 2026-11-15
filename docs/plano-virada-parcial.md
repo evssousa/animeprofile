@@ -660,3 +660,29 @@ avise" do 2.2. Nunca cortar: 0.x, 2.1, 2.2 (sem o "Me avise"), 2.3, 2.4, 2.5, 2.
 5. **AdSense e Analytics durante a lacuna:** ficar só com o `ads.txt`, sem anúncios nem Analytics até o banner de
    cookies? **Recomendação: sim.** Ligar anúncios sem o banner contraria a decisão de 2026-11-12. Durante a lacuna,
    os números vêm do Search Console.
+
+---
+
+## Descobertas do dia 1 (2026-11-15, pelo MCP da Hostinger, só leitura)
+
+- **Zona DNS do `animeprofile.com.br` está na Hostinger** (dá para o Claude alterar pelo MCP, com a aprovação do dono).
+  Hoje o `@` aponta para o Lovable: **A `185.158.133.1`** e **AAAA `2a07:8240::1` e `::2`**; o `www` tem A e AAAA iguais.
+  Há também `comunidade` (A e AAAA do Lovable) e TXT `_lovable*` (verificação do Lovable, não mexer até o fim).
+  O `novo` é um **ALIAS** para `novo.animeprofile.com.br.cdn.hstgr.net` (é assim que a Hostinger liga o app).
+- **Não mexer** em MX (`mx1`/`mx2.hostinger.com`), TXT do `@` (Google e SPF), DKIM `hostingermail-*`, `autodiscover`,
+  `autoconfig`, `_dmarc`.
+- **O site Node.js é o `novo.animeprofile.com.br`** (usuário da hospedagem e pasta `public_html` no plano Business, tipo
+  `nodejs`). Para servir o domínio principal, o caminho mais curto é `hosting_websites_add-domain` com
+  `type: parked` e `name: animeprofile.com.br` (domínio alias do mesmo app); depois ajustar o DNS do `@` (e do `www`,
+  que o Express já redireciona para o `@`) para o que a Hostinger indicar (ALIAS para a CDN, como o `novo`), removendo os
+  A/AAAA do Lovable. **Rollback:** repor `A 185.158.133.1` e os dois AAAA (anotados acima), TTL 300.
+- **Ainda a testar no dia 2:** se o alias aceita o certificado e se o Node recebe o `Host` correto; se não, plano B é criar
+  um segundo site `animeprofile.com.br` ligado ao mesmo repositório (`hosting_deploy`).
+- **`SITE_NOINDEX` é do app inteiro:** ao apagar a variável, o `novo.` também fica indexável. O canonical já aponta para
+  `VITE_SITE_URL`, mas o ideal é o `novo.` redirecionar (301) para o domínio principal depois da virada (a fazer no
+  `server-app.js`).
+- **Backup validado em 2026-11-15:** `animeprofile_261115.backup` (PostgreSQL, zstd, 377 tabelas com dados): 171 usuários
+  (64 com hash bcrypt, 114 identidades do Google), 2.235 `user_stickers`, 956 `posts`, 338 `chat_messages`; nenhuma tabela
+  obrigatória do 0.4 falta. `storage.objects`: 6.734 arquivos, 672 MB, listados em `storage-objetos.tsv`.
+- **Conferência de endereços** (`scripts/conferir-enderecos.mjs`) contra o `novo.`: 1.898 endereços do sitemap antigo;
+  achou `/en/articles/<slug>` (32) e `/animes/ranking` (404); ambos já têm redirecionamento. Rodar de novo no dia 2.
