@@ -108,7 +108,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
    - dia 2 (16/11): **feito pelo Claude:** exportação completa com mídia para o `novo.` (966 matérias, 36 imagens novas, 1 falha de
      envio), conferência de endereços (1.898, zero falhas), conferência visual em 375 e 1440 px (home, matéria, figurinhas, login,
      contato, tema claro e escuro) sem problema, procedimento do domínio registrado em [deploy-hostinger.md](deploy-hostinger.md)
-     e textos dos avisos em [avisos-virada.md](avisos-virada.md). **Falta:** "backup ok" e `.7z` em 2 cópias, UptimeRobot, aviso
+     e textos dos avisos em [avisos-virada.md](avisos-virada.md). **Falta:** UptimeRobot, aviso
      nas redes, testar o alias do domínio (só com a aprovação do dono, pode derrubar o site antigo) e decidir ir ou não;
    - dia 3 (17/11): virada às 7h;
    - dia 4 (18/11): dump final.
@@ -136,7 +136,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     **Falta:** conferir a propriedade do Search Console (tipo Domínio),
     baixar a lista de páginas do Search Console para `.import/gsc-paginas.csv` e tirar foto da zona DNS e da tela de
     domínio do Lovable (já anotei os valores do DNS em [plano-virada-parcial.md](plano-virada-parcial.md)).
-  - **Dia 2:** "backup ok" e `.7z` cifrado em 2 cópias, SMTP no hPanel (opcional), UptimeRobot e aviso nas redes.
+  - **Dia 2:** SMTP no hPanel (opcional), UptimeRobot e aviso nas redes. O dono decidiu em 2026-11-16 **não fechar o `.7z` cifrado** (a pasta `animeprofile-backup` fica só no PC).
   - **Dia 3:** hora H às 7h (desativar os workflows antigos, trocar `VITE_SITE_URL` e apagar `SITE_NOINDEX`, ligar o
     domínio, trocar o cron, enviar o sitemap).
   - **Dia 4:** dump final.
