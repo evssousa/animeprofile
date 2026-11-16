@@ -144,10 +144,10 @@ export default function Post({ loaderData }: Route.ComponentProps) {
       <div className="mx-auto max-w-[1328px] px-4 py-10 sm:px-8 sm:py-14 lg:px-14">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
-          {video && <div className="prose-ap mb-8 max-w-none" dangerouslySetInnerHTML={{ __html: video }} />}
           <div className="mb-8">
             <ShareBar url={absoluteUrl(post.url)} title={post.title} />
           </div>
+          {video && <div className="prose-ap mb-8 max-w-none" dangerouslySetInnerHTML={{ __html: video }} />}
           {showCover && post.image && <img src={post.image} alt="" className="mb-10 -mx-4 aspect-video w-[calc(100%+2rem)] max-w-none rounded-none object-cover sm:mx-0 sm:w-full sm:rounded-[18px] sm:shadow-[0_20px_40px_rgba(60,20,20,.16)]" />}
           <div className="prose-ap max-w-none" dangerouslySetInnerHTML={{ __html: post.html }} />
 

@@ -18,7 +18,7 @@ export const NEUTRAL_EDITOR_PROMPT =
 
 /** Regra de leitura: o guia antigo não limitava o tamanho do parágrafo e os textos saíam em blocos grandes. */
 export const PARAGRAPH_RULE =
-  "REGRA DE LEITURA (vale mais que qualquer exemplo acima): parágrafos CURTOS, de 2 a 3 frases e no máximo 50 palavras. " +
+  "REGRA DE LEITURA (vale mais que qualquer exemplo acima): parágrafos CURTOS, de 2 a 3 frases e no máximo 40 palavras. " +
   "Uma ideia por parágrafo. Quebre o texto em vários <p> em vez de escrever blocos longos; o leitor está no celular.";
 
 export function buildSystemPrompt(guide: string): string {

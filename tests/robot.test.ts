@@ -228,7 +228,7 @@ describe("parágrafos curtos", () => {
     const out = splitLongParagraphs(`<p>${long}</p>`);
     const parts = [...out.matchAll(/<p>([\s\S]*?)<\/p>/g)].map((m) => m[1]);
     expect(parts.length).toBeGreaterThanOrEqual(3);
-    for (const p of parts) expect(p.split(/\s+/).length).toBeLessThanOrEqual(55);
+    for (const p of parts) expect(p.split(/\s+/).length).toBeLessThanOrEqual(40);
     expect(parts.join(" ")).toBe(long);
   });
 
