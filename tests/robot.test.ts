@@ -10,7 +10,7 @@ import { buildSystemPrompt, buildUserPrompt } from "~/server/robot/prompt";
 import { GeneratedArticle, parseGeminiJson } from "~/server/robot/contract";
 import { autoFixArticle, checkQuality, trimTitle } from "~/server/robot/quality";
 import { checkArticleHtml } from "~/server/robot/html-guard";
-import { enforceSeoHtml } from "~/server/robot/html";
+import { enforceSeoHtml, splitLongParagraphs } from "~/server/robot/html";
 import { GeminiError, generateWithGemini } from "~/server/robot/gemini.server";
 import { ModelChain } from "~/server/robot/model-chain";
 import { isPrivateIp, isSafeUrlShape } from "~/server/robot/net.server";
@@ -217,5 +217,31 @@ describe("imagem própria", () => {
     expect(out).toEqual({ url: `/media/robo/${key}.webp`, width: 1280, height: 640 });
     expect((await sharp(await readFile(join(dir, "robo", `${key}.webp`))).metadata()).width).toBe(1280);
     expect((await sharp(await readFile(join(dir, "robo", `${key}-640.webp`))).metadata()).width).toBe(640);
+  });
+});
+
+describe("parágrafos curtos", () => {
+  const sentence = (n: number) => `Esta é a frase número ${n} com algumas palavras para contar.`;
+  const long = Array.from({ length: 12 }, (_, i) => sentence(i + 1)).join(" ");
+
+  it("divide um parágrafo longo em vários de 2 a 3 frases, sem perder texto", () => {
+    const out = splitLongParagraphs(`<p>${long}</p>`);
+    const parts = [...out.matchAll(/<p>([\s\S]*?)<\/p>/g)].map((m) => m[1]);
+    expect(parts.length).toBeGreaterThanOrEqual(3);
+    for (const p of parts) expect(p.split(/\s+/).length).toBeLessThanOrEqual(55);
+    expect(parts.join(" ")).toBe(long);
+  });
+
+  it("não mexe em parágrafo curto, em título nem em link que atravessaria o corte", () => {
+    const short = "<p>Uma frase curta. Outra frase curta.</p>";
+    expect(splitLongParagraphs(short)).toBe(short);
+    const linked = `<p>${sentence(1)} <a href="/tag/x">${sentence(2)} ${sentence(3)} ${sentence(4)} ${sentence(5)} ${sentence(6)} ${sentence(7)} ${sentence(8)}</a> ${sentence(9)}</p>`;
+    const out = splitLongParagraphs(linked);
+    expect((out.match(/<a\b/g) ?? []).length).toBe((out.match(/<\/a>/g) ?? []).length);
+    for (const chunk of out.split("\n")) expect((chunk.match(/<a\b/g) ?? []).length).toBe((chunk.match(/<\/a>/g) ?? []).length);
+  });
+
+  it("o prompt do sistema traz a regra de parágrafos curtos", () => {
+    expect(buildSystemPrompt("guia qualquer")).toContain("parágrafos CURTOS");
   });
 });

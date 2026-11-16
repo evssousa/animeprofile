@@ -16,9 +16,14 @@ export const NEUTRAL_EDITOR_PROMPT =
   "Você é um editor de notícias de anime e mangá, neutro e objetivo. Classifique o conteúdo na categoria " +
   "mais adequada com base no tema do artigo, não na fonte.";
 
+/** Regra de leitura: o guia antigo não limitava o tamanho do parágrafo e os textos saíam em blocos grandes. */
+export const PARAGRAPH_RULE =
+  "REGRA DE LEITURA (vale mais que qualquer exemplo acima): parágrafos CURTOS, de 2 a 3 frases e no máximo 50 palavras. " +
+  "Uma ideia por parágrafo. Quebre o texto em vários <p> em vez de escrever blocos longos; o leitor está no celular.";
+
 export function buildSystemPrompt(guide: string): string {
   if (!guide.trim()) throw new Error("guia editorial não importado");
-  return `${NEUTRAL_EDITOR_PROMPT}\n\n${guide.trim()}`;
+  return `${NEUTRAL_EDITOR_PROMPT}\n\n${guide.trim()}\n\n${PARAGRAPH_RULE}`;
 }
 
 export function buildRetryInstruction(issues: string[]): string {
@@ -42,9 +47,15 @@ export function buildUserPrompt(opts: {
   recentOpenings: string[];
 }): string {
   const mediaHint = [
-    opts.trailer ? `TRAILER PRINCIPAL (incorporar no topo): ${opts.trailer}` : "",
-    opts.extraVideos.length ? `VÍDEOS EXTRAS DA FONTE (incorporar todos): ${opts.extraVideos.join(" | ")}` : "",
-    opts.bodyImages.length ? `IMAGENS DA FONTE (incorporar TODAS as ${opts.bodyImages.length}, distribuídas pelo texto): ${opts.bodyImages.join(" | ")}` : "",
+    opts.trailer
+      ? `TRAILER PRINCIPAL (incorporar no topo): ${opts.trailer}`
+      : "",
+    opts.extraVideos.length
+      ? `VÍDEOS EXTRAS DA FONTE (incorporar todos): ${opts.extraVideos.join(" | ")}`
+      : "",
+    opts.bodyImages.length
+      ? `IMAGENS DA FONTE (incorporar TODAS as ${opts.bodyImages.length}, distribuídas pelo texto): ${opts.bodyImages.join(" | ")}`
+      : "",
   ]
     .filter(Boolean)
     .join("\n");
@@ -59,13 +70,17 @@ export function buildUserPrompt(opts: {
         `- Status: ${c.statusLabel}`,
         c.seasonLabel ? `- Temporada: ${c.seasonLabel}` : "",
         c.studio ? `- Estúdio: ${c.studio}` : "",
-        c.streamers.length ? `- Onde assistir (oficial): ${c.streamers.join(", ")}` : "",
+        c.streamers.length
+          ? `- Onde assistir (oficial): ${c.streamers.join(", ")}`
+          : "",
       ]
         .filter(Boolean)
         .join("\n")
     : "SEM CONTEXTO VERIFICADO — omita o bloco 'Para o fã brasileiro' e não invente onde assistir/dublagem/preço.";
 
-  const openingsHint = opts.recentOpenings.length ? `NÃO repita a estrutura destas últimas notícias do mesmo autor:\n${opts.recentOpenings.map((o) => `- ${o}`).join("\n")}` : "";
+  const openingsHint = opts.recentOpenings.length
+    ? `NÃO repita a estrutura destas últimas notícias do mesmo autor:\n${opts.recentOpenings.map((o) => `- ${o}`).join("\n")}`
+    : "";
 
   return [
     `NOTÍCIA ORIGINAL:`,

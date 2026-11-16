@@ -13,6 +13,7 @@ import { isWideImage } from "~/lib/images";
 import { getAnime } from "~/server/anime/anime.server";
 import { getPost, postComments, relatedPosts, withToc } from "~/server/content/posts.server";
 import { loadSidebar } from "~/server/sidebar.server";
+import { splitLongParagraphs } from "~/server/robot/html";
 
 export async function loader({ params, request }: Route.LoaderArgs) {
   const post = await getPost(params.slug);
@@ -22,7 +23,23 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   // Muitas matérias já trazem a capa no começo do texto: aí a capa do corpo não aparece, para não repetir.
   const coverFile = post.image?.split("?")[0].split("/").pop()?.replace(/-\d+(\.\w+)$/, "$1") ?? "";
   const showCover = Boolean(post.image) && !(coverFile && post.html.includes(coverFile.replace(/\.\w+$/, "")));
-  const { html, toc } = withToc(post.html);
+  // Parágrafos longos (as matérias do robô antigo vinham em blocos de 150+ palavras) viram parágrafos de 2 a 3 frases.
+  let { html, toc } = withToc(splitLongParagraphs(post.html));
+  // Vídeo no começo do texto: vai ANTES da matéria, em largura total. A capa, se existir, desce para logo abaixo do 1º título.
+  let video: string | null = null;
+  let coverBelowHeading = false;
+  const lead = html.match(/^\s*(<div class="aspect-video[^"]*">\s*<iframe[\s\S]*?<\/iframe>\s*<\/div>)/i);
+  if (lead) {
+    video = lead[1];
+    html = html.slice(lead[0].length).trimStart();
+    if (showCover && post.image) {
+      const figure = `<figure class="my-6"><img src="${post.image}" alt="" class="aspect-video w-full rounded-[18px] object-cover" loading="lazy" /></figure>`;
+      const h = html.search(/<\/h2>/i);
+      const at = h >= 0 ? h + 5 : html.search(/<\/p>/i) >= 0 ? html.search(/<\/p>/i) + 4 : 0;
+      html = html.slice(0, at) + figure + html.slice(at);
+      coverBelowHeading = true;
+    }
+  }
 
   // Barra lateral (como no site antigo): anime da matéria, destaque, últimas, comentários, índice e em alta
   // (docs/plano-sidebars.md). O anime vem só do banco (sem buscar no AniList), para a matéria abrir rápido.
@@ -37,7 +54,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   return {
     post: { ...post, html },
     related,
-    showCover,
+    showCover: showCover && !coverBelowHeading,
+    video,
     sidebar,
     comments: comments.map((c) => ({ ...label(c), replies: c.replies.map(label) })),
   };
@@ -73,7 +91,7 @@ export function meta({ loaderData: d }: Route.MetaArgs) {
 }
 
 export default function Post({ loaderData }: Route.ComponentProps) {
-  const { post, related, showCover, sidebar, comments } = loaderData;
+  const { post, related, showCover, video, sidebar, comments } = loaderData;
   const section = post.type === "news" ? { label: "Notícias", to: "/noticias?tipo=noticias" } : { label: "Artigos", to: "/artigos" };
   return (
     <article>
@@ -126,6 +144,7 @@ export default function Post({ loaderData }: Route.ComponentProps) {
       <div className="mx-auto max-w-[1328px] px-4 py-10 sm:px-8 sm:py-14 lg:px-14">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
+          {video && <div className="prose-ap mb-8 max-w-none" dangerouslySetInnerHTML={{ __html: video }} />}
           <div className="mb-8">
             <ShareBar url={absoluteUrl(post.url)} title={post.title} />
           </div>

@@ -118,6 +118,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 2. Barras laterais: executar [plano-sidebars.md](plano-sidebars.md) passo a passo (10 passos, P/M; dá para fazer em
    Sonnet), depois das respostas do dono às perguntas do fim do plano. **Depois da virada.**
 3. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
+   - **Agenda semanal de animes** (hoje só no site antigo, `weekly-agenda`): portar para o cron do site novo e **variar a capa a
+     cada semana** (rodízio entre os banners dos 6 mais populares, sem repetir a da semana anterior); o antigo usa sempre o do
+     mais popular e a capa repete. Pedido do dono em 2026-11-16.
 4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
    [deploy-hostinger.md](deploy-hostinger.md).
 5. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
