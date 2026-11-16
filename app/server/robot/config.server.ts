@@ -38,7 +38,7 @@ export async function getConfig(): Promise<RoboConfig> {
 /** Mescla os campos no `robo` (sem apagar os outros). */
 export async function setConfig(patch: Partial<RoboConfig>): Promise<RoboConfig> {
   const next = { ...(await getConfig()), ...patch };
-  await exec("INSERT INTO system_config (name, value) VALUES ('robo', CAST(? AS JSON)) ON DUPLICATE KEY UPDATE value = VALUES(value)", [JSON.stringify(next)]);
+  await exec("INSERT INTO system_config (name, value) VALUES ('robo', ?) ON DUPLICATE KEY UPDATE value = VALUES(value)", [JSON.stringify(next)]);
   return next;
 }
 
@@ -49,7 +49,7 @@ export async function getGuide(): Promise<string> {
 }
 
 export async function setGuide(texto: string) {
-  await exec("INSERT INTO system_config (name, value) VALUES ('robo.guia', CAST(? AS JSON)) ON DUPLICATE KEY UPDATE value = VALUES(value)", [JSON.stringify({ texto })]);
+  await exec("INSERT INTO system_config (name, value) VALUES ('robo.guia', ?) ON DUPLICATE KEY UPDATE value = VALUES(value)", [JSON.stringify({ texto })]);
 }
 
 export async function activeSlots(): Promise<Map<number, number>> {

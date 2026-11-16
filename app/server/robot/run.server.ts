@@ -153,7 +153,7 @@ export async function runRobot(opts: RunOptions = {}): Promise<Record<string, un
     report.erros.push(`Rodada interrompida: ${String((e as Error)?.message ?? e).slice(0, 300)}`);
   } finally {
     await exec("UPDATE ai_news_candidates SET status = 'pending', run_id = NULL WHERE run_id = ? AND status = 'selected'", [runId]);
-    await exec("UPDATE ai_news_runs SET status = ?, finished_at = UTC_TIMESTAMP(3), generated_count = ?, discarded = ?, failed = ?, report = CAST(? AS JSON) WHERE id = ?", [status, generated, discarded, report.falhas, JSON.stringify(report), runId]);
+    await exec("UPDATE ai_news_runs SET status = ?, finished_at = UTC_TIMESTAMP(3), generated_count = ?, discarded = ?, failed = ?, report = ? WHERE id = ?", [status, generated, discarded, report.falhas, JSON.stringify(report), runId]);
   }
   return { ...report, segundos: Math.round((Date.now() - startedAt) / 1000) };
 }

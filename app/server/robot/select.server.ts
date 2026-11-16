@@ -79,7 +79,7 @@ export async function scoreCandidates(now = Date.now()): Promise<number> {
     const trend = Math.min(20, (hay.split(/\s+/).length > 6 ? 10 : 5) + (c.content ? 5 : 0));
     const anime = looksLikeAnime(hay) ? ANIME_PRIORITY_BOOST : 0;
     const score = popularity + freshness + trend + anime;
-    await exec("UPDATE ai_news_candidates SET score = ?, score_breakdown = CAST(? AS JSON) WHERE id = ?", [
+    await exec("UPDATE ai_news_candidates SET score = ?, score_breakdown = ? WHERE id = ?", [
       score,
       JSON.stringify({ popularity, freshness, trend, anime_boost: anime, matched_topics: matched.map((t) => ({ topic: t.term, weight: t.weight })) }),
       c.id,
