@@ -34,10 +34,10 @@ export class ModelChain {
         const res = await gen({ model, system: input.system, user: input.user, record: this.opts.record });
         return { ...res, model };
       } catch (e) {
-        if (!(e instanceof GeminiError && (e.status === 429 || e.status === 404))) throw e;
+        if (!(e instanceof GeminiError && (e.status === 429 || e.status === 404 || e.status === 408))) throw e;
         this.unavailable.add(model);
         last = e;
-        this.opts.log?.(`Modelo ${model} indisponível (${e.status === 404 ? "não encontrado" : "cota esgotada"}); tentando o próximo.`);
+        this.opts.log?.(`Modelo ${model} indisponível (${e.status === 404 ? "não encontrado" : e.status === 408 ? "sem resposta" : "cota esgotada"}); tentando o próximo.`);
       }
     }
     throw last ?? new GeminiError("Gemini 429: todos os modelos da fila estão sem cota nesta rodada.", 429, true);

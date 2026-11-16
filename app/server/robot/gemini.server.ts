@@ -4,18 +4,34 @@ import { ARTICLE_JSON_SCHEMA } from "./contract";
 export type GeminiUsage = { inputTokens: number; outputTokens: number };
 export type GeminiResult = { text: string; usage: GeminiUsage };
 /** Chamado a cada resposta (inclusive 429), para contar o uso do dia por modelo. */
-export type UsageRecorder = (u: { model: string; status: number; inputTokens: number; outputTokens: number }) => void | Promise<void>;
+export type UsageRecorder = (u: {
+  model: string;
+  status: number;
+  inputTokens: number;
+  outputTokens: number;
+}) => void | Promise<void>;
 
 type GeminiBody = {
-  candidates?: { content?: { parts?: { text?: string; thought?: boolean }[] }; finishReason?: string }[];
+  candidates?: {
+    content?: { parts?: { text?: string; thought?: boolean }[] };
+    finishReason?: string;
+  }[];
   usageMetadata?: { promptTokenCount?: number; totalTokenCount?: number };
-  error?: { message?: string; details?: { "@type"?: string; retryDelay?: string; violations?: { quotaMetric?: string; quotaId?: string }[] }[] };
+  error?: {
+    message?: string;
+    details?: {
+      "@type"?: string;
+      retryDelay?: string;
+      violations?: { quotaMetric?: string; quotaId?: string }[];
+    }[];
+  };
 };
 
 const RETRY_WAITS_MS = [20_000, 60_000];
 /** Se o Google mandar esperar mais que isso (cota diária), desiste até a próxima rodada em vez de dormir. */
 export const MAX_RETRY_WAIT_MS = 90_000;
 
+const RESPONSE_TIMEOUT_MS = 90_000;
 const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 function retryDelayMs(b: GeminiBody): number | null {
@@ -30,7 +46,11 @@ function quotaId(b: GeminiBody): string | null {
 }
 
 export class GeminiError extends Error {
-  constructor(message: string, public status: number, public retryable: boolean) {
+  constructor(
+    message: string,
+    public status: number,
+    public retryable: boolean,
+  ) {
     super(message);
     this.name = "GeminiError";
   }
@@ -54,43 +74,113 @@ export async function generateWithGemini(opts: {
   const wait = opts.sleepImpl ?? sleep;
 
   for (let attempt = 0; ; attempt++) {
-    const res = await doFetch(`https://generativelanguage.googleapis.com/v1beta/models/${opts.model}:generateContent`, {
-      method: "POST",
-      headers: { "x-goog-api-key": apiKey, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: opts.system }] },
-        contents: [{ role: "user", parts: [{ text: opts.user }] }],
-        generationConfig: { responseMimeType: "application/json", responseJsonSchema: opts.jsonSchema ?? ARTICLE_JSON_SCHEMA },
-      }),
-      signal: AbortSignal.timeout(120_000),
-    });
+    let res: Response;
+    try {
+      res = await doFetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${opts.model}:generateContent`,
+        {
+          method: "POST",
+          headers: {
+            "x-goog-api-key": apiKey,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: opts.system }] },
+            contents: [{ role: "user", parts: [{ text: opts.user }] }],
+            generationConfig: {
+              responseMimeType: "application/json",
+              responseJsonSchema: opts.jsonSchema ?? ARTICLE_JSON_SCHEMA,
+              // Os modelos 3.x "pensam" muito por padrão e estouram o tempo; para reescrever uma notícia, pouco raciocínio basta.
+              ...(opts.model === "gemini-3-flash-preview"
+                ? { thinkingConfig: { thinkingLevel: "low" } }
+                : {}),
+            },
+          }),
+          signal: AbortSignal.timeout(RESPONSE_TIMEOUT_MS),
+        },
+      );
+    } catch (e) {
+      // Sem resposta a tempo: conta como falha do modelo e deixa a fila passar ao próximo.
+      if (
+        e instanceof Error &&
+        (e.name === "TimeoutError" || e.name === "AbortError")
+      ) {
+        await opts.record?.({
+          model: opts.model,
+          status: 408,
+          inputTokens: 0,
+          outputTokens: 0,
+        });
+        throw new GeminiError(
+          `Gemini ${opts.model}: sem resposta em ${RESPONSE_TIMEOUT_MS / 1000}s`,
+          408,
+          true,
+        );
+      }
+      throw e;
+    }
 
     if (!res.ok) {
-      await opts.record?.({ model: opts.model, status: res.status, inputTokens: 0, outputTokens: 0 });
+      await opts.record?.({
+        model: opts.model,
+        status: res.status,
+        inputTokens: 0,
+        outputTokens: 0,
+      });
       const body = (await res.json().catch(() => ({}))) as GeminiBody;
       const retryable = res.status === 429 || res.status >= 500;
       const delay = retryDelayMs(body) ?? RETRY_WAITS_MS[attempt] ?? 0;
-      if (retryable && attempt < RETRY_WAITS_MS.length && delay <= MAX_RETRY_WAIT_MS) {
+      if (
+        retryable &&
+        attempt < RETRY_WAITS_MS.length &&
+        delay <= MAX_RETRY_WAIT_MS
+      ) {
         await wait(delay);
         continue;
       }
       const q = quotaId(body);
       const suffix = q ? ` [quota: ${q}]` : "";
       if (retryable && delay > MAX_RETRY_WAIT_MS) {
-        throw new GeminiError(`Gemini ${res.status}: pediu para esperar ${Math.round(delay / 60_000)} min${suffix}; tenta na próxima rodada.`, res.status, true);
+        throw new GeminiError(
+          `Gemini ${res.status}: pediu para esperar ${Math.round(delay / 60_000)} min${suffix}; tenta na próxima rodada.`,
+          res.status,
+          true,
+        );
       }
-      throw new GeminiError(`Gemini ${res.status}: ${body.error?.message ?? res.statusText}${suffix}`.slice(0, 500), res.status, retryable);
+      throw new GeminiError(
+        `Gemini ${res.status}: ${body.error?.message ?? res.statusText}${suffix}`.slice(
+          0,
+          500,
+        ),
+        res.status,
+        retryable,
+      );
     }
 
     const json = (await res.json()) as GeminiBody;
     const input = json.usageMetadata?.promptTokenCount ?? 0;
-    const output = Math.max(0, (json.usageMetadata?.totalTokenCount ?? input) - input);
-    await opts.record?.({ model: opts.model, status: 200, inputTokens: input, outputTokens: output });
+    const output = Math.max(
+      0,
+      (json.usageMetadata?.totalTokenCount ?? input) - input,
+    );
+    await opts.record?.({
+      model: opts.model,
+      status: 200,
+      inputTokens: input,
+      outputTokens: output,
+    });
     const candidate = json.candidates?.[0];
     if (!candidate || candidate.finishReason !== "STOP") {
-      throw new GeminiError(`Gemini finishReason inesperado: ${candidate?.finishReason ?? "desconhecido"}`, 200, false);
+      throw new GeminiError(
+        `Gemini finishReason inesperado: ${candidate?.finishReason ?? "desconhecido"}`,
+        200,
+        false,
+      );
     }
-    const text = (candidate.content?.parts ?? []).filter((p) => !p.thought).map((p) => p.text ?? "").join("");
+    const text = (candidate.content?.parts ?? [])
+      .filter((p) => !p.thought)
+      .map((p) => p.text ?? "")
+      .join("");
     return { text, usage: { inputTokens: input, outputTokens: output } };
   }
 }
