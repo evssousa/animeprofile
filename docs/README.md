@@ -91,12 +91,14 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
   saiu da navbar e virou aba de Animes (Temporada, Calendário, Favoritos e Seguindo, as duas últimas "em breve"); a rolagem
   da lateral esquerda não tem mais barra (as bordas desvanecem quando há mais itens). **Contato** sem formulário: seis
   canais com `mailto:` e assunto pronto (como nos outros sites), para não receber spam.
-- **Robô de notícias, passos 4 a 6, 9 e 10 (código pronto, ainda sem ensaio):** `app/server/robot/` (funções puras, Gemini com
+- **Robô de notícias, passos 4 a 11 (ensaio aprovado em 2026-11-15):** `app/server/robot/` (funções puras, Gemini com
   fila de modelos e contagem de uso por modelo, RSS, leitura da matéria, mídia com cópia própria em `/media/robo/`,
-  seleção, publicação numa transação, rodada `runRobot`), tarefa `robo-noticias` no cron (minuto 20; nasce `desligado`),
-  `/api/robo/{status,modo,ensaio,url,previa,config}` e `scripts/importar-config-robo.mjs`. O guia editorial e as personas
-  vão para o banco (nunca para o git). Falta: o dono rodar o SQL do passo 7 e cadastrar `GEMINI_API_KEY`; depois, importar a
-  configuração, fazer o ensaio (3 prévias), e ligar `publicar` na virada.
+  seleção, publicação numa transação, rodada `runRobot`), tarefa `robo-noticias` no cron (minuto 20), `/api/robo/{status,modo,ensaio,url,previa,config}`
+  e `scripts/importar-config-robo.mjs`. O guia editorial e as personas estão no banco (nunca no git). Configuração importada
+  (10 fontes, 6 autores, 10 tópicos, 14 horários, guia) com teto 6/dia, 33% fora de anime, 3 imagens, modelo
+  `gemini-3-flash-preview`. **Banco da Hostinger é MariaDB:** nada de `CAST(? AS JSON)` (gravar o JSON como texto). Um tempo esgotado
+  no Gemini passa ao próximo modelo da fila (90 s, raciocínio baixo no 3-flash-preview). Ensaio: 6 prévias, as 3 de anime aprovadas pelo
+  dono; modo continua `desligado`. Falta: ligar `publicar` na virada.
 
 ## Próximos passos
 
@@ -120,11 +122,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 ## Pendências suas
 
-- **Robô de notícias (urgente para o SEO depois da virada):** responder as 4 perguntas do fim do
-  [plano-robo-noticias.md](plano-robo-noticias.md) (recomendação: sim nas 4), rodar a consulta do passo 7 no editor SQL do
-  Lovable e salvar o resultado em `C:\Users\evsli\animeprofile-backup\robo-config.json` (não colar no chat), e
-  cadastrar `GEMINI_API_KEY` no hPanel. Depois: `$env:CRON_TOKEN="..."; node scripts/importar-config-robo.mjs <robo-config.json>`
-  (o Claude roda quando o arquivo estiver na pasta de backup).
+- **Robô de notícias:** nada pendente seu agora (config e chave feitas, prévias aprovadas). Eu ligo `publicar` com teto 6
+  depois da virada (17/11); no dia 18 sobe para 10.
 - **SMTP do Contato (opcional):** cadastrar `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e `MAIL_FROM` no hPanel
   (caixa `contato@`). Sem isso, as mensagens só ficam no banco (`SELECT ... FROM contact_messages`).
 
@@ -138,7 +137,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     domínio, trocar o cron, enviar o sitemap).
   - **Dia 4:** dump final.
   - **Responder as 5 perguntas do fim do plano.**
-- Exportação feita em 2026-11-15 (950 matérias, 14 quizzes, 13 posts do blog, 224 figurinhas). Na virada, rodar de novo. O token apareceu no chat: troque `CRON_TOKEN` no hPanel se quiser.
+- Exportação feita em 2026-11-15 (950 matérias, 14 quizzes, 13 posts do blog, 224 figurinhas). Na virada, rodar de novo. O `CRON_TOKEN` apareceu no chat; o dono decidiu não trocar.
 - Responder as 3 perguntas do fim de [plano-sidebars.md](plano-sidebars.md): placeholder "Em breve: com a sua conta"
   na lateral (recomendado: não), lateral da Central em todas as páginas da lista (recomendado: sim) e Guia do anime na
   lateral ou no meio do texto (recomendado: lateral).
