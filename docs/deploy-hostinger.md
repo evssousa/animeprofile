@@ -73,6 +73,27 @@ principal (`@`, `www`, MX e TXT) ficaram iguais, conferidos antes e depois.
   5. apontar o DNS;
   6. conferir e enviar `/sitemap.xml` ao Google Search Console.
 
+### Procedimento registrado em 2026-11-16 (dia 2, só leitura pelo MCP)
+
+- **Estado:** `novo.animeprofile.com.br` é o único site Node.js; `hosting_websites_list-domains` mostra 0 domínios
+  parked e 0 subdomínios. A zona DNS está na Hostinger (`dns_records_list`): `@` e `www` com A `185.158.133.1` e AAAA
+  `2a07:8240::1` e `::2` (Lovable, TTL 300 s); `novo` é ALIAS para `novo.animeprofile.com.br.cdn.hstgr.net`.
+- **Caminho A (preferido):** `hosting_websites_add-domain` com `domain: novo.animeprofile.com.br`, `type: parked`,
+  `name: animeprofile.com.br` (mesmo app, mesmo banco, mesmas variáveis). A ferramenta exige que o domínio seja da conta
+  (é). Depois, na hora H, trocar no DNS os registros do `@` (A e os dois AAAA do Lovable) por um `ALIAS` para
+  `animeprofile.com.br.cdn.hstgr.net` (padrão do `novo`), e o `www` por CNAME/ALIAS equivalente. Conferir o certificado
+  e que o Express recebe o `Host` correto.
+- **O que NÃO foi testado:** adicionar o alias agora. A Hostinger pode reescrever o `@` na hora e derrubar o site antigo
+  antes da virada (ver o aviso acima). Só testar com a aprovação do dono, de preferência na hora H.
+- **Caminho B (se o A falhar):** `hosting_deploy` de um segundo site `animeprofile.com.br`, ligado ao mesmo repositório,
+  com as variáveis recadastradas pelo dono.
+- **Pasta de mídia:** `MEDIA_DIR` é uma variável do app; confirmar na hora H que o alias usa o mesmo diretório
+  (o app é o mesmo, então deve usar).
+- **Subdomínio `novo.`:** continua respondendo. Depois da virada o ideal é um 301 para o domínio principal
+  (a fazer no `server-app.js`), porque `SITE_NOINDEX` é do app inteiro.
+- **Rollback (até o fim do dia 4):** repor `@` e `www`: A `185.158.133.1` e AAAA `2a07:8240::1` e `2a07:8240::2`, TTL 300 s.
+  Não mexer em MX, TXT, DKIM, `autodiscover`, `autoconfig` nem `_dmarc`.
+
 ## Contas e chaves externas
 
 O dono gera as chaves e as guarda fora do repositório e fora do chat. **Decidido em 2026-11-12: fica para o fim**,

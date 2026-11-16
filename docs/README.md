@@ -23,6 +23,7 @@ Lovable Cloud. Por isso, o domínio animeprofile.com.br passa para cá numa **vi
 | [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md) | Plano (temporário): Quiz, leitura do Blog da comunidade e catálogo de figurinhas, com migrations 009–011, exportação e cópia das imagens |
 | [plano-virada-parcial.md](plano-virada-parcial.md) | **Plano urgente (temporário):** resgate dos dados do Lovable Cloud e virada parcial do domínio em 4 dias (sem contas), com cronograma por dia, o que é do dono e as fases depois da virada |
 | [plano-sidebar-esquerda.md](plano-sidebar-esquerda.md) | Plano (temporário): menu lateral esquerdo como no site antigo (recolhível, sem piscar), topo com slot de menus extras e o celular no estilo do antigo (barra inferior, faixas que rolam, topo compacto, rodapé em 2 colunas) |
+| [avisos-virada.md](avisos-virada.md) | Textos prontos dos avisos da virada para as redes (temporário) |
 | [plano-robo-noticias.md](plano-robo-noticias.md) | Plano (temporário): robô de notícias por IA no cron do site novo (fase A, antes das contas), com inventário do robô antigo, migration 012, ensaio sem publicar e ligação na virada |
 | [plano-sidebars.md](plano-sidebars.md) | Plano (temporário): inventário das barras laterais do site antigo e o sistema único de lateral (blocos por página, cache curto) para a matéria, Central, categoria/tag, blog, Otaku TV e quiz |
 
@@ -104,8 +105,11 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 0. **URGENTE: [plano-virada-parcial.md](plano-virada-parcial.md)**, na ordem do cronograma:
    - dia 1 (15/11): **feito** (backup, imagens, páginas das contas, redirects, arquivos públicos, conferência);
-   - dia 2 (16/11): conferir no navegador (375 e 1440 px, claro e escuro), SMTP do contato (opcional), ensaio, descobrir
-     como ligar o domínio no teste e decidir ir ou não;
+   - dia 2 (16/11): **feito pelo Claude:** exportação completa com mídia para o `novo.` (966 matérias, 36 imagens novas, 1 falha de
+     envio), conferência de endereços (1.898, zero falhas), conferência visual em 375 e 1440 px (home, matéria, figurinhas, login,
+     contato, tema claro e escuro) sem problema, procedimento do domínio registrado em [deploy-hostinger.md](deploy-hostinger.md)
+     e textos dos avisos em [avisos-virada.md](avisos-virada.md). **Falta:** "backup ok" e `.7z` em 2 cópias, UptimeRobot, aviso
+     nas redes, testar o alias do domínio (só com a aprovação do dono, pode derrubar o site antigo) e decidir ir ou não;
    - dia 3 (17/11): virada às 7h;
    - dia 4 (18/11): dump final.
 
