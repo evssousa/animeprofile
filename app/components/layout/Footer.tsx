@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { FOOTER_LINKS, INSTITUTIONAL, LEGAL_LINKS, SOCIAL } from "~/lib/nav";
+import { FOOTER_LINKS, INSTITUTIONAL, LEGAL_LINKS, SOCIAL, visibleNav } from "~/lib/nav";
 import { SITE } from "~/lib/site";
 import { Logo } from "./Logo";
 
@@ -37,7 +37,7 @@ export function Footer() {
             ))}
           </ul>
         </div>
-        {FOOTER_LINKS.map((g) => (
+        {visibleNav(FOOTER_LINKS).map((g) => (
           <Column key={g.label} title={g.label} links={g.items} />
         ))}
         <Column title="Anime Profile" links={INSTITUTIONAL} />

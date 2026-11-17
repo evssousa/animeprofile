@@ -17,8 +17,17 @@ import {
 
 /** `soon`: depende de conta; o item continua no menu e leva à página "volta em breve". */
 /** `also`: outros prefixos que mantêm o item ativo (ex.: News fica ativo em /noticias e em /artigos). */
-export type NavItem = { label: string; to: string; icon: LucideIcon; soon?: true; also?: string[] };
+/** `auth`: só aparece para quem está logado. Sem contas no ar (LOGGED_IN = false), some do menu; a página continua existindo. */
+export type NavItem = { label: string; to: string; icon: LucideIcon; soon?: true; also?: string[]; auth?: true };
 export type NavGroup = { label: string; items: NavItem[] };
+
+/** Enquanto as contas não voltam, ninguém está logado. Quando o login existir, isto passa a vir da sessão. */
+export const LOGGED_IN = false;
+
+/** Menus visíveis: tira os itens `auth` de quem não está logado e some com grupos que ficarem vazios. */
+export function visibleNav<T extends { items: { auth?: true }[] }>(groups: T[], loggedIn = LOGGED_IN): T[] {
+  return groups.map((g) => ({ ...g, items: g.items.filter((i) => loggedIn || !i.auth) })).filter((g) => g.items.length > 0);
+}
 
 export const NAV: NavGroup[] = [
   {
@@ -34,22 +43,22 @@ export const NAV: NavGroup[] = [
   {
     label: "Comunidade",
     items: [
-      { label: "Feed", to: "/feed", icon: MessagesSquare, soon: true },
-      { label: "Blog", to: "/blog", icon: PenSquare },
+      { label: "Feed", to: "/feed", icon: MessagesSquare, soon: true, auth: true },
+      { label: "Blog", to: "/blog", icon: PenSquare, auth: true },
     ],
   },
   {
     label: "Recompensas",
     items: [
-      { label: "Missões", to: "/missoes", icon: Award, soon: true },
-      { label: "Ranking", to: "/ranking", icon: Trophy, soon: true },
+      { label: "Missões", to: "/missoes", icon: Award, soon: true, auth: true },
+      { label: "Ranking", to: "/ranking", icon: Trophy, soon: true, auth: true },
     ],
   },
   {
     label: "Coleção",
     items: [
-      { label: "Figurinhas", to: "/figurinhas", icon: Sparkles },
-      { label: "Quarto Otaku", to: "/quarto", icon: Sofa, soon: true },
+      { label: "Figurinhas", to: "/figurinhas", icon: Sparkles, auth: true },
+      { label: "Quarto Otaku", to: "/quarto", icon: Sofa, soon: true, auth: true },
     ],
   },
 ];
@@ -78,10 +87,10 @@ export const FOOTER_LINKS: NavGroup[] = [
   {
     label: "Comunidade",
     items: [
-      { label: "Feed", to: "/feed", icon: MessagesSquare },
-      { label: "Blog", to: "/blog", icon: PenSquare },
-      { label: "Ranking", to: "/ranking", icon: Trophy },
-      { label: "Figurinhas", to: "/figurinhas", icon: Sparkles },
+      { label: "Feed", to: "/feed", icon: MessagesSquare, auth: true },
+      { label: "Blog", to: "/blog", icon: PenSquare, auth: true },
+      { label: "Ranking", to: "/ranking", icon: Trophy, auth: true },
+      { label: "Figurinhas", to: "/figurinhas", icon: Sparkles, auth: true },
     ],
   },
 ];

@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { NAV, isActive } from "~/lib/nav";
+import { NAV, isActive, visibleNav } from "~/lib/nav";
 import { ThemeToggle } from "./ThemeToggle";
 
 const KEY = "ap-sidebar";
@@ -21,7 +21,7 @@ export function NavGroups({ variant, onNavigate }: { variant: Variant; onNavigat
   const rail = variant === "rail";
   return (
     <div className="flex flex-col gap-4">
-      {NAV.map((group, gi) => (
+      {visibleNav(NAV).map((group, gi) => (
         <div key={group.label}>
           <p className={`px-3 pb-1.5 text-[0.75rem] font-bold tracking-[0.14em] text-ink-soft uppercase ${rail ? "lg:sr-only xl:not-sr-only xl:mini:sr-only" : ""}`}>{group.label}</p>
           {rail && gi > 0 && <span aria-hidden className="mx-auto my-1 hidden h-px w-8 bg-line lg:block xl:hidden xl:mini:block" />}
