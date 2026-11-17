@@ -1,6 +1,8 @@
 // Otaku TV: vídeos das matérias (YouTube dentro do texto) e trailers da temporada (guardados com os animes).
 // As aberturas e encerramentos (AnimeThemes) vêm direto do navegador: a API deles é lenta e às vezes cai.
 import { SEASON_PT, currentSeason } from "~/lib/anime";
+import { filterByTitle } from "~/lib/tv";
+import { cached, clearCache } from "../cache.server";
 import { VISIBLE, postUrl, type PostType } from "../content/posts.server";
 import { hasDatabase, iso, query, tx } from "../db.server";
 
@@ -34,6 +36,7 @@ export async function rebuildPostVideos() {
       await conn.query(`INSERT IGNORE INTO post_videos (video_id, post_id) VALUES ${chunk.map(() => "(?, ?)").join(", ")}`, chunk.flat());
     }
   });
+  clearCache();
   return { materiasComVideo: new Set(pairs.map((p) => p[1])).size, videos: new Set(pairs.map((p) => p[0])).size };
 }
 
@@ -73,28 +76,82 @@ export async function listPostVideos(q: string, page: number, perPage = 24) {
   return paginate(unique.map(fromPost), page, perPage);
 }
 
+
+/** Matéria "de anime": tem anime ligado, é artigo ou está na categoria Animes e Mangás (mesma regra do site antigo). */
+const IS_ANIME = `(p.anilist_id IS NOT NULL OR p.post_type = 'article' OR EXISTS (
+  SELECT 1 FROM post_categories pc JOIN categories c ON c.id = pc.category_id WHERE pc.post_id = p.id AND c.slug = 'animes-e-mangas'))`;
+
+const FIVE_MIN = 5 * 60_000;
+
+/** Vídeos das matérias de anime (cada vídeo uma vez, na matéria mais recente), com busca pelo título. A lista fica em cache. */
+export async function listAnimeVideos(q: string, page: number, perPage = 24) {
+  if (!hasDatabase()) return paginate<TvVideo>([], 1, perPage);
+  const all = await cached("tv:materias", FIVE_MIN, async () => {
+    const rows = await query<PostVideoRow>(
+      `SELECT v.video_id, p.title, p.excerpt, p.post_type, p.slug, p.published_at, p.anilist_id
+       FROM post_videos v JOIN posts p ON p.id = v.post_id WHERE ${VISIBLE} AND ${IS_ANIME}
+       ORDER BY p.published_at DESC`,
+    );
+    const seen = new Set<string>();
+    return rows.filter((r) => (seen.has(r.video_id) ? false : seen.add(r.video_id))).map(fromPost);
+  });
+  return paginate(filterByTitle(all, q), page, perPage);
+}
+
+export type TvShelf = { slug: string; name: string; total: number; items: TvVideo[] };
+
+/** Fileiras "Veja também": vídeos de matérias que não são de anime, por categoria (a com mais vídeos primeiro). */
+export async function listShelves(perShelf = 12): Promise<TvShelf[]> {
+  if (!hasDatabase()) return [];
+  return cached(`tv:fileiras:${perShelf}`, FIVE_MIN, async () => {
+    const rows = await query<PostVideoRow & { cat_slug: string; cat_name: string }>(
+      `SELECT v.video_id, p.title, p.excerpt, p.post_type, p.slug, p.published_at, p.anilist_id, c.slug AS cat_slug, c.name AS cat_name
+       FROM post_videos v JOIN posts p ON p.id = v.post_id
+       JOIN post_categories pc ON pc.post_id = p.id JOIN categories c ON c.id = pc.category_id
+       WHERE ${VISIBLE} AND NOT ${IS_ANIME} AND c.slug <> 'sem-categoria'
+       ORDER BY p.published_at DESC`,
+    );
+    const byCat = new Map<string, TvShelf & { seen: Set<string> }>();
+    for (const r of rows) {
+      const shelf = byCat.get(r.cat_slug) ?? { slug: r.cat_slug, name: r.cat_name, total: 0, items: [], seen: new Set<string>() };
+      byCat.set(r.cat_slug, shelf);
+      if (shelf.seen.has(r.video_id)) continue;
+      shelf.seen.add(r.video_id);
+      shelf.total++;
+      if (shelf.items.length < perShelf) shelf.items.push({ ...fromPost(r), subtitle: r.cat_name, badge: r.cat_name });
+    }
+    return [...byCat.values()]
+      .sort((a, b) => b.total - a.total)
+      .map(({ seen: _seen, ...shelf }) => shelf);
+  });
+}
+
 /** Trailers dos animes da temporada atual, dos mais populares para os menos. */
 export async function listTrailers(q: string, page: number, perPage = 24) {
   const season = currentSeason();
   const label = `${SEASON_PT[season.season]} ${season.year}`;
   if (!hasDatabase()) return { ...paginate<TvVideo>([], 1, perPage), label };
-  const rows = await query<{ anilist_id: number; title: string; trailer_youtube: string }>(
-    `SELECT anilist_id, title, trailer_youtube FROM anime_catalog
-     WHERE season = ? AND season_year = ? AND is_adult = 0 AND trailer_youtube IS NOT NULL ${q ? "AND title LIKE ?" : ""} ORDER BY popularity DESC`,
-    q ? [season.season, season.year, likeOf(q)] : [season.season, season.year],
-  );
-  const all: TvVideo[] = rows.map((r) => ({
-    id: r.trailer_youtube,
-    title: r.title,
-    subtitle: `Trailer · ${label}`,
-    badge: "Trailer",
-    date: null,
-    excerpt: null,
-    postUrl: null,
-    animeId: Number(r.anilist_id),
-    animeUrl: `/animes/${r.anilist_id}`,
-  }));
-  return { ...paginate(all, page, perPage), label };
+  const all = await cached(`tv:trailers:${season.season}:${season.year}`, 10 * 60_000, async () => {
+    const rows = await query<{ anilist_id: number; title: string; trailer_youtube: string }>(
+      `SELECT anilist_id, title, trailer_youtube FROM anime_catalog
+       WHERE season = ? AND season_year = ? AND is_adult = 0 AND trailer_youtube IS NOT NULL ORDER BY popularity DESC`,
+      [season.season, season.year],
+    );
+    return rows.map(
+      (r): TvVideo => ({
+        id: r.trailer_youtube,
+        title: r.title,
+        subtitle: `Trailer · ${label}`,
+        badge: "Trailer",
+        date: null,
+        excerpt: null,
+        postUrl: null,
+        animeId: Number(r.anilist_id),
+        animeUrl: `/animes/${r.anilist_id}`,
+      }),
+    );
+  });
+  return { ...paginate(filterByTitle(all, q), page, perPage), label };
 }
 
 /** Um vídeo pelo id do YouTube (link `/otaku-tv?v=...`): a matéria mais recente que o tem, ou o trailer de um anime. */

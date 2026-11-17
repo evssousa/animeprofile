@@ -25,6 +25,7 @@ Lovable Cloud. Por isso, o domínio animeprofile.com.br passa para cá numa **vi
 | [plano-sidebar-esquerda.md](plano-sidebar-esquerda.md) | Plano (temporário): menu lateral esquerdo como no site antigo (recolhível, sem piscar), topo com slot de menus extras e o celular no estilo do antigo (barra inferior, faixas que rolam, topo compacto, rodapé em 2 colunas) |
 | [avisos-virada.md](avisos-virada.md) | Textos prontos dos avisos da virada para as redes (temporário) |
 | [plano-robo-noticias.md](plano-robo-noticias.md) | Plano (temporário): robô de notícias por IA no cron do site novo (fase A, antes das contas), com inventário do robô antigo, migration 012, ensaio sem publicar e ligação na virada |
+| [plano-otaku-tv.md](plano-otaku-tv.md) | Plano (temporário): Otaku TV com cara de "YouTube" como no site antigo (palco escuro com player e "A seguir", abas, busca, grade com fileiras de outras categorias, músicas no mesmo player, troca de vídeo sem recarregar, SEO) |
 | [plano-sidebars.md](plano-sidebars.md) | Plano (temporário): inventário das barras laterais do site antigo e o sistema único de lateral (blocos por página, cache curto) para a matéria, Central, categoria/tag, blog, Otaku TV e quiz |
 
 ## Status
@@ -54,6 +55,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Blog da comunidade (só leitura): lista, post, autor, categoria, tag, RSS e sitemap ([plano](plano-quiz-blog-figurinhas.md) §2) | ✅ código pronto e testado; falta enviar o blog do site antigo (2026-11-16, depois das 15h) |
 | 2 | Catálogo de figurinhas (só ver), com as imagens copiadas para `/media` e a Coleção da home com dados reais ([plano](plano-quiz-blog-figurinhas.md) §3) | ✅ código pronto e testado, figurinhas em silhueta; falta enviar o catálogo e as imagens do site antigo (2026-11-16, depois das 15h) |
 | 2 | Barras laterais do site antigo: sistema único de lateral na matéria, Central, categoria/tag, blog, Otaku TV ("A seguir") e quiz ([plano](plano-sidebars.md)) | ⏳ plano pronto (2026-11-15); 3 perguntas para o dono |
+| 2 | Otaku TV no esquema do site antigo ("YouTube"): palco com player e "A seguir", fileiras por categoria, músicas no mesmo player ([plano](plano-otaku-tv.md)) | ⏳ plano pronto (2026-11-17), 8 passos P/M; 4 perguntas para o dono. Depois da virada |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
@@ -108,21 +110,26 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
    - dia 2 (16/11): **feito pelo Claude:** exportação completa com mídia para o `novo.` (966 matérias, 36 imagens novas, 1 falha de
      envio), conferência de endereços (1.898, zero falhas), conferência visual em 375 e 1440 px (home, matéria, figurinhas, login,
      contato, tema claro e escuro) sem problema, procedimento do domínio registrado em [deploy-hostinger.md](deploy-hostinger.md)
-     e textos dos avisos em [avisos-virada.md](avisos-virada.md). **Falta:** UptimeRobot, aviso
-     nas redes, testar o alias do domínio (só com a aprovação do dono, pode derrubar o site antigo) e decidir ir ou não;
+     e textos dos avisos em [avisos-virada.md](avisos-virada.md). **Feito depois:** alias testado e virada decidida (abaixo).
+     UptimeRobot adiado e aviso nas redes dispensado pelo dono em 2026-11-17;
    - dia 3 (17/11): **virada feita às 00h30** (o dono preferiu adiantar, sem tráfego): exportação final (970 matérias), alias
      `animeprofile.com.br` no app do `novo.` (`hosting_websites_add-domain`, tipo `parked`; a Hostinger reescreveu o `@` na hora
      para ALIAS `animeprofile.com.br.cdn.hstgr.net`), `www` virou CNAME para o domínio principal (301 para ele), `VITE_SITE_URL` e
      `SITE_NOINDEX` trocados pelo dono. Conferência pós-virada ok: robots liberado, canonical, sitemaps e RSS no domínio novo,
      `/sw.js`, `/ads.txt`, `/manifest.webmanifest` e `/api/health` 200, zero falhas nos 1.898 endereços. Robô em `publicar`,
-     teto 6 (publica a partir das 8h de Brasília). **Falta:** cron da Hostinger para o endereço novo, sitemap no Search Console,
-     aviso nas redes, logs de manhã e à noite, e (18/11) teto do robô para 10 e dump final;
+     teto 6 (publica a partir das 8h de Brasília). Depois, o dono trocou o domínio do site no hPanel ("Alterar domínio": o site
+     passou a se chamar `animeprofile.com.br`; o `novo.` deixou de existir) e foi preciso refazer o deploy para o app ler o `.env`.
+     Cron da Hostinger recriado (o comando tinha `url` em vez de `curl`; corrigido e rodando); sitemap enviado ao Search Console.
+     Menus Feed, Blog, Missões, Ranking, Figurinhas e Quarto Otaku só para logados (`LOGGED_IN` em `app/lib/nav.ts`).
+     **Falta:** logs de manhã e à noite, e (18/11) teto do robô para 10 e dump final;
    - dia 4 (18/11): dump final.
 
    Tudo o que não estiver nesse plano espera.
 1. Conferir no navegador `/quiz`, `/blog`, `/figurinhas`, a home e a ficha de um anime com álbum (exportação feita em 2026-11-15).
 2. Barras laterais: executar [plano-sidebars.md](plano-sidebars.md) passo a passo (10 passos, P/M; dá para fazer em
    Sonnet), depois das respostas do dono às perguntas do fim do plano. **Depois da virada.**
+2a. **Otaku TV como no site antigo:** executar [plano-otaku-tv.md](plano-otaku-tv.md) (8 passos, P/M; dá para fazer em
+   Sonnet), depois das respostas do dono às 4 perguntas do fim do plano. **Depois da virada.**
 3. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
    - **Agenda semanal de animes** (hoje só no site antigo, `weekly-agenda`): portar para o cron do site novo e **variar a capa a
      cada semana** (rodízio entre os banners dos 6 mais populares, sem repetir a da semana anterior); o antigo usa sempre o do
@@ -145,7 +152,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     **Falta:** conferir a propriedade do Search Console (tipo Domínio),
     baixar a lista de páginas do Search Console para `.import/gsc-paginas.csv` e tirar foto da zona DNS e da tela de
     domínio do Lovable (já anotei os valores do DNS em [plano-virada-parcial.md](plano-virada-parcial.md)).
-  - **Dia 2:** SMTP no hPanel (opcional), UptimeRobot e aviso nas redes. O dono decidiu em 2026-11-16 **não fechar o `.7z` cifrado** (a pasta `animeprofile-backup` fica só no PC).
+  - **Dia 2:** SMTP no hPanel (opcional). **UptimeRobot adiado** e **aviso nas redes dispensado** (decisões do dono em 2026-11-17). O dono decidiu em 2026-11-16 **não fechar o `.7z` cifrado** (a pasta `animeprofile-backup` fica só no PC).
   - **Dia 3:** hora H às 7h (desativar os workflows antigos, trocar `VITE_SITE_URL` e apagar `SITE_NOINDEX`, ligar o
     domínio, trocar o cron, enviar o sitemap).
   - **Dia 4:** dump final.
@@ -154,6 +161,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 - Responder as 3 perguntas do fim de [plano-sidebars.md](plano-sidebars.md): placeholder "Em breve: com a sua conta"
   na lateral (recomendado: não), lateral da Central em todas as páginas da lista (recomendado: sim) e Guia do anime na
   lateral ou no meio do texto (recomendado: lateral).
+- Responder as 4 perguntas do fim de [plano-otaku-tv.md](plano-otaku-tv.md): endereço de cada vídeo (`?v=`,
+  recomendado, ou `/otaku-tv/v/<id>`), botões de conta (recomendado: não mostrar), `VideoObject` na matéria
+  (recomendado: fazer depois deste plano) e "A seguir" no celular (proposto: 3 itens).
 - Se quiser as figurinhas abertas em vez de silhueta: trocar `MOSTRAR_ABERTAS` para `true` em `app/lib/stickers.ts`.
 
 ## Como atualizar o conteúdo do site de teste

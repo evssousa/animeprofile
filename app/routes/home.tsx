@@ -410,7 +410,7 @@ function OtakuTvPanel({ videos }: { videos: Awaited<ReturnType<typeof latestTvVi
             <Play className="ml-1 size-7 fill-current" aria-hidden />
           </span>
           <h3 className="absolute inset-x-5 bottom-4 text-[1.1rem] leading-snug font-bold sm:text-[1.25rem]">
-            <Link to={href(main.id)} className="line-clamp-2 after:absolute after:inset-0">
+            <Link to={href(main.id)} state={{ play: true }} className="line-clamp-2 after:absolute after:inset-0">
               {main.title}
             </Link>
           </h3>
@@ -420,7 +420,7 @@ function OtakuTvPanel({ videos }: { videos: Awaited<ReturnType<typeof latestTvVi
             <li key={v.id} className="group relative flex items-center gap-3.5 rounded-xl bg-white/5 p-2 hover:bg-white/10">
               <img src={ytThumb(v.id)} alt="" loading="lazy" className="aspect-video w-[130px] shrink-0 rounded-lg object-cover" />
               <h3 className="text-[0.9rem] leading-snug font-semibold">
-                <Link to={href(v.id)} className="line-clamp-3 after:absolute after:inset-0">
+                <Link to={href(v.id)} state={{ play: true }} className="line-clamp-3 after:absolute after:inset-0">
                   {v.title}
                 </Link>
               </h3>

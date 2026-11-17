@@ -2,6 +2,25 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-17 (plano) — Otaku TV no esquema do site antigo, com um "palco" escuro
+
+Detalhes em [plano-otaku-tv.md](plano-otaku-tv.md).
+
+- **Decisão (proposta, falta o dono responder 4 perguntas):**
+  - **Estrutura do antigo:** player grande no topo (primeiro vídeo parado quando não há `?v=`), "A seguir" ao lado com
+    a altura do player, abas e busca, grade só com vídeos de matérias de anime e fileiras "Veja também" das outras
+    categorias a cada 12 vídeos.
+  - **Acabamento novo:** cabeçalho, abas, player e fila num palco `night` (modo cinema); grade na página clara; largura
+    de até 1600 px só nesta página; músicas (AnimeThemes) no mesmo player.
+  - **Endereço:** continua `/otaku-tv?v=<id>`, com a canônica da aba e sem `VideoObject` na lista.
+  - **Player:** iframe `youtube-nocookie` só depois do clique; toca sozinho só quando a troca vem de um clique na
+    visita, nunca em link compartilhado. Trocar de vídeo não roda o loader (`shouldRevalidate`).
+  - **Conta:** curtir, salvar, histórico, comentar e "Sessão pipoca" não aparecem até as contas voltarem.
+- **Por quê:**
+  - **Pedido do dono:** "a página Otaku TV deve ficar no esquema da página do site antigo, parecendo um YouTube", com
+    melhoria de layout.
+  - **Cache de 60 s e sem cookie:** o que muda por visitante (vídeo tocando) fica no navegador; o HTML é o mesmo.
+
 ## 2026-11-15 (plano) — Robô de notícias volta antes das contas, no cron do próprio site
 
 Detalhes em [plano-robo-noticias.md](plano-robo-noticias.md).

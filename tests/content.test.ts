@@ -9,7 +9,7 @@ import { applySnapshot, mapPost, validateSnapshot, type OldSnapshot } from "~/se
 import { readingMinutes, sanitizePostHtml } from "~/server/content/sanitize.server";
 import { isWideImage } from "~/lib/images";
 import { timeAgo } from "~/lib/format";
-import { findVideo, listPostVideos, youtubeIds } from "~/server/tv/tv.server";
+import { findVideo, listAnimeVideos, listPostVideos, listShelves, youtubeIds } from "~/server/tv/tv.server";
 import { rssFeed, sitemapArticles, sitemapIndex, sitemapNews, sitemapStatic, sitemapTaxonomy } from "~/server/seo/feeds.server";
 import { getPost, getTag, latestComments, latestPosts, postComments, withToc, listCategories, listPosts, mostRead, relatedPosts, trendingTags } from "~/server/content/posts.server";
 
@@ -261,5 +261,15 @@ describe("Otaku TV: vídeos das matérias", () => {
     expect(await findVideo("BBBBBBBBBBB")).toMatchObject({ title: "SAKAMOTO DAYS entra no arco final", postUrl: "/noticias/sakamoto-days-arco-final" });
     expect(await findVideo("ZZZZZZZZZZZ")).toBeNull();
     expect(await findVideo("curto")).toBeNull();
+  });
+
+  it("a grade só traz vídeos de matérias de anime e as fileiras não repetem vídeo nem quebram a consulta", async () => {
+    const anime = await listAnimeVideos("", 1, 100);
+    const todos = await listPostVideos("", 1, 100);
+    expect(anime.total).toBeLessThanOrEqual(todos.total);
+    const shelves = await listShelves();
+    for (const s of shelves) expect(new Set(s.items.map((i) => i.id)).size).toBe(s.items.length);
+    const naGrade = new Set(anime.items.map((i) => i.id));
+    for (const s of shelves) for (const i of s.items) expect(naGrade.has(i.id)).toBe(false);
   });
 });

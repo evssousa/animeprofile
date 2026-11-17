@@ -1,21 +1,28 @@
-// Otaku TV (/otaku-tv): vídeos de anime num lugar só. Abas: das matérias, trailers da temporada e aberturas/encerramentos.
-// O link `/otaku-tv?v=<id do YouTube>` abre o vídeo no player (usado também para compartilhar).
-import { Form, Link } from "react-router";
-import { Clapperboard, Music, Newspaper, Search } from "lucide-react";
+// Otaku TV (/otaku-tv): vídeos de anime num lugar só, com cara de "YouTube" (docs/plano-otaku-tv.md).
+// Palco escuro em cima (player + "A seguir"), grade e fileiras "Veja também" embaixo. Abas: das matérias, trailers da
+// temporada e aberturas/encerramentos. `/otaku-tv?v=<id do YouTube>` abre o vídeo (parado: só toca depois de um clique).
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate, useSearchParams, type ShouldRevalidateFunctionArgs } from "react-router";
+import { Clapperboard, Music, Newspaper } from "lucide-react";
 import type { Route } from "./+types/otaku-tv";
-import { ThemesTab, VideoCard, YoutubePlayer, ytThumb } from "~/components/otaku-tv";
-import { SideCard } from "~/components/sidebar";
-import { PageHeader } from "~/components/PageHeader";
+import { EmptyStage, fromTheme, fromVideo, Info, Player, PlayerSkeleton, SearchForm, SearchInput, Shelf, Stage, StageHead, Tabs, TypeSwitch, UpNext, useThemes, VideoCard, ytThumb, type TvItem } from "~/components/otaku-tv";
 import { Pagination } from "~/components/posts";
 import { seo } from "~/lib/seo";
-import { findVideo, listPostVideos, listTrailers } from "~/server/tv/tv.server";
+import { absoluteUrl } from "~/lib/site";
+import { cardHref, interleaveShelves, shelfCopy, upNext } from "~/lib/tv";
+import { findVideo, listAnimeVideos, listShelves, listTrailers, type TvVideo } from "~/server/tv/tv.server";
 
 type Tab = "materias" | "trailers" | "musicas";
-const TABS: { value: Tab; label: string; icon: typeof Newspaper }[] = [
-  { value: "materias", label: "Das matérias", icon: Newspaper },
-  { value: "trailers", label: "Trailers da temporada", icon: Clapperboard },
-  { value: "musicas", label: "Aberturas e encerramentos", icon: Music },
+const TABS = [
+  { value: "materias", label: "Das matérias", href: "/otaku-tv", icon: Newspaper },
+  { value: "trailers", label: "Trailers da temporada", href: "/otaku-tv?tab=trailers", icon: Clapperboard },
+  { value: "musicas", label: "Aberturas e encerramentos", href: "/otaku-tv?tab=musicas", icon: Music },
 ];
+const ID = /^[A-Za-z0-9_-]{11}$/;
+
+export function links() {
+  return [{ rel: "preconnect", href: "https://i.ytimg.com" }];
+}
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
@@ -24,129 +31,257 @@ export async function loader({ request }: Route.LoaderArgs) {
   const q = (url.searchParams.get("q") ?? "").trim().slice(0, 80);
   const page = Math.max(1, Number(url.searchParams.get("pagina")) || 1);
   const v = url.searchParams.get("v") ?? "";
-  const selected = v ? await findVideo(v) : null;
-  const generic = v && !selected && /^[A-Za-z0-9_-]{11}$/.test(v) ? { id: v, title: "Vídeo da Otaku TV", subtitle: "Otaku TV", badge: "Vídeo", date: null, excerpt: null, postUrl: null, animeId: null, animeUrl: null } : null;
-  const list = tab === "materias" ? await listPostVideos(q, page) : tab === "trailers" ? await listTrailers(q, page) : null;
-  return { tab, q, selected: selected ?? generic, list, label: list && "label" in list ? list.label : null };
+
+  const list = tab === "materias" ? await listAnimeVideos(q, page) : tab === "trailers" ? await listTrailers(q, page) : null;
+  const shelves = tab === "materias" && page === 1 && !q ? await listShelves(12) : [];
+
+  // O vídeo do link: o que está na lista ou nas fileiras; senão a matéria/trailer que o tem; senão um genérico (tocável).
+  let selected: TvVideo | null = null;
+  if (tab !== "musicas" && ID.test(v)) {
+    selected = [...(list?.items ?? []), ...shelves.flatMap((s) => s.items)].find((x) => x.id === v) ?? (await findVideo(v));
+    selected ??= { id: v, title: "Vídeo da Otaku TV", subtitle: "Otaku TV", badge: "Vídeo", date: null, excerpt: null, postUrl: null, animeId: null, animeUrl: null };
+  }
+  return { tab, q, list, shelves, selected, label: list && "label" in list ? list.label : null };
 }
 
-export function meta({ loaderData: d }: Route.MetaArgs) {
+/** Trocar só o vídeo (`v`) não refaz a lista: o clique no cartão é instantâneo e a lista não pisca. */
+export function shouldRevalidate({ currentUrl, nextUrl, defaultShouldRevalidate }: ShouldRevalidateFunctionArgs) {
+  const a = new URLSearchParams(currentUrl.search);
+  const b = new URLSearchParams(nextUrl.search);
+  a.delete("v");
+  b.delete("v");
+  return currentUrl.pathname === nextUrl.pathname && a.toString() === b.toString() ? false : defaultShouldRevalidate;
+}
+
+export function meta({ loaderData: d, location }: Route.MetaArgs) {
   const tab = d?.tab ?? "materias";
   const titles: Record<Tab, string> = { materias: "Otaku TV: vídeos e trailers de anime", trailers: "Trailers de anime da temporada", musicas: "Aberturas e encerramentos de anime" };
+  const v = new URLSearchParams(location.search).get("v");
+  const pool: TvVideo[] = d ? [...(d.list?.items ?? []), ...d.shelves.flatMap((s) => s.items), ...(d.selected ? [d.selected] : [])] : [];
+  const current = v ? pool.find((x) => x.id === v) : null;
+  const first = d?.list?.items[0];
+  const path = tab === "materias" ? "/otaku-tv" : `/otaku-tv?tab=${tab}`;
+  const itemList = (d?.list?.items ?? []).slice(0, 20).flatMap((x, i) => {
+    const target = tab === "trailers" ? x.animeUrl : x.postUrl;
+    return target ? [{ "@type": "ListItem", position: i + 1, url: absoluteUrl(target), name: x.title }] : [];
+  });
   return seo({
-    title: d?.selected ? d.selected.title : titles[tab],
-    description: "Trailers, vídeos das matérias e aberturas e encerramentos dos animes, num lugar só.",
-    path: tab === "materias" ? "/otaku-tv" : `/otaku-tv?tab=${tab}`,
+    title: current ? `${current.title} · Otaku TV` : titles[tab],
+    description: current?.excerpt || "Trailers, vídeos das matérias e aberturas e encerramentos dos animes, num lugar só.",
+    path,
+    image: current ? ytThumb(current.id) : first ? ytThumb(first.id) : null,
     noindex: Boolean(d?.q) || (d?.list?.page ?? 1) > 1,
+    jsonLd: {
+      "@context": "https://schema.org",
+      "@graph": [
+        { "@type": "CollectionPage", name: "Otaku TV", url: absoluteUrl(path), inLanguage: "pt-BR", ...(itemList.length ? { mainEntity: { "@type": "ItemList", itemListElement: itemList } } : {}) },
+        {
+          "@type": "BreadcrumbList",
+          itemListElement: [
+            { "@type": "ListItem", position: 1, name: "Início", item: absoluteUrl("/") },
+            { "@type": "ListItem", position: 2, name: "Otaku TV", item: absoluteUrl("/otaku-tv") },
+          ],
+        },
+      ],
+    },
   });
 }
 
+/** Quando a troca de vídeo veio de um clique nesta visita, rola até o player se ele estiver fora da tela. */
+function useScrollToPlayer(trigger: string | null) {
+  useEffect(() => {
+    if (!trigger) return;
+    const el = document.getElementById("player");
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    if (r.top < 0 || r.bottom > window.innerHeight) el.scrollIntoView({ block: "start", behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  }, [trigger]);
+}
+
+/** Vindo da home (`state.play`), o vídeo já toca; link aberto de fora ou recarregado mostra o pôster parado. */
+function useArrivedToPlay() {
+  const loc = useLocation();
+  const navigate = useNavigate();
+  const [arrived] = useState(() => Boolean((loc.state as { play?: boolean } | null)?.play));
+  useEffect(() => {
+    if (arrived) navigate(`${loc.pathname}${loc.search}`, { replace: true, state: null, preventScrollReset: true });
+    // só na primeira vez: limpa o `state` para o recarregar não tocar sozinho
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return arrived;
+}
+
 export default function OtakuTv({ loaderData }: Route.ComponentProps) {
-  const { tab, q, selected, list, label } = loaderData;
-  const tabHref = (t: Tab) => (t === "materias" ? "/otaku-tv" : `/otaku-tv?tab=${t}`);
-  const cardHref = (id: string) => `/otaku-tv?${new URLSearchParams({ ...(tab !== "materias" ? { tab } : {}), v: id }).toString()}`;
+  return loaderData.tab === "musicas" ? <MusicPage /> : <VideoPage data={loaderData} />;
+}
+
+function VideoPage({ data }: { data: Route.ComponentProps["loaderData"] }) {
+  const { tab, q, list, shelves, selected, label } = data;
+  const [params] = useSearchParams();
+  const v = params.get("v");
+  const arrived = useArrivedToPlay();
+
+  const items = (list?.items ?? []).map(fromVideo);
+  const shelfItems = shelves.map((s) => ({ ...s, items: s.items.map(fromVideo) }));
+  const pool = [...items, ...shelfItems.flatMap((s) => s.items)];
+  const initial = selected ? fromVideo(selected) : null;
+  const current: TvItem | null = v ? (pool.find((i) => i.src === v) ?? (initial && initial.src === v ? initial : null)) : (items[0] ?? null);
+  const [playId, setPlayId] = useState<string | null>(() => (arrived ? (current?.key ?? null) : null));
+  useScrollToPlayer(playId);
+
+  const page = list?.page ?? 1;
+  const hrefFor = (i: TvItem) => cardHref({ tab, q, pagina: page }, i.src);
+  const onPick = (i: TvItem) => setPlayId(i.key);
+
+  const shelf = current ? shelfItems.find((s) => s.items.some((i) => i.key === current.key)) : undefined;
+  const source = shelf ? [...shelf.items.slice(shelf.items.findIndex((i) => i.key === current!.key) + 1), ...items] : items;
+  const queue = current ? upNext(source, shelf ? null : current.key, 12).filter((i) => i.key !== current.key) : [];
+
+  const title = tab === "trailers" ? `Trailers de ${label}` : q ? `Vídeos sobre “${q}”` : "Vídeos das matérias";
+  const placeholder = tab === "trailers" ? "Filtrar trailers" : "Buscar nas matérias";
+  const blocks = interleaveShelves(items, shelfItems, 12);
+  const emptyText = q ? `Nenhum vídeo encontrado para “${q}”.` : tab === "trailers" ? `Os trailers de ${label} ainda não chegaram.` : "Nenhum vídeo por aqui ainda.";
+
   return (
     <>
-      <PageHeader label="Otaku TV" title="Trailers e vídeos fresquinhos" intro="Os vídeos que aparecem nas nossas matérias, os trailers da temporada e as aberturas e encerramentos dos animes.">
-        <nav aria-label="Seções da Otaku TV" className="mt-7 flex flex-wrap gap-2">
-          {TABS.map(({ value, label: l, icon: Icon }) => (
-            <Link
-              key={value}
-              to={tabHref(value)}
-              aria-current={value === tab ? "page" : undefined}
-              className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[0.88rem] font-semibold ${value === tab ? "bg-white text-night" : "bg-white/12 text-white hover:bg-white/20"}`}
-            >
-              <Icon className="size-4" aria-hidden />
-              {l}
-            </Link>
-          ))}
-        </nav>
-      </PageHeader>
-
-      <div className="mx-auto flex max-w-[1328px] flex-col gap-10 px-4 py-10 sm:px-8 sm:py-12 lg:px-14">
-        {selected && tab !== "musicas" && (
-          <section aria-labelledby="player" className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-            <YoutubePlayer video={selected} autoplay />
-            <div className="flex flex-col gap-3">
-              <p className="text-[0.8rem] font-bold text-brand">{selected.subtitle}</p>
-              <h2 id="player" className="text-[1.4rem] leading-tight font-extrabold">
-                {selected.title}
-              </h2>
-              {selected.excerpt && <p className="line-clamp-4 text-ink-soft">{selected.excerpt}</p>}
-              <div className="mt-2 flex flex-wrap gap-2">
-                {selected.postUrl && (
-                  <Link to={selected.postUrl} className="rounded-[9px] bg-brand px-4 py-2.5 text-[0.9rem] font-bold text-brand-ink hover:brightness-110">
-                    Ler a matéria
-                  </Link>
-                )}
-                {selected.animeUrl && (
-                  <Link to={selected.animeUrl} className="rounded-[9px] border border-line bg-surface px-4 py-2.5 text-[0.9rem] font-semibold hover:bg-sunken">
-                    Ver o anime
-                  </Link>
-                )}
+      <Stage>
+        <StageHead search={<SearchForm tab={tab} q={q} placeholder={placeholder} />} />
+        <Tabs tabs={TABS} current={tab} />
+        {current ? (
+          <div className="mt-5 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="min-w-0">
+              <Player item={current} playing={playId === current.key} onPlay={() => setPlayId(current.key)} />
+              <Info item={current} shareUrl={absoluteUrl(cardHref({ tab }, current.src))} />
+              <div className="xl:hidden">
+                <UpNext items={queue} variant="below" hrefFor={hrefFor} onPick={onPick} />
               </div>
-              {list && list.items.filter((v) => v.id !== selected.id).length > 0 && (
-                <div className="mt-4">
-                  <SideCard title="A seguir">
-                    <ul className="flex flex-col gap-3">
-                      {list.items
-                        .filter((v) => v.id !== selected.id)
-                        .slice(0, 5)
-                        .map((v) => (
-                          <li key={v.id}>
-                            <Link to={cardHref(v.id)} className="-m-1.5 flex items-center gap-3 rounded-[10px] p-1.5 hover:bg-sunken">
-                              <img src={ytThumb(v.id)} alt="" loading="lazy" className="aspect-video w-28 shrink-0 rounded-lg object-cover" />
-                              <span className="min-w-0">
-                                <span className="line-clamp-2 block text-[0.88rem] leading-snug font-semibold">{v.title}</span>
-                                <span className="mt-0.5 block text-[0.78rem] text-ink-soft">{v.subtitle}</span>
-                              </span>
-                            </Link>
-                          </li>
-                        ))}
-                    </ul>
-                  </SideCard>
-                </div>
-              )}
             </div>
-          </section>
-        )}
-
-        {tab === "musicas" ? (
-          <ThemesTab />
+            <aside aria-label="A seguir" className="relative hidden xl:block">
+              <UpNext items={queue} variant="side" hrefFor={hrefFor} onPick={onPick} />
+            </aside>
+          </div>
         ) : (
-          <section aria-labelledby="lista" className="flex flex-col gap-6">
-            <div className="flex flex-wrap items-end justify-between gap-4">
-              <h2 id="lista" className="text-[1.6rem] font-extrabold tracking-[-0.025em]">
-                {tab === "trailers" ? `Trailers de ${label}` : q ? `Vídeos sobre “${q}”` : "Vídeos das matérias"}
-              </h2>
-              <Form method="get" role="search" className="relative w-full sm:w-72">
-                {tab !== "materias" && <input type="hidden" name="tab" value={tab} />}
-                <label>
-                  <span className="sr-only">{tab === "trailers" ? "Filtrar trailers" : "Buscar nas matérias"}</span>
-                  <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-ink-soft" aria-hidden />
-                  <input
-                    type="search"
-                    name="q"
-                    defaultValue={q}
-                    placeholder={tab === "trailers" ? "Filtrar trailers" : "Buscar nas matérias"}
-                    className="h-11 w-full rounded-[10px] border border-line bg-surface pr-4 pl-10 focus:border-ink-soft focus:outline-none"
-                  />
-                </label>
-              </Form>
-            </div>
-            {list && list.items.length > 0 ? (
-              <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 lg:grid-cols-4">
-                {list.items.map((video) => (
-                  <VideoCard key={video.id} video={video} href={cardHref(video.id)} />
-                ))}
-              </div>
-            ) : (
-              <p className="text-ink-soft">{q ? `Nenhum vídeo encontrado para “${q}”.` : "Ainda não há vídeos aqui."}</p>
-            )}
-            {list && <Pagination page={list.page} pages={list.pages} basePath="/otaku-tv" query={{ ...(tab !== "materias" ? { tab } : {}), ...(q ? { q } : {}) }} />}
-          </section>
+          <EmptyStage
+            text={emptyText}
+            action={
+              q ? (
+                <Link to={tab === "materias" ? "/otaku-tv" : `/otaku-tv?tab=${tab}`} className="inline-flex h-11 items-center rounded-[10px] bg-white/10 px-4 font-semibold hover:bg-white/[.18]">
+                  Limpar busca
+                </Link>
+              ) : (
+                <Link to={tab === "trailers" ? "/otaku-tv" : "/otaku-tv?tab=trailers"} className="inline-flex h-11 items-center rounded-[10px] bg-brand px-4 font-bold text-brand-ink hover:brightness-110">
+                  {tab === "trailers" ? "Ver os vídeos das matérias" : "Ver os trailers da temporada"}
+                </Link>
+              )
+            }
+          />
         )}
-      </div>
+      </Stage>
+
+      {items.length > 0 && (
+        <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+          <div className="flex items-end justify-between gap-4">
+            <h2 id="lista" className="scroll-mt-24 text-[1.35rem] font-extrabold tracking-[-0.025em] sm:text-[1.6rem]">
+              {title}
+            </h2>
+            {list && <span className="text-[0.9rem] text-ink-soft">{list.total} vídeos</span>}
+          </div>
+          <div className="mt-6 flex flex-col gap-8">
+            {blocks.map((b, bi) =>
+              b.kind === "grid" ? (
+                <div key={`g${bi}`} className="grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-5 sm:gap-y-8 md:grid-cols-3 xl:grid-cols-4">
+                  {b.items.map((it) => (
+                    <VideoCard key={it.key} item={it} href={hrefFor(it)} onPick={onPick} active={current?.key === it.key} />
+                  ))}
+                </div>
+              ) : (
+                <ShelfBlock key={b.shelf.slug} shelf={b.shelf} hrefFor={hrefFor} onPick={onPick} activeKey={current?.key ?? null} />
+              ),
+            )}
+          </div>
+          <div className="mt-10">{list && <Pagination page={list.page} pages={list.pages} basePath="/otaku-tv" query={{ ...(tab !== "materias" ? { tab } : {}), ...(q ? { q } : {}) }} />}</div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function ShelfBlock({ shelf, hrefFor, onPick, activeKey }: { shelf: { slug: string; name: string; items: TvItem[] }; hrefFor: (i: TvItem) => string; onPick: (i: TvItem) => void; activeKey: string | null }) {
+  const copy = shelfCopy(shelf.slug, shelf.name);
+  return <Shelf id={`fileira-${shelf.slug}`} icon={copy.icon} title={copy.title} tagline={copy.tagline} moreHref={`/categoria/${shelf.slug}`} moreLabel={`Mais de ${shelf.name}`} items={shelf.items} hrefFor={hrefFor} onPick={onPick} activeKey={activeKey} />;
+}
+
+function MusicPage() {
+  const t = useThemes();
+  const all = t.items.map(fromTheme);
+  const [pick, setPick] = useState<string | null>(null);
+  const [playId, setPlayId] = useState<string | null>(null);
+  const current = all.find((i) => i.key === pick) ?? all[0] ?? null;
+  useScrollToPlayer(playId);
+  const onPick = (i: TvItem) => {
+    setPick(i.key);
+    setPlayId(i.key);
+  };
+  const queue = current ? upNext(all, current.key, 12) : [];
+
+  return (
+    <>
+      <Stage>
+        <StageHead search={<SearchInput value={t.q} onChange={t.setQ} placeholder="Buscar músicas de um anime" />} />
+        <Tabs tabs={TABS} current="musicas" extra={<TypeSwitch value={t.type} onChange={t.setType} />} />
+        {t.state === "loading" ? (
+          <PlayerSkeleton text={`Carregando as músicas de ${t.term.length >= 2 ? `“${t.term}”` : t.label}. Esse serviço é lento: pode levar uns segundos.`} />
+        ) : t.state === "error" ? (
+          <div className="mt-5 rounded-2xl border border-white/15 bg-white/[.04] p-5">
+            <p className="font-semibold">Não consegui carregar as músicas agora.</p>
+            <p className="mt-1 text-[0.9rem] text-white/70">O serviço que guarda os vídeos (AnimeThemes) está fora do ar ou lento. Isso não afeta o resto do site.</p>
+            <button type="button" onClick={t.retry} className="mt-3 inline-flex h-11 items-center rounded-[10px] bg-brand px-4 font-bold text-brand-ink hover:brightness-110">
+              Tentar de novo
+            </button>
+          </div>
+        ) : current ? (
+          <div className="mt-5 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+            <div className="min-w-0">
+              <Player item={current} playing={playId === current.key} onPlay={() => setPlayId(current.key)} />
+              <Info item={current} shareUrl={null} />
+              <div className="xl:hidden">
+                <UpNext items={queue} variant="below" hrefFor={null} onPick={onPick} />
+              </div>
+            </div>
+            <aside aria-label="A seguir" className="relative hidden xl:block">
+              <UpNext items={queue} variant="side" hrefFor={null} onPick={onPick} />
+            </aside>
+          </div>
+        ) : (
+          <EmptyStage text={`Nenhuma música encontrada${t.term ? ` para “${t.term}”` : ""}.`} />
+        )}
+      </Stage>
+
+      {all.length > 0 && (
+        <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+          <h2 id="lista" className="scroll-mt-24 text-[1.35rem] font-extrabold tracking-[-0.025em] sm:text-[1.6rem]">
+            {t.term.length >= 2 ? `Músicas de “${t.term}”` : `Aberturas e encerramentos de ${t.label}`}
+          </h2>
+          <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-6 sm:gap-x-5 sm:gap-y-8 md:grid-cols-3 xl:grid-cols-5">
+            {all.map((it) => (
+              <VideoCard key={it.key} item={it} href={null} onPick={onPick} active={current?.key === it.key} cover />
+            ))}
+          </div>
+          {t.hasMore && (
+            <div className="mt-10 text-center">
+              <button type="button" onClick={t.loadMore} className="rounded-[9px] border border-line bg-surface px-6 py-3 font-semibold hover:bg-sunken">
+                Carregar mais
+              </button>
+            </div>
+          )}
+          <p className="mt-8 text-center text-[0.85rem] text-ink-soft">
+            Fonte:{" "}
+            <a href="https://animethemes.moe" target="_blank" rel="noreferrer" className="font-semibold text-link underline">
+              AnimeThemes.moe
+            </a>
+          </p>
+        </div>
+      )}
     </>
   );
 }

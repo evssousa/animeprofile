@@ -6,6 +6,7 @@ import { GeneratedArticle, ARTICLE_JSON_SCHEMA, parseGeminiJson } from "./contra
 import { activeSources, allowedCategories, computeSlotLimit, getConfig, getGuide, modelCallsLast24h, recordUsage, type RoboConfig } from "./config.server";
 import { BACKUP_POOL, MAX_QUALITY_ATTEMPTS, MIN_TIME_FOR_CANDIDATE_MS, RSS_CONCURRENCY, RUN_BUDGET_MS, RUN_LOCK_MINUTES } from "./constants";
 import { GeminiError } from "./gemini.server";
+import { rebuildPostVideos } from "../tv/tv.server";
 import { enforceSeoHtml, ensureAtLeastOneImage } from "./html";
 import { collectAndValidateMedia, localizeImages, replaceImageUrls } from "./media.server";
 import { ModelChain, newsModelChain } from "./model-chain";
@@ -152,6 +153,8 @@ export async function runRobot(opts: RunOptions = {}): Promise<Record<string, un
     status = "error";
     report.erros.push(`Rodada interrompida: ${String((e as Error)?.message ?? e).slice(0, 300)}`);
   } finally {
+    // Matéria nova com vídeo entra na Otaku TV na hora, e não até 6 h depois (tarefa videos-materias).
+    if (report.publicados.length > 0) await rebuildPostVideos().catch((e) => report.erros.push(`Otaku TV: ${String(e?.message ?? e).slice(0, 120)}`));
     await exec("UPDATE ai_news_candidates SET status = 'pending', run_id = NULL WHERE run_id = ? AND status = 'selected'", [runId]);
     await exec("UPDATE ai_news_runs SET status = ?, finished_at = UTC_TIMESTAMP(3), generated_count = ?, discarded = ?, failed = ?, report = ? WHERE id = ?", [status, generated, discarded, report.falhas, JSON.stringify(report), runId]);
   }
