@@ -28,6 +28,19 @@ const ANIME_RE =
 const NON_ANIME_RE =
   /\b(xbox|playstation|ps5|nintendo|switch|steam|game pass|marvel|dc comics|batman|superman|homem-aranha|spider-man|star wars|netflix series|live-action|hbo|disney\+|filme da marvel|trailer do filme)\b/i;
 
+export const GAMES_CATEGORY_SLUG = "games";
+
+// Games no Anime Profile são só os ligados a anime e mangá (adaptações, spin-offs, colaborações). Os outros são do Respawnou.
+// Limites de palavra que entendem acento (a barra-b do JavaScript não trata "á" como letra: "mangá" nunca casaria).
+const GAME_ANIME_RE = /(?<![\p{L}\p{N}])(anime|animes|mang[aá]s?|light novels?|shonen|shounen|seinen|shojo|isekai|webtoons?|manhwa|crunchyroll|toei|mappa|ufotable|shueisha|kodansha)(?![\p{L}\p{N}])/iu;
+
+/** O texto de um game cita anime ou mangá de verdade? Usa o título, o resumo e o corpo (sem HTML) e o anime em foco. */
+export function gameTiedToAnime(a: { title: string; excerpt: string; html: string; animeTitle: string | null; animeFocus?: string }): boolean {
+  if (a.animeTitle && a.animeFocus && a.animeFocus !== "none") return true;
+  const text = `${a.title} ${a.excerpt} ${a.html.replace(/<[^>]+>/g, " ")}`;
+  return GAME_ANIME_RE.test(text);
+}
+
 /** Palpite antes de gerar o texto (só título e resumo): parece notícia de anime/mangá? */
 export const looksLikeAnime = (text: string) => ANIME_RE.test(text) && !NON_ANIME_RE.test(text);
 

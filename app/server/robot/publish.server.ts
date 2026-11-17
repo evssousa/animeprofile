@@ -4,7 +4,7 @@ import { clearCache } from "../cache.server";
 import { readingMinutes, sanitizePostHtml } from "../content/sanitize.server";
 import { query, sqlDate, tx } from "../db.server";
 import { activeAuthors, allowedCategories, getConfig, type Author, type RoboConfig } from "./config.server";
-import { LISTICLE_RE, isAnimeCategory, nonAnimeAllowed, nonAnimeDailyLimit } from "./constants";
+import { GAMES_CATEGORY_SLUG, LISTICLE_RE, gameTiedToAnime, isAnimeCategory, nonAnimeAllowed, nonAnimeDailyLimit } from "./constants";
 import type { GeneratedArticle } from "./contract";
 import { checkArticleHtml, hasBodyImage } from "./html-guard";
 import { isSourceUsed } from "./select.server";
@@ -83,6 +83,8 @@ export async function checkPublishable(input: Pick<PublishInput, "candidate" | "
   const category = (await allowedCategories()).find((c) => c.slug === article.categorySlug);
   if (!category) return reject("discarded", `Categoria "${article.categorySlug}" não é permitida para autores de IA.`) as never;
   if (!isAnimeCategory(category.slug) && article.otakuRelated === false) return reject("discarded", "Fora do universo otaku (game/filme/série sem ligação com anime ou cultura japonesa).") as never;
+
+  if (category.slug === GAMES_CATEGORY_SLUG && !gameTiedToAnime(article)) return reject("discarded", "Game sem ligação com anime ou mangá: esse conteúdo é do Respawnou.") as never;
 
   if (!isAnimeCategory(category.slug)) {
     const since = sqlDate(startOfBrasiliaDay(now));

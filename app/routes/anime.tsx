@@ -139,27 +139,31 @@ export default function Anime({ loaderData }: Route.ComponentProps) {
               <h2 id="personagens" className="text-[1.5rem] font-extrabold">
                 Personagens
               </h2>
-              <ul className="mt-5 grid gap-3 sm:grid-cols-2">
+              <ul className="mt-5 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 xl:grid-cols-4">
                 {a.characters.map((c) => (
-                  <li key={c.id} className="relative flex items-center gap-3 overflow-hidden rounded-[14px] border border-line bg-surface p-2.5 hover:border-ink-soft">
-                    {c.image && <img src={c.image} alt="" loading="lazy" className="size-14 shrink-0 rounded-[10px] object-cover" />}
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-bold">
-                        <Link to={`/animes/personagem/${c.id}`} className="after:absolute after:inset-0 hover:underline">
-                          {c.name}
-                        </Link>
-                      </p>
-                      <p className="text-[0.8rem] text-ink-soft">{c.role}</p>
+                  <li key={c.id} className="group relative flex flex-col overflow-hidden rounded-[16px] border border-line bg-surface hover:border-ink-soft">
+                    <div className="aspect-[3/4] w-full bg-sunken">
+                      {c.image && <img src={c.image} alt="" loading="lazy" decoding="async" width={230} height={310} className="size-full object-cover motion-safe:transition-transform motion-safe:duration-300 group-hover:scale-[1.03]" />}
                     </div>
-                    {c.voice && (
-                      <div className="flex min-w-0 items-center gap-2 text-right">
-                        <div className="min-w-0">
-                          <p className="truncate text-[0.82rem] font-semibold">{c.voice.name}</p>
-                          <p className="text-[0.72rem] text-ink-soft">Dublagem japonesa</p>
-                        </div>
-                        {c.voice.image && <img src={c.voice.image} alt="" loading="lazy" className="size-11 shrink-0 rounded-full object-cover" />}
+                    <div className="flex flex-1 flex-col gap-2.5 p-3">
+                      <div className="min-w-0">
+                        <p className="line-clamp-2 leading-snug font-bold">
+                          <Link to={`/animes/personagem/${c.id}`} className="after:absolute after:inset-0 hover:underline">
+                            {c.name}
+                          </Link>
+                        </p>
+                        <p className="text-[0.8rem] text-ink-soft">{c.role}</p>
                       </div>
-                    )}
+                      {c.voice && (
+                        <div className="mt-auto flex min-w-0 items-center gap-2 border-t border-line pt-2.5">
+                          {c.voice.image && <img src={c.voice.image} alt="" loading="lazy" className="size-9 shrink-0 rounded-full object-cover" />}
+                          <div className="min-w-0">
+                            <p className="truncate text-[0.82rem] font-semibold">{c.voice.name}</p>
+                            <p className="text-[0.72rem] text-ink-soft">Dublagem japonesa</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </li>
                 ))}
               </ul>

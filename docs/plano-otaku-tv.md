@@ -1,6 +1,6 @@
 # Plano: Otaku TV com cara de "YouTube", como no site antigo
 
-Plano de 2026-11-17, para executar **na ordem dos passos**, **depois das tarefas da virada**
+**Status: executado em 2026-11-17** (passos 1 a 7; falta a conferência do dono). Plano de 2026-11-17, para executar **na ordem dos passos**, **depois das tarefas da virada**
 ([plano-virada-parcial.md](plano-virada-parcial.md)). Cada passo é uma entrega pequena: `npm run typecheck`, `npm test`,
 `npm run build`, commit e push. **Nenhuma migration**, nenhuma API paga, nenhum cookie.
 

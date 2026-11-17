@@ -55,7 +55,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Blog da comunidade (só leitura): lista, post, autor, categoria, tag, RSS e sitemap ([plano](plano-quiz-blog-figurinhas.md) §2) | ✅ código pronto e testado; falta enviar o blog do site antigo (2026-11-16, depois das 15h) |
 | 2 | Catálogo de figurinhas (só ver), com as imagens copiadas para `/media` e a Coleção da home com dados reais ([plano](plano-quiz-blog-figurinhas.md) §3) | ✅ código pronto e testado, figurinhas em silhueta; falta enviar o catálogo e as imagens do site antigo (2026-11-16, depois das 15h) |
 | 2 | Barras laterais do site antigo: sistema único de lateral na matéria, Central, categoria/tag, blog, Otaku TV ("A seguir") e quiz ([plano](plano-sidebars.md)) | ⏳ plano pronto (2026-11-15); 3 perguntas para o dono |
-| 2 | Otaku TV no esquema do site antigo ("YouTube"): palco com player e "A seguir", fileiras por categoria, músicas no mesmo player ([plano](plano-otaku-tv.md)) | ⏳ plano pronto (2026-11-17), 8 passos P/M; 4 perguntas para o dono. Depois da virada |
+| 2 | Otaku TV no esquema do site antigo ("YouTube"): palco com player e "A seguir", fileiras por categoria, músicas no mesmo player ([plano](plano-otaku-tv.md)) | ✅ feito em 2026-11-17 (passos 1 a 7; dono conferindo). Recomendadas aplicadas: `?v=`, sem botões de conta, "A seguir" com 3 itens no celular. Falta o `VideoObject` na página da matéria |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
@@ -128,8 +128,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 1. Conferir no navegador `/quiz`, `/blog`, `/figurinhas`, a home e a ficha de um anime com álbum (exportação feita em 2026-11-15).
 2. Barras laterais: executar [plano-sidebars.md](plano-sidebars.md) passo a passo (10 passos, P/M; dá para fazer em
    Sonnet), depois das respostas do dono às perguntas do fim do plano. **Depois da virada.**
-2a. **Otaku TV como no site antigo:** executar [plano-otaku-tv.md](plano-otaku-tv.md) (8 passos, P/M; dá para fazer em
-   Sonnet), depois das respostas do dono às 4 perguntas do fim do plano. **Depois da virada.**
+2a. **Otaku TV:** feita (ver tabela de status). Falta o `VideoObject` na página da matéria com vídeo (P, separado) e a conferência do dono;
+    a aba de músicas depende do AnimeThemes (estava com 503 em 2026-11-17, o aviso "Tentar de novo" aparece).
 3. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
    - **Agenda semanal de animes** (hoje só no site antigo, `weekly-agenda`): portar para o cron do site novo e **variar a capa a
      cada semana** (rodízio entre os banners dos 6 mais populares, sem repetir a da semana anterior); o antigo usa sempre o do
@@ -161,9 +161,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 - Responder as 3 perguntas do fim de [plano-sidebars.md](plano-sidebars.md): placeholder "Em breve: com a sua conta"
   na lateral (recomendado: não), lateral da Central em todas as páginas da lista (recomendado: sim) e Guia do anime na
   lateral ou no meio do texto (recomendado: lateral).
-- Responder as 4 perguntas do fim de [plano-otaku-tv.md](plano-otaku-tv.md): endereço de cada vídeo (`?v=`,
-  recomendado, ou `/otaku-tv/v/<id>`), botões de conta (recomendado: não mostrar), `VideoObject` na matéria
-  (recomendado: fazer depois deste plano) e "A seguir" no celular (proposto: 3 itens).
+- Conferir a Otaku TV no navegador (`/otaku-tv`, `?tab=trailers`, `?tab=musicas`, `?v=<id>`). As 4 perguntas do plano foram respondidas com as recomendadas.
 - Se quiser as figurinhas abertas em vez de silhueta: trocar `MOSTRAR_ABERTAS` para `true` em `app/lib/stickers.ts`.
 
 ## Como atualizar o conteúdo do site de teste

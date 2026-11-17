@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import sharp from "sharp";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { LISTICLE_RE, looksLikeAnime, nonAnimeAllowed, nonAnimeDailyLimit } from "~/server/robot/constants";
+import { LISTICLE_RE, gameTiedToAnime, looksLikeAnime, nonAnimeAllowed, nonAnimeDailyLimit } from "~/server/robot/constants";
 import { dedupHash, ensureSlug, makeSlug, normalizeSpoilerBoxes, startOfBrasiliaDay, brasiliaHour, titleSimilarity } from "~/server/robot/text";
 import { buildSystemPrompt, buildUserPrompt } from "~/server/robot/prompt";
 import { GeneratedArticle, parseGeminiJson } from "~/server/robot/contract";
@@ -243,5 +243,26 @@ describe("parágrafos curtos", () => {
 
   it("o prompt do sistema traz a regra de parágrafos curtos", () => {
     expect(buildSystemPrompt("guia qualquer")).toContain("parágrafos CURTOS");
+  });
+});
+
+describe("categoria Games: só jogos ligados a anime e mangá", () => {
+  const base = { title: "Novo jogo chega ao PC", excerpt: "Um estúdio anuncia a data de lançamento do jogo de tiro para o PC e consoles.", html: "<p>O jogo de tiro chega em março com campanha cooperativa.</p>", animeTitle: null as string | null };
+
+  it("jogo sem ligação com anime ou mangá é barrado (é do Respawnou)", () => {
+    expect(gameTiedToAnime(base)).toBe(false);
+    expect(gameTiedToAnime({ ...base, animeFocus: "none", animeTitle: null })).toBe(false);
+  });
+
+  it("jogo baseado em anime ou mangá passa", () => {
+    expect(gameTiedToAnime({ ...base, title: "Jogo de Naruto ganha trailer", html: "<p>O jogo é baseado no mangá de Masashi Kishimoto.</p>" })).toBe(true);
+    expect(gameTiedToAnime({ ...base, html: "<p>A colaboração com o anime Jujutsu Kaisen traz novos personagens.</p>" })).toBe(true);
+    expect(gameTiedToAnime({ ...base, animeTitle: "Dragon Ball", animeFocus: "main" })).toBe(true);
+  });
+
+  it("o prompt do sistema traz a regra de Games e do Respawnou", () => {
+    const p = buildSystemPrompt("guia qualquer");
+    expect(p).toContain("REGRA DA CATEGORIA GAMES");
+    expect(p).toContain("Respawnou");
   });
 });

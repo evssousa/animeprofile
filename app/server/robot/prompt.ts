@@ -21,9 +21,14 @@ export const PARAGRAPH_RULE =
   "REGRA DE LEITURA (vale mais que qualquer exemplo acima): parágrafos CURTOS, de 2 a 3 frases e no máximo 40 palavras. " +
   "Uma ideia por parágrafo. Quebre o texto em vários <p> em vez de escrever blocos longos; o leitor está no celular.";
 
+/** A categoria Games é só para jogos ligados a anime e mangá; os demais são do Respawnou (outro site do dono). */
+export const GAMES_RULE =
+  "REGRA DA CATEGORIA GAMES: use a categoria games SOMENTE para jogos ligados a anime ou mangá (adaptações, spin-offs, colaborações, " +
+  "jogos baseados em obras japonesas). Jogo sem essa ligação NÃO é assunto deste site (é do Respawnou): marque otakuRelated como false.";
+
 export function buildSystemPrompt(guide: string): string {
   if (!guide.trim()) throw new Error("guia editorial não importado");
-  return `${NEUTRAL_EDITOR_PROMPT}\n\n${guide.trim()}\n\n${PARAGRAPH_RULE}`;
+  return `${NEUTRAL_EDITOR_PROMPT}\n\n${guide.trim()}\n\n${PARAGRAPH_RULE}\n\n${GAMES_RULE}`;
 }
 
 export function buildRetryInstruction(issues: string[]): string {

@@ -361,7 +361,7 @@ export function VideoCard({ item, href, onPick, active, cover, compact }: { item
         )}
         <span className={`absolute top-2 left-2 inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[0.7rem] font-bold ${active ? "bg-brand text-brand-ink" : "bg-night/80 text-white"}`}>
           {active && <AudioLines className="size-3" aria-hidden />}
-          {active ? "Tocando" : item.badge}
+          {active ? "No player" : item.badge}
         </span>
         <span className="absolute inset-0 grid place-items-center bg-black/0 group-hover:bg-black/25">
           <span className="grid size-11 place-items-center rounded-full bg-white/95 text-night opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100">
