@@ -110,7 +110,13 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
      contato, tema claro e escuro) sem problema, procedimento do domínio registrado em [deploy-hostinger.md](deploy-hostinger.md)
      e textos dos avisos em [avisos-virada.md](avisos-virada.md). **Falta:** UptimeRobot, aviso
      nas redes, testar o alias do domínio (só com a aprovação do dono, pode derrubar o site antigo) e decidir ir ou não;
-   - dia 3 (17/11): virada às 7h;
+   - dia 3 (17/11): **virada feita às 00h30** (o dono preferiu adiantar, sem tráfego): exportação final (970 matérias), alias
+     `animeprofile.com.br` no app do `novo.` (`hosting_websites_add-domain`, tipo `parked`; a Hostinger reescreveu o `@` na hora
+     para ALIAS `animeprofile.com.br.cdn.hstgr.net`), `www` virou CNAME para o domínio principal (301 para ele), `VITE_SITE_URL` e
+     `SITE_NOINDEX` trocados pelo dono. Conferência pós-virada ok: robots liberado, canonical, sitemaps e RSS no domínio novo,
+     `/sw.js`, `/ads.txt`, `/manifest.webmanifest` e `/api/health` 200, zero falhas nos 1.898 endereços. Robô em `publicar`,
+     teto 6 (publica a partir das 8h de Brasília). **Falta:** cron da Hostinger para o endereço novo, sitemap no Search Console,
+     aviso nas redes, logs de manhã e à noite, e (18/11) teto do robô para 10 e dump final;
    - dia 4 (18/11): dump final.
 
    Tudo o que não estiver nesse plano espera.

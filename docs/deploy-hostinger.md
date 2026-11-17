@@ -73,6 +73,10 @@ principal (`@`, `www`, MX e TXT) ficaram iguais, conferidos antes e depois.
   5. apontar o DNS;
   6. conferir e enviar `/sitemap.xml` ao Google Search Console.
 
+### Virada executada em 2026-11-17 (00h30) pelo Caminho A
+
+- Alias `animeprofile.com.br` adicionado ao app do `novo.`; a Hostinger trocou o `@` (A e AAAA do Lovable) por ALIAS `animeprofile.com.br.cdn.hstgr.net` na hora. Os AAAA do `www` ficaram no Lovable, então foram removidos e o `www` virou CNAME `animeprofile.com.br.` (TTL 300). MX, SPF, DKIM e DMARC intactos; `comunidade.` continua no Lovable. O `novo.` segue respondendo (mesmo app).
+
 ### Procedimento registrado em 2026-11-16 (dia 2, só leitura pelo MCP)
 
 - **Estado:** `novo.animeprofile.com.br` é o único site Node.js; `hosting_websites_list-domains` mostra 0 domínios
