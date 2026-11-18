@@ -146,8 +146,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 - **Robô de notícias:** nada pendente seu agora (config e chave feitas, prévias aprovadas). Eu ligo `publicar` com teto 6
   depois da virada (17/11); no dia 18 sobe para 10.
-- **SMTP do Contato (opcional):** cadastrar `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e `MAIL_FROM` no hPanel
-  (caixa `contato@`). Sem isso, as mensagens só ficam no banco (`SELECT ... FROM contact_messages`).
+- **SMTP:** não é mais necessário para o Contato (decisão do dono em 2026-11-17: sem formulário, só e-mail por `mailto:`). Volta a ser
+  necessário na fase das contas (recuperar senha e avisos por e-mail): `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e `MAIL_FROM`.
 
 - **URGENTE (virada parcial, [plano](plano-virada-parcial.md)):**
   - **Dia 1 (feito até aqui):** banco e storage guardados em `C:\Users\evsli\animeprofile-backup\`. TTL do DNS já em 300 s (feito).
