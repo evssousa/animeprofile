@@ -54,7 +54,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Quiz sem login: `/quiz`, `/quiz/:slug`, pontuação no servidor, sitemap e seção da home ([plano](plano-quiz-blog-figurinhas.md) §1) | ✅ código pronto e testado; falta enviar os quizzes do site antigo (na virada) |
 | 2 | Blog da comunidade (só leitura): lista, post, autor, categoria, tag, RSS e sitemap ([plano](plano-quiz-blog-figurinhas.md) §2) | ✅ código pronto e testado; falta enviar o blog do site antigo (2026-11-16, depois das 15h) |
 | 2 | Catálogo de figurinhas (só ver), com as imagens copiadas para `/media` e a Coleção da home com dados reais ([plano](plano-quiz-blog-figurinhas.md) §3) | ✅ código pronto e testado, figurinhas em silhueta; falta enviar o catálogo e as imagens do site antigo (2026-11-16, depois das 15h) |
-| 2 | Barras laterais do site antigo: sistema único de lateral na matéria, Central, categoria/tag, blog, Otaku TV ("A seguir") e quiz ([plano](plano-sidebars.md)) | ⏳ plano pronto (2026-11-15); 3 perguntas para o dono |
+| 2 | Barras laterais do site antigo: sistema único de lateral na matéria, Central, categoria/tag, blog, Otaku TV ("A seguir") e quiz ([plano](plano-sidebars.md)) | ✅ feito (passos 1 a 8 e 10); o dono respondeu as 3 perguntas com as recomendadas em 2026-11-17 |
 | 2 | Otaku TV no esquema do site antigo ("YouTube"): palco com player e "A seguir", fileiras por categoria, músicas no mesmo player ([plano](plano-otaku-tv.md)) | ✅ feito em 2026-11-17 (passos 1 a 7; dono conferindo). Recomendadas aplicadas: `?v=`, sem botões de conta, "A seguir" com 3 itens no celular. Falta o `VideoObject` na página da matéria |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
@@ -121,13 +121,15 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
      passou a se chamar `animeprofile.com.br`; o `novo.` deixou de existir) e foi preciso refazer o deploy para o app ler o `.env`.
      Cron da Hostinger recriado (o comando tinha `url` em vez de `curl`; corrigido e rodando); sitemap enviado ao Search Console.
      Menus Feed, Blog, Missões, Ranking, Figurinhas e Quarto Otaku só para logados (`LOGGED_IN` em `app/lib/nav.ts`).
-     **Falta:** logs de manhã e à noite, e (18/11) teto do robô para 10 e dump final;
+     **Logs do dia (22h, 17/11):** cron rodando, `/api/health` ok, 15 páginas sem 5xx, robô com as 6 matérias do teto (8h às 13h,
+     0 falhas, 13 chamadas ao Gemini sem erro; 398 a 730 palavras, parágrafos curtos, fonte no fim, canonical e RSS certos).
+     Teto do robô subido para 10 às 22h25 (vale a partir das 8h de 18/11). **Falta:** (18/11) dump final e a exportação final;
    - dia 4 (18/11): dump final.
 
    Tudo o que não estiver nesse plano espera.
 1. Conferir no navegador `/quiz`, `/blog`, `/figurinhas`, a home e a ficha de um anime com álbum (exportação feita em 2026-11-15).
-2. Barras laterais: executar [plano-sidebars.md](plano-sidebars.md) passo a passo (10 passos, P/M; dá para fazer em
-   Sonnet), depois das respostas do dono às perguntas do fim do plano. **Depois da virada.**
+2. Barras laterais: **feitas** (ver tabela de status). Respostas do dono em 2026-11-17: sem placeholder "Em breve", lateral da Central em
+   todas as páginas da lista e Guia do anime dentro do cartão do anime, na lateral (tudo como recomendado e já implementado).
 2a. **Otaku TV:** feita (ver tabela de status). Falta o `VideoObject` na página da matéria com vídeo (P, separado) e a conferência do dono;
     a aba de músicas depende do AnimeThemes (estava com 503 em 2026-11-17, o aviso "Tentar de novo" aparece).
 3. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
@@ -158,9 +160,6 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
   - **Dia 4:** dump final.
   - **Responder as 5 perguntas do fim do plano.**
 - Exportação feita em 2026-11-15 (950 matérias, 14 quizzes, 13 posts do blog, 224 figurinhas). Na virada, rodar de novo. O `CRON_TOKEN` apareceu no chat; o dono decidiu não trocar.
-- Responder as 3 perguntas do fim de [plano-sidebars.md](plano-sidebars.md): placeholder "Em breve: com a sua conta"
-  na lateral (recomendado: não), lateral da Central em todas as páginas da lista (recomendado: sim) e Guia do anime na
-  lateral ou no meio do texto (recomendado: lateral).
 - Conferir a Otaku TV no navegador (`/otaku-tv`, `?tab=trailers`, `?tab=musicas`, `?v=<id>`). As 4 perguntas do plano foram respondidas com as recomendadas.
 - Se quiser as figurinhas abertas em vez de silhueta: trocar `MOSTRAR_ABERTAS` para `true` em `app/lib/stickers.ts`.
 

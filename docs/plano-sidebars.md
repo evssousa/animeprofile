@@ -1,5 +1,7 @@
 # Plano: barras laterais do site antigo no site novo
 
+**Status: executado** (passos 1 a 8 e 10). O dono respondeu as 3 perguntas em 2026-11-17: (1) sem placeholder das contas, (2) lateral da Central em todas as páginas da lista, (3) Guia do anime na lateral. O passo 9 não entra.
+
 Plano de 2026-11-15, para executar **na ordem dos passos**. Cada passo é uma entrega pequena: testes, `npm run build`,
 commit e push. Nenhuma migration nova. Tudo sem login (contas ficam por último, decisão de 2026-11-12).
 
