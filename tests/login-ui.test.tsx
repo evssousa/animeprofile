@@ -23,7 +23,8 @@ describe("página /login", () => {
     expect(html).toContain("Continuar com Google");
     expect(html).toMatch(/<button[^>]*disabled[^>]*>/);
     expect(html).toContain("Em breve");
-    expect(html).toContain('name="email"');
+    expect(html).toContain('name="usuario"');
+    expect(html).toContain("E-mail ou usuário");
     expect(html).toContain('name="senha"');
     expect(html).toContain('type="password"');
     expect(html).toContain("Mostrar senha");

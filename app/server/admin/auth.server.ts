@@ -1,6 +1,7 @@
 // Acesso do administrador: um único admin, definido por variáveis de ambiente (até as contas voltarem; na fase 2,
 // `getViewer` passa a ler a sessão do banco e `user_roles`, e este arquivo some).
 //   ADMIN_EMAIL           e-mail de login
+//   ADMIN_USERNAME        usuário de login (opcional; padrão "animeprofile"). Entra-se com o e-mail OU com o usuário.
 //   ADMIN_PASSWORD_HASH   hash scrypt da senha (gerado por `npm run admin:hash`, nunca a senha)
 //   SESSION_SECRET        segredo que assina o cookie de sessão (32+ caracteres aleatórios)
 import { createCookieSessionStorage } from "react-router";
@@ -16,6 +17,7 @@ export const ADMIN_COOKIE = "__ap_admin";
 
 export function adminConfig() {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const username = (process.env.ADMIN_USERNAME?.trim() || "animeprofile").replace(/^@/, "").toLowerCase();
   const hash = process.env.ADMIN_PASSWORD_HASH?.trim();
   const secret = process.env.SESSION_SECRET?.trim();
   // O que falta ou está inválido (só nomes, nunca valores): vai para o log do servidor, nunca para a página.
@@ -26,7 +28,7 @@ export function adminConfig() {
   else if (!parseHash(hash)) problems.push("ADMIN_PASSWORD_HASH incompleta ou alterada (cole a linha inteira gerada pelo npm run admin:hash)");
   if (!secret) problems.push("SESSION_SECRET não encontrada");
   else if (secret.length < 32) problems.push("SESSION_SECRET curta demais (mín. 32 caracteres)");
-  return { ready: problems.length === 0, problems, email, hash, secret };
+  return { ready: problems.length === 0, problems, email, username, hash, secret };
 }
 
 type SessionData = { admin: string };
@@ -89,8 +91,8 @@ export function registerFail(ip: string, now = Date.now()) {
 
 export type LoginResult = { ok: true; cookies: string[] } | { ok: false; error: "config" | "bloqueado" | "credenciais" };
 
-/** Confere e-mail e senha. Devolve os dois cookies (sessão HttpOnly + marcador) ou o motivo da recusa. */
-export async function login(request: Request, email: string, password: string): Promise<LoginResult> {
+/** Confere e-mail OU usuário e a senha. Devolve os dois cookies (sessão HttpOnly + marcador) ou o motivo da recusa. */
+export async function login(request: Request, identificador: string, password: string): Promise<LoginResult> {
   const cfg = adminConfig();
   if (!cfg.ready) {
     console.error(`[login] configuração incompleta: ${cfg.problems.join("; ")}`);
@@ -98,7 +100,8 @@ export async function login(request: Request, email: string, password: string): 
   }
   const ip = clientIp(request) || "local";
   if (loginBlocked(ip)) return { ok: false, error: "bloqueado" };
-  const emailOk = email.trim().toLowerCase() === cfg.email;
+  const quem = identificador.trim().replace(/^@/, "").toLowerCase();
+  const emailOk = quem !== "" && (quem === cfg.email || quem === cfg.username);
   // Sempre calcula o hash (mesmo com e-mail errado) para não revelar pelo tempo de resposta.
   const passOk = await verifyPassword(password, cfg.hash!);
   if (!emailOk || !passOk) {

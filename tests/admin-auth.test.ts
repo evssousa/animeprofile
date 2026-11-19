@@ -39,6 +39,24 @@ describe("login do admin (senha e limites)", () => {
     if (r.ok) expect(r.cookies).toHaveLength(2);
   });
 
+  it("entra também com o usuário (padrão \"animeprofile\"), com ou sem @ e sem diferença de maiúscula", async () => {
+    expect((await login(req("1.1.1.2"), "animeprofile", SENHA)).ok).toBe(true);
+    expect((await login(req("1.1.1.2"), "@AnimeProfile", SENHA)).ok).toBe(true);
+    expect((await login(req("1.1.1.2"), "  animeprofile  ", SENHA)).ok).toBe(true);
+    expect(await login(req("1.1.1.3"), "animeprofile", "senha errada errada")).toEqual({ ok: false, error: "credenciais" });
+    expect(await login(req("1.1.1.4"), "", SENHA)).toEqual({ ok: false, error: "credenciais" });
+    expect(await login(req("1.1.1.4"), "@", SENHA)).toEqual({ ok: false, error: "credenciais" });
+    expect(adminConfig().username).toBe("animeprofile");
+  });
+
+  it("o usuário pode ser trocado por ADMIN_USERNAME", async () => {
+    process.env.ADMIN_USERNAME = "@Equipe";
+    expect(adminConfig().username).toBe("equipe");
+    expect((await login(req("1.1.1.5"), "equipe", SENHA)).ok).toBe(true);
+    expect((await login(req("1.1.1.5"), "animeprofile", SENHA)).ok).toBe(false);
+    delete process.env.ADMIN_USERNAME;
+  });
+
   it("senha ou e-mail errados dão o mesmo erro", async () => {
     const a = await login(req("2.2.2.2"), "dono@exemplo.com", "errada errada errada");
     const b = await login(req("2.2.2.2"), "outro@exemplo.com", SENHA);

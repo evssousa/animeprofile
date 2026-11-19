@@ -143,8 +143,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 3a. **Painel de visitas** ([plano-painel-visitas.md](plano-painel-visitas.md)): passos 1 a 12 feitos em 2026-11-19. Falta: conferir em produção
     com o login do dono, **textos legais (13)**, país ou idioma (14, olhar os cabeçalhos da CDN por 1 dia) e docs finais (15). Depois, os irmãos
     (criasite, vibecoin, respawnou) com o módulo `app/visitas/`. Importar do backup os totais por dia do site antigo (pergunta 2) fica num passo extra.
-3b. **`/login` do administrador:** feito em 2026-11-19 (fase 1 do [plano-contas-login.md](plano-contas-login.md)). Só o admin entra
-    (variáveis `ADMIN_*` do hPanel), sem cadastro; menu do usuário com "Administração"; `/admin/login` leva a `/login`; marcador `ap_logado` e
+3b. **`/login` do administrador:** feito em 2026-11-19 (fase 1 do [plano-contas-login.md](plano-contas-login.md)). Só o admin entra, com **e-mail ou usuário** (usuário padrão `animeprofile`, opcional `ADMIN_USERNAME`;
+    variáveis `ADMIN_*` do hPanel), sem cadastro; menu do usuário com "Administração"; `/admin/login` leva a `/login`; marcador `ap_logado` e
     `GET /api/eu` mantêm o cache da CDN. Falta conferir em produção com o dono logado.
 3c. **Contas de todos e Google (fases 2 e 3 do mesmo plano): não agora** (decisão do dono em 2026-11-19). Quando voltar: importação dos
     171 usuários do dump final (64 com senha, 114 identidades do Google) com todos os dados, login para todos, SMTP, Turnstile, Google OAuth.

@@ -2,7 +2,7 @@
 // Contas de todos, "esqueci a senha" e o Google voltam nas próximas fases (docs/plano-contas-login.md).
 import { useEffect, useRef } from "react";
 import { data, Form, Link, redirect, useNavigation } from "react-router";
-import { Clock, Info, Mail } from "lucide-react";
+import { Clock, Info, User } from "lucide-react";
 import type { Route } from "./+types/login";
 import { Honeypot, Notice, PasswordField, SubmitButton, TextField } from "~/components/form";
 import { safeRedirect } from "~/lib/safe-redirect";
@@ -28,7 +28,7 @@ const MENSAGENS: Record<Erro, string> = {
 export async function action({ request }: Route.ActionArgs) {
   if (!sameOrigin(request)) return data({ erro: "origem" as Erro, email: "" }, { status: 403 });
   const form = await request.formData();
-  const email = String(form.get("email") ?? "").slice(0, 255);
+  const email = String(form.get("usuario") ?? "").slice(0, 255);
   // campo-isca preenchido: é robô; conta como tentativa errada e responde como se a senha estivesse errada
   if (String(form.get("site") ?? "")) {
     registerFail(clientIp(request) || "local");
@@ -105,7 +105,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
 
           <div className="my-6 flex items-center gap-3">
             <span className="h-px flex-1 bg-line" />
-            <span className="text-[0.7rem] font-bold tracking-[0.18em] text-ink-soft uppercase">Ou entre com e-mail</span>
+            <span className="text-[0.7rem] font-bold tracking-[0.18em] text-ink-soft uppercase">Ou entre com e-mail ou usuário</span>
             <span className="h-px flex-1 bg-line" />
           </div>
 
@@ -121,7 +121,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
               </div>
             )}
             <Honeypot />
-            <TextField label="E-mail" name="email" type="email" icon={Mail} autoComplete="username" placeholder="voce@email.com" maxLength={255} defaultValue={actionData?.email} />
+            <TextField label="E-mail ou usuário" name="usuario" type="text" icon={User} autoComplete="username" placeholder="voce@email.com ou usuário" maxLength={255} defaultValue={actionData?.email} />
             <PasswordField label="Senha" name="senha" autoComplete="current-password" maxLength={200} />
             <SubmitButton busy={busy} busyLabel="Entrando..." className="h-12 w-full shadow-[0_8px_24px_rgba(194,53,43,.35)]">
               Entrar
