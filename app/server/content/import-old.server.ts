@@ -102,7 +102,8 @@ export function mapPost(p: OldPost) {
 export async function upsert(conn: PoolConnection, table: string, rows: Record<string, unknown>[], keys: string[]) {
   if (!rows.length) return;
   const cols = Object.keys(rows[0]);
-  const updates = cols.filter((c) => !keys.includes(c)).map((c) => `${c} = VALUES(${c})`);
+  // views_count nunca baixa: o contador novo (/api/v) soma em cima do número importado.
+  const updates = cols.filter((c) => !keys.includes(c)).map((c) => (c === "views_count" ? "views_count = GREATEST(views_count, VALUES(views_count))" : `${c} = VALUES(${c})`));
   for (let i = 0; i < rows.length; i += 200) {
     const chunk = rows.slice(i, i + 200);
     const sql = `INSERT INTO ${table} (${cols.join(", ")}) VALUES ${chunk.map(() => `(${cols.map(() => "?").join(", ")})`).join(", ")}

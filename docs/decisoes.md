@@ -2,6 +2,33 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-19 (plano) — Contador de visitas próprio, sem cookie, e painel `/admin` sem contas
+
+Detalhes em [plano-painel-visitas.md](plano-painel-visitas.md).
+
+- **Decisão (proposta, falta o dono responder 6 perguntas):**
+  - **Coleta:** um sinal do navegador (`sendBeacon` para `/api/v`) depois que a página abre e a cada troca de endereço.
+    Sem cookie e sem nada guardado no aparelho; robôs (`isbot`), pré-carregamentos, o admin e recarregamentos em 30 s
+    não contam.
+  - **Visitante aproximado:** hash de IP + navegador + um sal aleatório que é trocado e apagado todo dia; o IP nunca é
+    gravado. Visitantes únicos só por dia (7 e 30 dias mostram a média diária).
+  - **Armazenamento:** contadores agregados por dia (`visit_daily`, `visit_pages`, `visit_dims`, `visit_seen`, migration
+    013), gravados em lote a cada 10 s. Páginas e origens por 13 meses; totais por dia sem prazo.
+  - **`posts.views_count` e `blog_posts.views_count` voltam a andar** pela mesma coleta (30 min por pessoa e matéria), e a
+    importação do site antigo não pode mais baixar o número (`GREATEST`).
+  - **Proteção:** o login do admin dos sites irmãos (e-mail + hash scrypt + `SESSION_SECRET` em variáveis de ambiente),
+    cookie `__ap_admin` assinado, `HttpOnly`, `SameSite=Strict`, `Path=/`, limite de tentativas por IP e global. Troca
+    pelo papel `admin` das contas quando elas voltarem, só dentro de `requireAdmin()`.
+  - **Reuso:** o módulo `app/visitas/` é copiado para criasite, vibecoin e respawnou; por site mudam só `config.ts`,
+    `db.ts` e as cores em `visitas.css`.
+- **Por quê:**
+  - **CDN:** com o HTML em cache por 60 s, o servidor não vê a maioria das visitas; o `POST` em `/api` sempre chega.
+  - **LGPD e banner:** sem cookie e sem dado pessoal guardado, a contagem não depende do banner de cookies (que ainda não
+    existe). O site antigo só contava quem aceitava cookies.
+  - **Custo:** uma linha por visita (modelo antigo) chegaria a milhões de linhas por ano; agregado por dia fica em
+    centenas de milhares no pior caso.
+  - **"Em alta" parado:** desde a virada nada somava `views_count`; as matérias do robô ficavam sempre com 0.
+
 ## 2026-11-17 (plano) — Otaku TV no esquema do site antigo, com um "palco" escuro
 
 Detalhes em [plano-otaku-tv.md](plano-otaku-tv.md).

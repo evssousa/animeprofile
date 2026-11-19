@@ -26,6 +26,7 @@ Lovable Cloud. Por isso, o domínio animeprofile.com.br passa para cá numa **vi
 | [avisos-virada.md](avisos-virada.md) | Textos prontos dos avisos da virada para as redes (temporário) |
 | [plano-robo-noticias.md](plano-robo-noticias.md) | Plano (temporário): robô de notícias por IA no cron do site novo (fase A, antes das contas), com inventário do robô antigo, migration 012, ensaio sem publicar e ligação na virada |
 | [plano-otaku-tv.md](plano-otaku-tv.md) | Plano (temporário): Otaku TV com cara de "YouTube" como no site antigo (palco escuro com player e "A seguir", abas, busca, grade com fileiras de outras categorias, músicas no mesmo player, troca de vídeo sem recarregar, SEO) |
+| [plano-painel-visitas.md](plano-painel-visitas.md) | Plano (temporário): painel `/admin` com contador de visitas próprio, sem cookie (sinal `/api/v`, agregado por dia, login do admin por variáveis de ambiente) e o módulo `app/visitas/` copiável para criasite, vibecoin e respawnou |
 | [plano-sidebars.md](plano-sidebars.md) | Plano (temporário): inventário das barras laterais do site antigo e o sistema único de lateral (blocos por página, cache curto) para a matéria, Central, categoria/tag, blog, Otaku TV e quiz |
 
 ## Status
@@ -61,6 +62,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
 | 4 | Social: Feed, mensagens, blog, comentários, quarto otaku, Otaku TV | 💤 |
 | 5 | Painel admin e robôs (notícias por IA, redes sociais) | 💤 |
+| 5 | Painel `/admin` de visitas sem contas (contador próprio sem cookie, base para os outros 3 sites) ([plano](plano-painel-visitas.md)) | ⏳ feito em 2026-11-19 (passos 1 a 12): login do admin, migration 013, coleta `/api/v`, `views_count` voltando a andar, limpeza e a tela. Falta conferir em produção, textos legais (13), país/idioma (14) e docs (15). Dono respondeu com as recomendadas |
 | 6 | **Virada parcial (sem contas) em 4 dias:** backup completo do Lovable Cloud, imagens no `/media`, páginas das contas honestas, ensaio e DNS ([plano](plano-virada-parcial.md)) | 🔄 urgente. **Dia 1 (15/11) feito:** backup do banco validado, storage inteiro baixado (6.757 arquivos), 2.436 imagens no `/media`, páginas das contas, faixa, `/site-novo`, redirects, arquivos públicos, Mercado Pago/descadastro guardados, conferência de 1.898 endereços com zero falhas, cache de 60 s para a CDN. Faltam o ensaio e a DNS (dias 2 e 3). Site antigo sai do ar no fim do dia 4 (18/11) |
 | 6 | Importação das contas e da economia a partir do dump final, em fases (A robô, B contas, C perfil e comentar, D economia, E figurinhas e missões, F resto) | 💤 depois da virada |
 
@@ -136,6 +138,12 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
    - **Agenda semanal de animes:** feita em 2026-11-19 (tarefa `agenda-semanal`, segunda às 9h de Brasília, a partir de `anime_catalog`).
      A capa gira a cada semana entre os banners dos 8 mais populares e nunca repete a da semana anterior (`source_url` guarda o banner
      de origem). Código em `app/lib/agenda.ts` e `app/server/agenda/agenda.server.ts`; a primeira automática sai em 2026-11-23.
+3a. **Painel de visitas** ([plano-painel-visitas.md](plano-painel-visitas.md)): passos 1 a 12 feitos em 2026-11-19. Falta: conferir em produção
+    com o login do dono, **textos legais (13)**, país ou idioma (14, olhar os cabeçalhos da CDN por 1 dia) e docs finais (15). Depois, os irmãos
+    (criasite, vibecoin, respawnou) com o módulo `app/visitas/`. Importar do backup os totais por dia do site antigo (pergunta 2) fica num passo extra.
+3b. **Contas com login do Google (pedido do dono em 2026-11-19):** a fase das contas deve incluir "Entrar com o Google" e a importação dos
+    usuários do site antigo que entraram com o Google (114 identidades no backup de 15/11), com todos os dados deles. É uma tarefa G
+    (planejador antes), separada do painel; depende de: cliente OAuth do Google com o endereço novo, SMTP e Turnstile.
 4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
    [deploy-hostinger.md](deploy-hostinger.md).
 5. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
@@ -144,6 +152,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 ## Pendências suas
 
+- **Painel de visitas:** as variáveis `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` e `SESSION_SECRET` já estão no hPanel (2026-11-19). Depois do deploy,
+  entrar em `/admin` e conferir; aprovar o texto novo da Privacidade e dos Cookies (passo 13).
 - **Robô de notícias:** nada pendente seu agora (config e chave feitas, prévias aprovadas). Eu ligo `publicar` com teto 6
   depois da virada (17/11); no dia 18 sobe para 10.
 - **SMTP:** não é mais necessário para o Contato (decisão do dono em 2026-11-17: sem formulário, só e-mail por `mailto:`). Volta a ser

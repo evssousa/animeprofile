@@ -5,7 +5,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   resolve: { alias: { "~": fileURLToPath(new URL("./app", import.meta.url)) } },
   test: {
-    include: ["tests/**/*.test.ts"],
+    include: ["tests/**/*.test.{ts,tsx}"],
     testTimeout: 20_000,
     hookTimeout: 300_000, // o primeiro teste com banco baixa o MySQL descartável
     // Um arquivo por vez: vários MySQL descartáveis subindo juntos às vezes travam no Windows.

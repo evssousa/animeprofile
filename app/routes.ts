@@ -21,7 +21,7 @@ const ACCOUNT_PENDING = [
   "login", "cadastro", "esqueci-senha", "redefinir-senha", "configuracoes", "perfil", "notificacoes", "salvos", "u/:username",
   "check-in", "missoes", "conquistas", "ranking", "loja", "premium", "rubi", "pagamentos", "convidar", "indicacoes",
   "convite/:code", "w/:code", "feed", "feed/post/:id", "mensagens", "explorar", "quarto", "animes/favoritos", "animes/seguindo",
-  "blog/editor", "blog/dashboard", "admin/*",
+  "blog/editor", "blog/dashboard",
 ];
 
 export default [
@@ -53,6 +53,9 @@ export default [
   route("animes/:id", "routes/anime.tsx"),
   ...TEXT_PAGES.map((path) => route(path, "routes/pagina.tsx", { id: `pagina-${path}` })),
   route("contato", "routes/contato.tsx"),
+  route("admin/login", "routes/admin/login.tsx"),
+  route("admin/sair", "routes/admin/sair.ts"),
+  route("admin", "routes/admin/layout.tsx", [index("routes/admin/visitas.tsx")]),
   ...ACCOUNT_PENDING.map((path) => route(path, "routes/contas-em-breve.tsx", { id: `contas-${path}` })),
   route("robots.txt", "routes/robots.ts"),
   ...["sitemap.xml", "sitemap-static.xml", "sitemap-news.xml", "sitemap-articles.xml", "sitemap-taxonomy.xml", "sitemap-animes.xml", "sitemap-quiz.xml", "sitemap-blog.xml", "sitemap-figurinhas.xml", "rss.xml"].map((f) =>
@@ -62,6 +65,7 @@ export default [
   route("api/public/payments/webhook", "routes/api.mp-webhook.ts", { id: "mp-webhook" }),
   route("api/public/payments/mercado-pago", "routes/api.mp-webhook.ts", { id: "mp-webhook-2" }),
   route("api/health", "routes/api.health.ts"),
+  route("api/v", "routes/api.v.ts"),
   route("api/cron/:job", "routes/api.cron.ts"),
   route("api/importar/:what", "routes/api.importar.ts"),
   route("api/robo/:acao", "routes/api.robo.ts"),

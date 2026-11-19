@@ -1,0 +1,47 @@
+/* Cores do painel de visitas: só este bloco muda de um site para outro (as variáveis do tema vêm do app.css do site). */
+.vp {
+  --vp-bg: var(--paper);
+  --vp-card: var(--surface);
+  --vp-sunken: var(--sunken);
+  --vp-ink: var(--ink);
+  --vp-soft: var(--ink-soft);
+  --vp-line: var(--line);
+  --vp-accent: var(--brand);
+  --vp-accent-soft: var(--brand-soft);
+  --vp-hero: var(--night);
+  --vp-hero-ink: var(--night-ink);
+  --vp-hero-label: var(--glow);
+  --vp-up: #1f7a4d;
+  --vp-down: #b42318;
+  --vp-o-direto: #6e5f5f;
+  --vp-o-busca: #2f6fd6;
+  --vp-o-social: #c2352b;
+  --vp-o-site: #b7791f;
+  --vp-o-campanha: #2e8b62;
+}
+[data-theme="dark"] .vp {
+  --vp-up: #4cc98f;
+  --vp-down: #ff8a80;
+  --vp-o-direto: #ab9d9f;
+  --vp-o-busca: #6f9cf0;
+  --vp-o-social: #ff7a6e;
+  --vp-o-site: #f0b04a;
+  --vp-o-campanha: #4cc98f;
+}
+.vp .vp-pulso {
+  animation: vp-pulso 2s ease-in-out infinite;
+}
+@keyframes vp-pulso {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .vp .vp-pulso {
+    animation: none;
+  }
+}

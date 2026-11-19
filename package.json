@@ -9,7 +9,8 @@
     "start": "node server.js",
     "typecheck": "react-router typegen && tsc",
     "test": "vitest run",
-    "db:migrate": "node scripts/db-migrate.ts"
+    "db:migrate": "node scripts/db-migrate.ts",
+    "admin:hash": "node scripts/admin-hash.ts"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",

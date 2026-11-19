@@ -89,3 +89,9 @@ Lista de partida, sem os detalhes de coluna. Cada área ganha o detalhe aqui qua
    endereços das imagens.
 3. Ao final, a contagem de linhas e a soma dos saldos (AP Coins, Rubis, figurinhas por usuário) são comparadas com o
    banco antigo. Se der diferença, a importação não segue.
+
+## Visitas (migration 013)
+
+`visit_daily` (totais por dia: páginas vistas, entradas, visitantes aproximados, robôs), `visit_pages` (por endereço e dia), `visit_dims` (origem,
+aparelho, navegador, sistema, idioma por dia) e `visit_seen` (códigos de visitante do dia, apagados à noite). Nada de IP nem identificador permanente;
+ver [plano-painel-visitas.md](plano-painel-visitas.md). O sal diário fica em `system_config` (`visitas.sal`).

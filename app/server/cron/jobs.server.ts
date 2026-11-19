@@ -4,6 +4,7 @@ import { publishWeeklyAgenda } from "../agenda/agenda.server";
 import { syncAnimes } from "../anime/anime.server";
 import { rebuildPostVideos } from "../tv/tv.server";
 import { exec } from "../db.server";
+import { limparVisitas } from "~/visitas/server/limpeza.server";
 import { runRobot } from "../robot/run.server";
 
 export type JobStats = Record<string, unknown>;
@@ -28,8 +29,9 @@ export const JOBS: Job[] = [
       );
       const cands = await exec("DELETE FROM ai_news_candidates WHERE created_at < UTC_TIMESTAMP(3) - INTERVAL 30 DAY AND status NOT IN ('published', 'draft')");
       const usage = await exec("DELETE FROM ai_news_usage WHERE created_at < UTC_TIMESTAMP(3) - INTERVAL 60 DAY");
+      const visitas = await limparVisitas();
       const runs = await exec("DELETE FROM ai_news_runs WHERE started_at < UTC_TIMESTAMP(3) - INTERVAL 60 DAY");
-      return { execucoesApagadas: old.affected, execucoesTravadas: stuck.affected, candidatosApagados: cands.affected, usoApagado: usage.affected, rodadasApagadas: runs.affected };
+      return { execucoesApagadas: old.affected, execucoesTravadas: stuck.affected, candidatosApagados: cands.affected, usoApagado: usage.affected, rodadasApagadas: runs.affected, ...visitas };
     },
   },
   {
