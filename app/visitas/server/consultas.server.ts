@@ -95,3 +95,9 @@ export async function resumoPeriodo(periodo: Periodo, hoje: string) {
   const s = await somar(de, ate);
   return { robos: s.bots, paginas: s.pageviews, entradas: s.entries, paginasPorVisita: s.entries > 0 ? s.pageviews / s.entries : null };
 }
+
+/** Visitantes do dia (uma consulta só; para o topo da equipe, que não precisa dos 8 números de `cartoes`). */
+export async function visitantesHoje(dia: string): Promise<number> {
+  const [r] = await query<{ v: number }>("SELECT visitors AS v FROM visit_daily WHERE day = ?", [dia]);
+  return num(r?.v);
+}

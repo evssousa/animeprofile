@@ -53,7 +53,8 @@ async function main() {
   app.use((req, res, next) => {
     if (/^\/(admin|api|login|sair)(\.data)?(\/|$)/.test(req.path)) {
       res.setHeader("X-Robots-Tag", "noindex, nofollow");
-      res.setHeader("Cache-Control", "no-store");
+      // Exceção: o topo do site pede estes dois endereços públicos (iguais para todos); eles mesmos definem o cache.
+      if (!/^\/api\/(sugestoes|agora)$/.test(req.path)) res.setHeader("Cache-Control", "no-store");
     }
     next();
   });

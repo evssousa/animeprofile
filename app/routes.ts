@@ -68,6 +68,8 @@ export default [
   route("api/public/payments/mercado-pago", "routes/api.mp-webhook.ts", { id: "mp-webhook-2" }),
   route("api/health", "routes/api.health.ts"),
   route("api/eu", "routes/api.eu.ts"),
+  route("api/sugestoes", "routes/api.sugestoes.ts"),
+  route("api/agora", "routes/api.agora.ts"),
   route("api/v", "routes/api.v.ts"),
   route("api/cron/:job", "routes/api.cron.ts"),
   route("api/importar/:what", "routes/api.importar.ts"),

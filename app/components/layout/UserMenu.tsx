@@ -8,7 +8,9 @@ import { USER_MENU } from "~/lib/nav";
 import { podeVer } from "~/lib/papeis";
 import { clearSessionHint, setPapeisAttr } from "~/lib/session-hint";
 
-type Estado = { fase: "carregando" } | { fase: "pronto"; nome: string; inicial: string; papeis: string[] } | { fase: "erro" };
+import type { PainelEquipe } from "~/routes/api.eu";
+
+export type Estado = { fase: "carregando" } | { fase: "pronto"; nome: string; inicial: string; papeis: string[]; painel?: PainelEquipe } | { fase: "erro" };
 
 // Uma consulta só para o topo e a gaveta.
 let estado: Estado = { fase: "carregando" };
@@ -25,10 +27,10 @@ function consultar() {
   iniciou = true;
   fetch("/api/eu", { credentials: "same-origin" })
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-    .then((j: { logado: boolean; nome?: string; inicial?: string; papeis?: string[] }) => {
+    .then((j: { logado: boolean; nome?: string; inicial?: string; papeis?: string[]; painel?: PainelEquipe }) => {
       if (j.logado) {
         setPapeisAttr(j.papeis ?? []); // confirma os papéis no <html> (o menu lateral acompanha)
-        publicar({ fase: "pronto", nome: j.nome ?? "Conta", inicial: j.inicial ?? "?", papeis: j.papeis ?? [] });
+        publicar({ fase: "pronto", nome: j.nome ?? "Conta", inicial: j.inicial ?? "?", papeis: j.papeis ?? [], painel: j.painel });
       } else {
         clearSessionHint(); // sessão vencida: volta ao "Entrar"
         publicar({ fase: "erro" });
@@ -40,7 +42,7 @@ function consultar() {
     });
 }
 
-function useViewer(): Estado {
+export function useViewer(): Estado {
   useEffect(consultar, []);
   return useSyncExternalStore(
     (f) => {
@@ -133,13 +135,13 @@ export function UserMenu() {
             aria-controls="menu-usuario"
             aria-label="Menu da conta"
             onClick={() => setAberto((a) => !a)}
-            className="flex size-11 items-center gap-2.5 rounded-full hover:bg-white/10 lg:h-11 lg:w-auto lg:py-1 lg:pr-3 lg:pl-1"
+            className="flex size-11 items-center gap-2.5 rounded-full hover:bg-white/10 xl:h-11 xl:w-auto xl:py-1 xl:pr-3 xl:pl-1"
           >
-            <span className="mx-auto lg:mx-0">
+            <span className="mx-auto xl:mx-0">
               <Avatar inicial={v.inicial} tamanho="p" />
             </span>
-            <span className="hidden max-w-[10rem] truncate text-[0.9rem] font-semibold lg:inline">{v.nome}</span>
-            <ChevronDown className={`hidden size-4 text-white/70 transition-transform motion-reduce:transition-none lg:block ${aberto ? "rotate-180" : ""}`} aria-hidden />
+            <span className="hidden max-w-[10rem] truncate text-[0.9rem] font-semibold xl:inline">{v.nome}</span>
+            <ChevronDown className={`hidden size-4 text-white/70 transition-transform motion-reduce:transition-none xl:block ${aberto ? "rotate-180" : ""}`} aria-hidden />
           </button>
           {aberto && (
             <div id="menu-usuario" role="menu" className="absolute top-[calc(100%+8px)] right-0 z-40 max-h-[calc(100dvh-90px)] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-2xl border border-line bg-surface p-1.5 text-ink shadow-[0_20px_50px_-20px_rgba(0,0,0,.35)]">

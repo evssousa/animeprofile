@@ -378,3 +378,14 @@ export async function categoriesOfTag(tagId: string, limit = 6) {
     [...w.params, limit],
   );
 }
+
+/** Sugestões da busca do topo: mesma regra da busca (todos os termos, sem acento), sem contar o total. */
+export async function sugerirPosts(q: string, limite = 4): Promise<PostCard[]> {
+  if (!hasDatabase()) return [];
+  const w = where({ search: q });
+  const rows = await query<CardRow>(
+    `SELECT ${CARD_COLUMNS} FROM posts p LEFT JOIN post_authors a ON a.id = p.author_id WHERE ${w.sql} ORDER BY p.published_at DESC LIMIT ?`,
+    [...w.params, limite],
+  );
+  return rows.map(toCard);
+}

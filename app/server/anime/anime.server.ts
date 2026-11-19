@@ -271,3 +271,14 @@ export async function animeIdsForSitemap() {
     "SELECT anilist_id, synced_at FROM anime_catalog WHERE is_adult = 0 AND cover_url IS NOT NULL ORDER BY popularity DESC LIMIT 5000",
   );
 }
+
+/** Sugestões da busca do topo: só o banco (nunca o AniList), do mais popular para o menos. */
+export async function sugerirAnimes(q: string, limite = 4): Promise<AnimeCard[]> {
+  if (!hasDatabase()) return [];
+  const like = `%${q.replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
+  const rows = await query<CardRow>(
+    `SELECT ${CARD_COLS} FROM anime_catalog c WHERE c.is_adult = 0 AND (c.title LIKE ? OR c.title_english LIKE ?) ORDER BY c.popularity DESC LIMIT ?`,
+    [like, like, limite],
+  );
+  return rows.map(toCard);
+}

@@ -172,7 +172,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     `/admin/visitas`) → Métricas (migration 014) → Posts (015, editor Tiptap) → Notícias IA → Artigos com IA (016) → Quizzes. Depois:
     Agendamentos → Categorias e tags → Mídias; Usuários, Segurança e E-mails na fase 2; economia na fase D. Recomendado tirar da barra
     Eventos, Sistemas e Títulos no Google (pergunta 8 do plano; WhatsApp já saiu por decisão do dono).
-3b4. **Topo (navbar) mais rico ([plano-navbar.md](plano-navbar.md)), plano pronto em 2026-11-19.** Três entregas: (1) `/api/sugestoes` e
+3b4. **Topo (navbar) mais rico ([plano-navbar.md](plano-navbar.md)), **FEITO em 2026-11-19, as 3 entregas, com as recomendadas aprovadas pelo dono** (falta o dono conferir no navegador, e o "Instalar app" só aparece onde o navegador oferece). Plano: (1) `/api/sugestoes` e
     `/api/agora` com cache da CDN + busca com sugestões, atalho `/`/Ctrl+K e diálogo no celular; (2) botão "Agora" (última hora, no ar
     hoje, em alta) + registrar o `sw.js` e arrumar o manifesto + "Instalar app"; (3) pílulas da equipe (robô e visitas de hoje, via
     `/api/eu`) e conferência de larguras. Celular (375 px) sem botão novo no topo.

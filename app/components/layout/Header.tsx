@@ -3,6 +3,11 @@ import { Form, Link, NavLink, useLocation } from "react-router";
 import { Menu, Search, X } from "lucide-react";
 import { HEADER_LINKS, isActive } from "~/lib/nav";
 import { AcoesLogado } from "./AcoesLogado";
+import { AgoraTopo } from "./AgoraTopo";
+import { InstalarGaveta, InstalarTopo } from "./InstalarApp";
+import { PainelEquipeTopo } from "./PainelEquipeTopo";
+import { registrarApp } from "~/lib/pwa";
+import { BuscaCelular, BuscaTopo } from "./BuscaTopo";
 import { Logo } from "./Logo";
 import { MenuFooter, NavGroups } from "./SideNav";
 import { ThemeToggle } from "./ThemeToggle";
@@ -16,6 +21,7 @@ import { UserMenu, UserMenuDrawer } from "./UserMenu";
  */
 export function Header() {
   const { pathname } = useLocation();
+  useEffect(registrarApp, []);
   return (
     <header className="sticky top-0 z-30 bg-night/95 text-night-ink backdrop-blur-md">
       <div className="flex h-[60px] items-center gap-3 lg:h-[72px] px-4 sm:gap-5 sm:px-6 lg:px-5">
@@ -40,20 +46,12 @@ export function Header() {
             })}
           </nav>
         )}
-        <Form method="get" action="/busca" role="search" className="relative mr-auto ml-auto hidden w-[min(24rem,32vw)] lg:block">
-          <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-white/60" aria-hidden />
-          <input
-            type="search"
-            name="q"
-            placeholder="Buscar notícias, animes..."
-            aria-label="Buscar no site"
-            className="h-10 w-full rounded-full border border-white/10 bg-white/10 pr-4 pl-10 text-white placeholder:text-white/50 focus:bg-white/15 focus:outline-none"
-          />
-        </Form>
+        <AgoraTopo />
+        <BuscaTopo />
         <div className="ml-auto flex items-center gap-1.5 sm:gap-3 lg:ml-0">
-          <Link to="/busca" aria-label="Buscar" className="grid size-11 place-items-center rounded-full bg-white/10 hover:bg-white/20 lg:hidden">
-            <Search className="size-[19px]" aria-hidden />
-          </Link>
+          <PainelEquipeTopo />
+          <InstalarTopo />
+          <BuscaCelular />
           <ThemeToggle className="text-white/80 hover:bg-white/10 hover:text-white lg:hidden logado:max-sm:hidden!" />
           <Link to="/login" className="hidden px-2 py-2 font-semibold hover:text-glow sm:inline-block logado:hidden!">
             Entrar
@@ -116,6 +114,7 @@ function MobileMenu() {
             Entrar
           </Link>
           <UserMenuDrawer onNavigate={close} />
+          <InstalarGaveta onNavigate={close} />
           <div className="flex flex-col gap-1">
             <MenuFooter variant="drawer" />
           </div>

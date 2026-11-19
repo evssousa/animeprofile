@@ -25,6 +25,7 @@ import { VisitBeacon } from "./visitas/client/VisitBeacon";
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/favicon.png", type: "image/png" },
   { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+  { rel: "manifest", href: "/manifest.webmanifest" },
   {
     rel: "alternate",
     type: "application/rss+xml",

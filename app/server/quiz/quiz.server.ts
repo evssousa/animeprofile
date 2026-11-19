@@ -208,3 +208,11 @@ export async function quizzesForSitemap() {
   if (!hasDatabase()) return [];
   return query<{ slug: string; updated_at: string | null; published_at: string | null }>(`SELECT slug, updated_at, published_at FROM quizzes WHERE ${VISIBLE} ORDER BY published_at DESC`);
 }
+
+/** Sugestões da busca do topo: quizzes publicados cujo título tem o termo. */
+export async function sugerirQuizzes(q: string, limite = 2) {
+  if (!hasDatabase()) return [];
+  const like = `%${q.replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
+  const rows = await query<QuizRow>(`SELECT ${CARD_COLS} FROM quizzes WHERE ${VISIBLE} AND title LIKE ? ORDER BY (plays_old + plays_new) DESC LIMIT ?`, [like, limite]);
+  return rows.map(toCard);
+}
