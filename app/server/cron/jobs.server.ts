@@ -6,6 +6,8 @@ import { rebuildPostVideos } from "../tv/tv.server";
 import { exec } from "../db.server";
 import { limparVisitas } from "~/visitas/server/limpeza.server";
 import { runRobot } from "../robot/run.server";
+import { gravarRetrato, ultimaSemanaCompleta } from "../admin/metricas.server";
+import { diaBrasilia } from "~/visitas/core/dia";
 
 export type JobStats = Record<string, unknown>;
 export type Job = {
@@ -54,6 +56,17 @@ export const JOBS: Job[] = [
     schedule: "0 9 * * 1",
     leaseMinutes: 10,
     run: () => publishWeeklyAgenda(),
+  },
+  {
+    // Retrato semanal das métricas do painel (/admin/retention): grava a última semana completa. Segunda às 9h30 (Brasília).
+    name: "metricas-semanal",
+    schedule: "30 9 * * 1",
+    leaseMinutes: 5,
+    async run() {
+      const semana = ultimaSemanaCompleta(diaBrasilia());
+      const r = await gravarRetrato(semana);
+      return { semana, visitantesDia: r.visitantesDia };
+    },
   },
   {
     // Temporada atual, em alta nesta semana e episódios dos próximos 8 dias, do AniList (gratuito, sem chave).

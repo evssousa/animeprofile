@@ -27,6 +27,12 @@
   --night-ink: #f4f4f6;
   --glow: #ff9a90;
   color-scheme: light;
+  --ok: #1f7a4d;
+  --ok-soft: #e8f5ee;
+  --warn: #8a5a00;
+  --warn-soft: #fdf3dc;
+  --info: #2558b8;
+  --info-soft: #e9f0fc;
 }
 
 [data-theme="dark"] {
@@ -43,6 +49,12 @@
   --night: #0b0b0e;
   --night-ink: #f4f4f6;
   --glow: #ff9a90;
+  --ok: #4cc98f;
+  --ok-soft: #15291f;
+  --warn: #f0b04a;
+  --warn-soft: #2e2412;
+  --info: #6f9cf0;
+  --info-soft: #18233a;
   color-scheme: dark;
 }
 
@@ -62,6 +74,12 @@
   --color-night: var(--night);
   --color-night-ink: var(--night-ink);
   --color-glow: var(--glow);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
 }
 
 @layer base {

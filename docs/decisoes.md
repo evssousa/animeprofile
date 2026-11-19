@@ -2,6 +2,27 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-19 (plano) — Topo (navbar) mais rico, sem mudar o HTML público
+
+Detalhes em [plano-navbar.md](plano-navbar.md).
+
+- **Decisão (proposta; 5 perguntas ao dono, nenhuma bloqueia):**
+  - **Entram:** busca com sugestões (animes do banco, matérias e quizzes; buscas recentes no aparelho; "Em alta" com o
+    campo vazio; atalho `/` e Ctrl+K; diálogo de tela cheia no celular, com o formulário GET de sempre sem JS); botão
+    **"Agora"** (≥ 768 px) com última hora, episódios de hoje e tags em alta, e uma bolinha que pulsa só com notícia nova
+    desde a última abertura; **"Instalar app"** só quando o navegador oferece (registrar o `sw.js` que já existe e
+    corrigir o manifesto herdado: cor roxa e atalhos para páginas "em breve"); **pílulas da equipe** (≥ 1280 px) com o
+    robô ("4/10") e os visitantes de hoje, vindas do `/api/eu` só para admin/moderador.
+  - **Ficam de fora:** atalhos de seção no topo (repetem a lateral), faixa rolante de última hora, saldos/nível/XP (sem
+    economia seriam "0" falso), decoração de datas, menu "Mais" com redes e tema (pergunta ao dono).
+  - **Celular (375 px):** nenhum botão novo no topo; a busca ganha sugestões no diálogo e "Instalar o app" vai para a
+    gaveta. O nome no avatar passa a aparecer só a partir de 1280 px, para caber o "Agora" em 1024 px.
+  - **Dados:** dois endpoints públicos e iguais para todos (`/api/agora`, `/api/sugestoes`), com cache da CDN e do
+    `cached()` em memória; são as únicas rotas de `/api` sem `no-store`. As sugestões nunca chamam o AniList.
+- **Por quê:** o dono achou o topo simples demais; o topo é a peça presente em todas as páginas. Tudo o que entra usa dado
+  real que o site já tem, mantém o cache de 60 s (nada lido da sessão no servidor) e não cria link indexável para o que
+  não existe.
+
 ## 2026-11-19 (plano) — Próximas telas do painel `/admin`, com a segurança dos loaders antes
 
 Detalhes em [plano-telas-painel.md](plano-telas-painel.md).

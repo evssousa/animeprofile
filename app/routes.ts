@@ -57,7 +57,7 @@ export default [
   route("sair", "routes/sair.ts"),
   route("admin/login", "routes/admin/login.tsx"),
   route("admin/sair", "routes/admin/sair.ts"),
-  route("admin", "routes/admin/layout.tsx", [index("routes/admin/visitas.tsx"), route("*", "routes/admin/em-construcao.tsx")]),
+  route("admin", "routes/admin/layout.tsx", [index("routes/admin/visitas.tsx"), route("retention", "routes/admin/metricas.tsx"), route("*", "routes/admin/em-construcao.tsx")]),
   ...ACCOUNT_PENDING.map((path) => route(path, "routes/contas-em-breve.tsx", { id: `contas-${path}` })),
   route("robots.txt", "routes/robots.ts"),
   ...["sitemap.xml", "sitemap-static.xml", "sitemap-news.xml", "sitemap-articles.xml", "sitemap-taxonomy.xml", "sitemap-animes.xml", "sitemap-quiz.xml", "sitemap-blog.xml", "sitemap-figurinhas.xml", "rss.xml"].map((f) =>

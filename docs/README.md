@@ -30,6 +30,7 @@ Lovable Cloud. Por isso, o domínio animeprofile.com.br passa para cá numa **vi
 | [plano-contas-login.md](plano-contas-login.md) | Plano (temporário): `/login` no formato do site antigo, **fase 1 só para o administrador** (sessão das variáveis `ADMIN_*`, menu do usuário com "Administração", estado lido no navegador por `/api/eu` sem quebrar o cache da CDN); fases 2 (contas de todos, importação) e 3 (Google) resumidas, "não agora" |
 | [plano-menus-logado.md](plano-menus-logado.md) | Plano (temporário): menus de quem está logado no formato do antigo, em 4 entregas: menu lateral, navbar (sino), menu do usuário e barra lateral do painel `/admin`, sem quebrar o cache da CDN (itens por CSS `logado:`/papéis no marcador, sem links para "em breve" no HTML público) |
 | [plano-telas-painel.md](plano-telas-painel.md) | Plano (temporário): as próximas telas reais do `/admin` na ordem do dono (Painel, Métricas, Posts, Notícias IA, Artigos com IA, Quizzes) com desenho, migrations 014–016 e passos; fichas curtas dos outros 21 itens da barra; correção de segurança dos loaders do painel (etapa 0) |
+| [plano-navbar.md](plano-navbar.md) | Plano (temporário): topo mais rico para visitante e logado: busca com sugestões e atalho `/`/Ctrl+K (diálogo no celular), botão "Agora" (última hora, no ar hoje, em alta), instalar o app (PWA) e pílulas da equipe (robô e visitas de hoje), sem mudar o HTML público |
 | [plano-sidebars.md](plano-sidebars.md) | Plano (temporário): inventário das barras laterais do site antigo e o sistema único de lateral (blocos por página, cache curto) para a matéria, Central, categoria/tag, blog, Otaku TV e quiz |
 
 ## Status
@@ -62,6 +63,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Otaku TV no esquema do site antigo ("YouTube"): palco com player e "A seguir", fileiras por categoria, músicas no mesmo player ([plano](plano-otaku-tv.md)) | ✅ feito em 2026-11-17 (passos 1 a 7; dono conferindo). Recomendadas aplicadas: `?v=`, sem botões de conta, "A seguir" com 3 itens no celular. Falta o `VideoObject` na página da matéria |
 | 2 | `/login` do administrador no formato do antigo, menu do usuário com "Administração", `/admin/login` → `/login`, sem cadastro ([plano](plano-contas-login.md), fase 1) | ✅ feito em 2026-11-19 (fase 1; recomendadas aplicadas) |
 | 2 | Menus de quem está logado no formato do antigo: lateral, navbar, menu do usuário e barra lateral do `/admin` ([plano](plano-menus-logado.md)) | ⏳ plano pronto em 2026-11-19; 4 entregas na ordem; 5 perguntas ao dono (nenhuma bloqueia) |
+| 2 | Topo (navbar) mais rico para visitante e logado: busca com sugestões, "Agora", instalar o app, pílulas da equipe ([plano](plano-navbar.md)) | ⏳ plano pronto em 2026-11-19; 3 entregas, 15 passos, sem migration; 5 perguntas ao dono (nenhuma bloqueia) |
 | 2 | Telas reais do painel `/admin`: Painel, Métricas, Posts, Notícias IA, Artigos com IA, Quizzes; depois Agendamentos, Categorias e tags, Mídias ([plano](plano-telas-painel.md)) | ⏳ plano pronto em 2026-11-19: etapa 0 (segurança dos loaders do painel, **fazer primeiro**) + 6 telas, 29 passos, migrations 014–016; 10 perguntas ao dono (nenhuma bloqueia) |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha, Google ([plano](plano-contas-login.md), fases 2 e 3) | 💤 não agora (decisão do dono em 2026-11-19) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
@@ -161,11 +163,19 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     Blog dos usuários · Categorias e tags · Mídias · Denúncias · Bug reports · Eventos · Usuários · Segurança · Molduras · Emblemas · Figurinhas ·
     Níveis · Custos · Receita · Sistemas (provavelmente não precisa mais) · Agendamentos (talvez não) · E-mails.
     Código da barra em `app/lib/admin-nav.ts` (campo `pronto` marca as telas feitas).
+    **Métricas (`/admin/retention`): feita em 2026-11-19** (migration 014 `metrics_snapshots` + `metrics_decisions`, tarefa `metricas-semanal` segunda 9h30,
+    `app/server/admin/metricas.server.ts`, kit `app/components/admin/ui.tsx` e tokens ok/warn/info). Mostra só audiência e conteúdo com dado real; o funil das contas
+    é um bloco "começa quando o cadastro abrir". Falta o dono conferir logado. A Etapa 0 do plano está feita (segurança dos loaders, kit visual); o
+    Painel completo (tela 1) e `/admin/visitas` ainda não.
     **Plano pronto em [plano-telas-painel.md](plano-telas-painel.md) (2026-11-19).** Ordem de execução: **etapa 0 primeiro** (passo 1:
     os loaders filhos do `/admin` não conferem a sessão e `/admin.data` sai sem `no-store`; passo 2: kit visual) → Painel (Visitas vai para
     `/admin/visitas`) → Métricas (migration 014) → Posts (015, editor Tiptap) → Notícias IA → Artigos com IA (016) → Quizzes. Depois:
     Agendamentos → Categorias e tags → Mídias; Usuários, Segurança e E-mails na fase 2; economia na fase D. Recomendado tirar da barra
     Eventos, Sistemas e Títulos no Google (pergunta 8 do plano; WhatsApp já saiu por decisão do dono).
+3b4. **Topo (navbar) mais rico ([plano-navbar.md](plano-navbar.md)), plano pronto em 2026-11-19.** Três entregas: (1) `/api/sugestoes` e
+    `/api/agora` com cache da CDN + busca com sugestões, atalho `/`/Ctrl+K e diálogo no celular; (2) botão "Agora" (última hora, no ar
+    hoje, em alta) + registrar o `sw.js` e arrumar o manifesto + "Instalar app"; (3) pílulas da equipe (robô e visitas de hoje, via
+    `/api/eu`) e conferência de larguras. Celular (375 px) sem botão novo no topo.
 3c. **Contas de todos e Google (fases 2 e 3 do mesmo plano): não agora** (decisão do dono em 2026-11-19). Quando voltar: importação dos
     171 usuários do dump final (64 com senha, 114 identidades do Google) com todos os dados, login para todos, SMTP, Turnstile, Google OAuth.
 4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
@@ -183,6 +193,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
   também para o admin). Sem resposta, sigo com as recomendadas (visível, 30, escondidos). Depois do deploy: entrar pelo `/login`.
 - **Menus de logado:** entrar pelo `/login` e conferir o menu lateral (grupo Equipe), os três ícones do topo, o menu do usuário e a barra do `/admin`
   (no celular também). Dizer o que ajustar. Decidir quais itens do painel saem (Títulos no Google, Sistemas, Agendamentos).
+- **Topo (navbar) ([plano-navbar.md](plano-navbar.md)):** nada bloqueia. Se quiser, responda as 5 perguntas do fim do plano ("Agora" ou
+  "Ao vivo"; manter "Contas em breve"; menu "Mais" com redes e tema; "Nova matéria" na faixa da equipe; blog nas sugestões). Sem
+  resposta, sigo com as recomendadas. Depois de cada entrega, conferir no navegador (computador e celular).
 - **Telas do painel ([plano-telas-painel.md](plano-telas-painel.md)):** nada bloqueia. Se quiser, responda as 10 perguntas do fim do plano
   (as mais importantes: 1, Visitas em `/admin/visitas`; 2, com que autor você assina os posts; 4, se a exportação final do site antigo já
   rodou; 8, quais itens saem da barra). Sem resposta, sigo com as recomendadas. Rodar/aprovar as migrations 014, 015 e 016 quando eu colar

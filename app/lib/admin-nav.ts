@@ -44,7 +44,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
     label: "Visão geral",
     items: [
       { label: "Painel", href: "/admin", icon: LayoutDashboard, desc: "Visitas por dia, páginas e de onde vêm, sem cookie.", papeis: ["admin", "moderator"], pronto: true, exact: true },
-      { label: "Métricas", href: "/admin/retention", icon: Activity, desc: "Funil, retenção, churn, NPS, receita e decisões.", papeis: ADMIN },
+      { label: "Métricas", href: "/admin/retention", icon: Activity, desc: "Funil, retenção, churn, NPS, receita e decisões.", papeis: ADMIN, pronto: true },
     ],
   },
   {
