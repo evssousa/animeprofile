@@ -1,5 +1,6 @@
 // Catálogo das tarefas agendadas. O horário mora aqui (versionado); o estado mora em cron_jobs.
 // Cada tarefa devolve um resumo curto (vai para cron_runs.stats) ou lança erro.
+import { publishWeeklyAgenda } from "../agenda/agenda.server";
 import { syncAnimes } from "../anime/anime.server";
 import { rebuildPostVideos } from "../tv/tv.server";
 import { exec } from "../db.server";
@@ -44,6 +45,13 @@ export const JOBS: Job[] = [
     schedule: "40 */6 * * *",
     leaseMinutes: 5,
     run: () => rebuildPostVideos(),
+  },
+  {
+    // Agenda de animes da semana: toda segunda às 9h (Brasília). A capa gira a cada semana. Se a matéria já existe, atualiza.
+    name: "agenda-semanal",
+    schedule: "0 9 * * 1",
+    leaseMinutes: 10,
+    run: () => publishWeeklyAgenda(),
   },
   {
     // Temporada atual, em alta nesta semana e episódios dos próximos 8 dias, do AniList (gratuito, sem chave).

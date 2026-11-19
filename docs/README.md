@@ -133,9 +133,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 2a. **Otaku TV:** feita (ver tabela de status). Falta o `VideoObject` na página da matéria com vídeo (P, separado) e a conferência do dono;
     a aba de músicas depende do AnimeThemes (estava com 503 em 2026-11-17, o aviso "Tentar de novo" aparece).
 3. Depois: contas/login (por último, decisão do dono), economia, chat, quarto otaku, painel admin, robôs.
-   - **Agenda semanal de animes** (hoje só no site antigo, `weekly-agenda`): portar para o cron do site novo e **variar a capa a
-     cada semana** (rodízio entre os banners dos 6 mais populares, sem repetir a da semana anterior); o antigo usa sempre o do
-     mais popular e a capa repete. Pedido do dono em 2026-11-16.
+   - **Agenda semanal de animes:** feita em 2026-11-19 (tarefa `agenda-semanal`, segunda às 9h de Brasília, a partir de `anime_catalog`).
+     A capa gira a cada semana entre os banners dos 8 mais populares e nunca repete a da semana anterior (`source_url` guarda o banner
+     de origem). Código em `app/lib/agenda.ts` e `app/server/agenda/agenda.server.ts`; a primeira automática sai em 2026-11-23.
 4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
    [deploy-hostinger.md](deploy-hostinger.md).
 5. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
