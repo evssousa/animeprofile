@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Form, Link, NavLink, useLocation } from "react-router";
 import { Menu, Search, X } from "lucide-react";
 import { HEADER_LINKS, isActive } from "~/lib/nav";
+import { AcoesLogado } from "./AcoesLogado";
 import { Logo } from "./Logo";
 import { MenuFooter, NavGroups } from "./SideNav";
 import { ThemeToggle } from "./ThemeToggle";
@@ -53,7 +54,7 @@ export function Header() {
           <Link to="/busca" aria-label="Buscar" className="grid size-11 place-items-center rounded-full bg-white/10 hover:bg-white/20 lg:hidden">
             <Search className="size-[19px]" aria-hidden />
           </Link>
-          <ThemeToggle className="text-white/80 hover:bg-white/10 hover:text-white lg:hidden" />
+          <ThemeToggle className="text-white/80 hover:bg-white/10 hover:text-white lg:hidden logado:max-sm:hidden!" />
           <Link to="/login" className="hidden px-2 py-2 font-semibold hover:text-glow sm:inline-block logado:hidden!">
             Entrar
           </Link>
@@ -61,6 +62,7 @@ export function Header() {
             <span className="min-[400px]:hidden">Em breve</span>
             <span className="hidden min-[400px]:inline">Contas em breve</span>
           </Link>
+          <AcoesLogado />
           <UserMenu />
         </div>
       </div>

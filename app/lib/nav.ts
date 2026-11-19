@@ -1,9 +1,12 @@
 // Menu do site, nos mesmos grupos do site antigo (sem Comunidades, Eventos e Games, que saíram).
 import {
   Award,
+  Bell,
   BookOpen,
+  CalendarCheck,
   Home,
   LayoutDashboard,
+  MessageCircle,
   MessagesSquare,
   MonitorPlay,
   Newspaper,
@@ -72,6 +75,13 @@ export const BOTTOM_NAV: { label: string; to: string; icon: LucideIcon; also?: s
 
 /** Menus extras do topo (ao lado do logo, a partir de `lg`). O menu principal fica na lateral esquerda. */
 export const HEADER_LINKS: { label: string; to: string; badge?: string; external?: boolean }[] = [];
+
+/** Ações do topo de quem está logado, na ordem do site antigo (Check-in, Mensagens, Notificações). Saldos e nível voltam com a economia. */
+export const HEADER_ACOES: { id: "checkin" | "mensagens" | "notificacoes"; label: string; icon: LucideIcon; to?: string }[] = [
+  { id: "checkin", label: "Check-in do dia", icon: CalendarCheck, to: "/check-in" },
+  { id: "mensagens", label: "Mensagens", icon: MessageCircle, to: "/mensagens" },
+  { id: "notificacoes", label: "Notificações", icon: Bell },
+];
 
 export const FOOTER_LINKS: NavGroup[] = [
   {

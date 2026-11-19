@@ -27,3 +27,17 @@ describe("menu lateral no servidor (HTML público, igual para todos)", () => {
     expect(sessionHintBootstrap).toContain("d.papeis");
   });
 });
+
+describe("ações do topo logado", () => {
+  it("na ordem do antigo: Check-in, Mensagens, Notificações; nada no HTML público", async () => {
+    const { HEADER_ACOES } = await import("~/lib/nav");
+    const { AcoesLogado } = await import("~/components/layout/AcoesLogado");
+    expect(HEADER_ACOES.map((a) => a.id)).toEqual(["checkin", "mensagens", "notificacoes"]);
+    const handler = createStaticHandler([{ path: "/", Component: () => <AcoesLogado /> }]);
+    const context = await handler.query(new Request("https://animeprofile.com.br/"));
+    if (context instanceof Response) throw new Error("redirecionou");
+    const h = renderToString(<StaticRouterProvider router={createStaticRouter(handler.dataRoutes, context)} context={context} />);
+    expect(h).not.toContain("/check-in");
+    expect(h).not.toContain("Notificações");
+  });
+});
