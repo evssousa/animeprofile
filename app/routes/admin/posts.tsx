@@ -1,8 +1,8 @@
 // Posts (/admin/posts): lista paginada no servidor, com abas de status, filtros na URL e exclusão de rascunhos.
-// O editor (novo post, editar, publicar, agendar) é o próximo passo (docs/plano-telas-painel.md, tela 3).
+// O editor fica em /admin/posts/novo e /admin/posts/:id (posts-editar.tsx).
 import { useState } from "react";
 import { Form, Link, useSubmit } from "react-router";
-import { ExternalLink, Trash2, X } from "lucide-react";
+import { ExternalLink, Pencil, Plus, Trash2, X } from "lucide-react";
 import type { Route } from "./+types/posts";
 import { Pagination } from "~/components/posts";
 import { Abas, Aviso, Botao, Cabecalho, Cartao, Confirmar, Selo, Vazio } from "~/components/admin/ui";
@@ -66,6 +66,9 @@ function Linha({ p, marcado, onMarcar }: { p: LinhaPost; marcado: boolean; onMar
           <span className="tabular-nums">· {fmt.format(p.vistas)} vistas</span>
         </p>
       </div>
+      <Link to={`/admin/posts/${p.id}`} aria-label={`Editar “${p.titulo}”`} title="Editar" className="grid size-9 shrink-0 place-items-center rounded-full text-ink-soft hover:bg-sunken hover:text-ink">
+        <Pencil className="size-4" aria-hidden />
+      </Link>
       {p.status === "published" && (
         <a href={p.url} target="_blank" rel="noreferrer" aria-label={`Abrir “${p.titulo}” no site`} title="Ver no site" className="grid size-9 shrink-0 place-items-center rounded-full text-ink-soft hover:bg-sunken hover:text-ink">
           <ExternalLink className="size-4" aria-hidden />
@@ -110,7 +113,7 @@ export default function Posts({ loaderData, actionData }: Route.ComponentProps) 
   const select = "h-10 rounded-[10px] border border-line bg-surface px-3 text-[0.88rem] focus:outline-none";
   return (
     <div className="flex flex-col gap-4">
-      <Cabecalho titulo="Posts" desc="Notícias e artigos do site: ver o que está no ar, o que está agendado e os rascunhos." />
+      <Cabecalho titulo="Posts" desc="Notícias e artigos do site: escrever, editar, agendar e publicar." acoes={<Botao href="/admin/posts/novo" variante="primario" icone={Plus}>Novo post</Botao>} />
       {actionData && "ok" in actionData && <Aviso tom="ok">{actionData.ok}</Aviso>}
       {actionData && "erro" in actionData && <Aviso tom="erro">{actionData.erro}</Aviso>}
       <Abas ativo={f.status} itens={abas.map((a) => ({ id: a.id, rotulo: a.rotulo, href: q({ status: a.id === "todos" ? "" : a.id }), n: lista.contagens[a.id] }))} />

@@ -4,11 +4,11 @@ import { ADMIN_NAV, adminAtivo, adminItem, adminNavVisivel } from "~/lib/admin-n
 const todos = ADMIN_NAV.flatMap((g) => g.items);
 
 describe("barra lateral do painel", () => {
-  it("tem os grupos do antigo, endereços únicos em /admin e o Painel e as Métricas prontos", () => {
+  it("tem os grupos do antigo, endereços únicos em /admin e Painel, Métricas e Posts prontos", () => {
     expect(ADMIN_NAV.map((g) => g.label)).toEqual(["Visão geral", "Conteúdo", "Moderação", "Usuários", "Economia e gamificação", "Financeiro", "Sistema"]);
     expect(new Set(todos.map((i) => i.href)).size).toBe(todos.length);
     expect(todos.every((i) => i.href === "/admin" || i.href.startsWith("/admin/"))).toBe(true);
-    expect(todos.filter((i) => i.pronto).map((i) => i.label)).toEqual(["Painel", "Métricas"]);
+    expect(todos.filter((i) => i.pronto).map((i) => i.label)).toEqual(["Painel", "Métricas", "Posts"]);
     expect(todos).toHaveLength(26);
   });
 

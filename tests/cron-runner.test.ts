@@ -39,11 +39,11 @@ describe("cron", () => {
     const t1 = new Date("2026-11-12T07:31:00Z");
     const [a, b] = await Promise.all([tick(t1), tick(t1)]);
     // O robô (minuto 20 de cada hora) também estava na hora; desligado, ele só responde { modo: "desligado" }.
-    expect([...a.started, ...b.started].sort()).toEqual(["limpeza", "robo-noticias"]);
+    expect([...a.started, ...b.started].sort()).toEqual(["limpeza", "publicar-agendados", "robo-noticias"]); // e os agendados do painel, que rodam a cada 5 min
     await Promise.all([a.done, b.done]);
 
     const runs = await query<{ job: string; status: string }>("SELECT job, status FROM cron_runs ORDER BY job");
-    expect(runs).toEqual([{ job: "limpeza", status: "ok" }, { job: "robo-noticias", status: "ok" }]);
+    expect(runs).toEqual([{ job: "limpeza", status: "ok" }, { job: "publicar-agendados", status: "ok" }, { job: "robo-noticias", status: "ok" }]);
     const [after] = await query<{ next_run_at: string; locked_until: string | null; last_status: string }>(
       "SELECT next_run_at, locked_until, last_status FROM cron_jobs WHERE name = 'limpeza'",
     );
@@ -52,7 +52,7 @@ describe("cron", () => {
     // Antes da próxima hora, nada roda.
     // 08:00 UTC: a limpeza já rodou e a dos animes (06:10 em Brasília = 09:10 UTC) ainda não chegou.
     const late = await tick(new Date("2026-11-12T08:00:00Z"));
-    expect(late.started).toEqual([]);
+    expect(late.started.filter((n) => n !== "publicar-agendados")).toEqual([]); // os agendados do painel rodam a cada 5 min
     await late.done;
   });
 
@@ -62,6 +62,6 @@ describe("cron", () => {
     expect(result && result.status).toBe("ok");
     const s = await status(5);
     expect(s.runs.filter((r) => (r as { job: string }).job === "limpeza").length).toBe(2);
-    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["agenda-semanal", "animes-anilist", "limpeza", "metricas-semanal", "robo-noticias", "videos-materias"]);
+    expect(s.jobs.map((j) => (j as { name: string }).name)).toEqual(["agenda-semanal", "animes-anilist", "limpeza", "metricas-semanal", "publicar-agendados", "robo-noticias", "videos-materias"]);
   });
 });

@@ -7,6 +7,7 @@ import { exec } from "../db.server";
 import { limparVisitas } from "~/visitas/server/limpeza.server";
 import { runRobot } from "../robot/run.server";
 import { gravarRetrato, ultimaSemanaCompleta } from "../admin/metricas.server";
+import { publicarAgendados } from "../admin/posts-edit.server";
 import { diaBrasilia } from "~/visitas/core/dia";
 
 export type JobStats = Record<string, unknown>;
@@ -32,8 +33,9 @@ export const JOBS: Job[] = [
       const cands = await exec("DELETE FROM ai_news_candidates WHERE created_at < UTC_TIMESTAMP(3) - INTERVAL 30 DAY AND status NOT IN ('published', 'draft')");
       const usage = await exec("DELETE FROM ai_news_usage WHERE created_at < UTC_TIMESTAMP(3) - INTERVAL 60 DAY");
       const visitas = await limparVisitas();
+      const orfas = await exec("DELETE r FROM post_revisions r LEFT JOIN posts p ON p.id = r.post_id WHERE p.id IS NULL");
       const runs = await exec("DELETE FROM ai_news_runs WHERE started_at < UTC_TIMESTAMP(3) - INTERVAL 60 DAY");
-      return { execucoesApagadas: old.affected, execucoesTravadas: stuck.affected, candidatosApagados: cands.affected, usoApagado: usage.affected, rodadasApagadas: runs.affected, ...visitas };
+      return { execucoesApagadas: old.affected, execucoesTravadas: stuck.affected, candidatosApagados: cands.affected, usoApagado: usage.affected, rodadasApagadas: runs.affected, versoesOrfas: orfas.affected, ...visitas };
     },
   },
   {
@@ -56,6 +58,15 @@ export const JOBS: Job[] = [
     schedule: "0 9 * * 1",
     leaseMinutes: 10,
     run: () => publishWeeklyAgenda(),
+  },
+  {
+    // Posts agendados no painel: quando a hora chega, passam a publicados (e o cache das páginas é limpo).
+    name: "publicar-agendados",
+    schedule: "*/5 * * * *",
+    leaseMinutes: 2,
+    async run() {
+      return { publicados: await publicarAgendados() };
+    },
   },
   {
     // Retrato semanal das métricas do painel (/admin/retention): grava a última semana completa. Segunda às 9h30 (Brasília).

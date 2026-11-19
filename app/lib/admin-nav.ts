@@ -50,7 +50,7 @@ export const ADMIN_NAV: AdminNavGroup[] = [
   {
     label: "Conteúdo",
     items: [
-      { label: "Posts", href: "/admin/posts", icon: Newspaper, desc: "Notícias e artigos: escrever, agendar e publicar.", papeis: ["admin", "author"] },
+      { label: "Posts", href: "/admin/posts", icon: Newspaper, desc: "Notícias e artigos: escrever, agendar e publicar.", papeis: ["admin", "author"], pronto: true },
       { label: "Notícias IA", href: "/admin/ai-news", icon: Bot, desc: "Motor de notícias por IA, autores e desempenho.", papeis: ADMIN },
       { label: "Artigos com IA", href: "/admin/artigos-ia", icon: PenLine, desc: "Rascunhos de artigos evergreen para revisar e publicar.", papeis: ADMIN },
       { label: "Quizzes", href: "/admin/quizzes", icon: Puzzle, desc: "Quiz de personalidade e de conhecimento, com página própria em /quiz.", papeis: ADMIN },

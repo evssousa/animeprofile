@@ -39,19 +39,19 @@ export async function saveImportedMedia(name: string, bytes: Buffer): Promise<{ 
   return { existia: false };
 }
 
-const ROBOT_KEY = /^[a-f0-9]{24}$/;
+const OWN_KEY = /^[a-f0-9]{24}$/;
 
 /**
- * Imagens das matérias do robô: /media/robo/<24 hex>.webp e <24 hex>-640.webp. O nome vem do sha1 do endereço da
- * fonte, então rodar de novo não duplica. Devolve o endereço público da imagem principal.
+ * Imagens próprias (robô e painel): /media/<pasta>/<24 hex>.webp e <24 hex>-640.webp. O nome vem do sha1 (do endereço da fonte,
+ * no robô; do conteúdo, no painel), então repetir não duplica. Devolve o endereço público da imagem principal.
  */
-export async function saveRobotMedia(key: string, main: Buffer, thumb: Buffer): Promise<string> {
-  if (!ROBOT_KEY.test(key)) throw new MediaError("chave inválida");
+export async function saveOwnMedia(pasta: "robo" | "painel", key: string, main: Buffer, thumb: Buffer): Promise<string> {
+  if (!OWN_KEY.test(key)) throw new MediaError("chave inválida");
   for (const b of [main, thumb]) {
     if (b.length > MAX_MEDIA_BYTES) throw new MediaError("arquivo grande demais");
     if (b.length < 12 || b.toString("latin1", 0, 4) !== "RIFF" || b.toString("latin1", 8, 12) !== "WEBP") throw new MediaError("não é WebP");
   }
-  const dir = join(mediaDir(), "robo");
+  const dir = join(mediaDir(), pasta);
   await mkdir(dir, { recursive: true });
   for (const [name, bytes] of [[`${key}.webp`, main], [`${key}-640.webp`, thumb]] as const) {
     const target = join(dir, name);
@@ -59,5 +59,8 @@ export async function saveRobotMedia(key: string, main: Buffer, thumb: Buffer): 
     await writeFile(tmp, bytes);
     await rename(tmp, target);
   }
-  return `/media/robo/${key}.webp`;
+  return `/media/${pasta}/${key}.webp`;
 }
+
+/** Imagens das matérias do robô (/media/robo). */
+export const saveRobotMedia = (key: string, main: Buffer, thumb: Buffer) => saveOwnMedia("robo", key, main, thumb);

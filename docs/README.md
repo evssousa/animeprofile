@@ -163,9 +163,11 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     Blog dos usuários · Categorias e tags · Mídias · Denúncias · Bug reports · Eventos · Usuários · Segurança · Molduras · Emblemas · Figurinhas ·
     Níveis · Custos · Receita · Sistemas (provavelmente não precisa mais) · Agendamentos (talvez não) · E-mails.
     Código da barra em `app/lib/admin-nav.ts` (campo `pronto` marca as telas feitas).
-    **Posts (`/admin/posts`), em andamento (2026-11-19):** feitos os passos 9 e 10 do plano (migration 015 `edited_at` + `post_revisions`, a importação do
-    antigo não mexe em matéria editada no painel, lista paginada com abas, filtros e exclusão de rascunhos). **Falta o editor** (passos 11 a 15: `post-editor.ts`, Tiptap,
-    salvar/publicar/agendar com versões, imagens, prévia) e marcar `pronto` na barra.
+    **Posts (`/admin/posts`): feito em 2026-11-19** (passos 9 a 15 do plano): lista paginada com abas, filtros e exclusão de rascunhos; **editor completo**
+    (`/admin/posts/novo` e `/admin/posts/:id`: Tiptap com título, H2/H3, negrito, itálico, sublinhado, link, listas, citação, imagem com legenda, YouTube, spoiler e "Ver HTML";
+    capa e imagens enviadas para `/media/painel`; categorias e tags; palavra-chave e 4 checagens de SEO; checklist "Para publicar"; marcações ✍️; salvar rascunho, publicar,
+    agendar (tarefa `publicar-agendados` a cada 5 min), despublicar; endereço travado depois de publicado; 20 versões com ver/restaurar; aviso de conflito; cópia local; Ctrl+S; prévia em `/admin/posts/:id/previa`).
+    Migration 015 no ar. O Tiptap só entra no chunk do editor. **Falta o dono conferir** logado (enviar imagem, publicar de verdade) e dizer com qual autor assinar (pergunta 2 do plano; hoje "Sem assinatura").
     **Métricas (`/admin/retention`): feita em 2026-11-19** (migration 014 `metrics_snapshots` + `metrics_decisions` (esta ficou sem uso: o dono dispensou "Decisões" e o botão de gravar retrato manual, 2026-11-19), tarefa `metricas-semanal` segunda 9h30,
     `app/server/admin/metricas.server.ts`, kit `app/components/admin/ui.tsx` e tokens ok/warn/info). Mostra só audiência e conteúdo com dado real; o funil das contas
     é um bloco "começa quando o cadastro abrir". Falta o dono conferir logado. A Etapa 0 do plano está feita (segurança dos loaders, kit visual); o

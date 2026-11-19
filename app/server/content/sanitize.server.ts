@@ -19,6 +19,7 @@ export function sanitizePostHtml(html: string): string {
       iframe: ["src", "title", "width", "height", "allow", "allowfullscreen", "loading"],
       th: ["colspan", "rowspan", "scope"],
       td: ["colspan", "rowspan"],
+      div: ["data-youtube-video"],
       "*": ["class", "id", "data-align"],
     },
     allowedSchemes: ["https", "http", "mailto"],
