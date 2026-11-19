@@ -109,7 +109,7 @@ export function MenuFooter({ variant }: { variant: Variant }) {
  * Rolagem do menu sem barra: as bordas desvanecem quando há mais itens para cima ou para baixo (some no fim).
  * A roda e o toque continuam rolando; o teclado também (os links recebem foco e a lista acompanha).
  */
-function FadeScroll({ children, label }: { children: ReactNode; label: string }) {
+export function FadeScroll({ children, label }: { children: ReactNode; label: string }) {
   const ref = useRef<HTMLElement>(null);
   const [edge, setEdge] = useState({ top: false, bottom: false });
   useEffect(() => {
@@ -135,7 +135,8 @@ function FadeScroll({ children, label }: { children: ReactNode; label: string })
   );
 }
 
-export function SideNav() {
+/** Preferência "menu recolhido" (compartilhada com o painel): lê o <html> depois de montar e salva em localStorage. */
+export function useSidebarMini() {
   const [mini, setMini] = useState(false);
   useEffect(() => setMini(document.documentElement.dataset.sidebar === "mini"), []);
   function toggle() {
@@ -149,6 +150,11 @@ export function SideNav() {
       // modo privado: vale só nesta visita
     }
   }
+  return { mini, toggle };
+}
+
+export function SideNav() {
+  const { mini, toggle } = useSidebarMini();
   return (
     <aside
       id="menu-lateral"

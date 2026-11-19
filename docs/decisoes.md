@@ -370,3 +370,11 @@ Detalhes em [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md).
   - **Tempo real:** o chat e as notificações passam a buscar novidades a cada poucos segundos (o plano Business não
     aceita conexão permanente).
   - **Arquivos:** ficam no disco da Hostinger.
+
+## 2026-11-19: menus de logado (respostas do dono)
+
+- Sem selo "em breve" nos menus de logado: tudo será construído antes de importar as contas dos outros usuários, testando com o admin (`animeprofile`).
+- Topo logado: Check-in, Mensagens e sino, como no antigo (sem saldos nem nível por enquanto). Blog e Figurinhas só para logados.
+- Barra do painel mostra os itens do antigo (27, sem "Ver escritório"); telas feitas na ordem listada no README (3b3), primeiro o que o recebimento de usuários exige.
+- Quarto otaku do painel será refeito com three.js; WhatsApp, Títulos no Google, Sistemas e Agendamentos a reavaliar.
+

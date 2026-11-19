@@ -126,7 +126,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
      teto 6 (publica a partir das 8h de Brasília). Depois, o dono trocou o domínio do site no hPanel ("Alterar domínio": o site
      passou a se chamar `animeprofile.com.br`; o `novo.` deixou de existir) e foi preciso refazer o deploy para o app ler o `.env`.
      Cron da Hostinger recriado (o comando tinha `url` em vez de `curl`; corrigido e rodando); sitemap enviado ao Search Console.
-     Menus Feed, Blog, Missões, Ranking, Figurinhas e Quarto Otaku só para logados (`LOGGED_IN` em `app/lib/nav.ts`).
+     Menus Feed, Blog, Missões, Ranking, Figurinhas e Quarto Otaku só para logados (`auth` em `app/lib/nav.ts`; escondidos por CSS, sem `LOGGED_IN`).
      **Logs do dia (22h, 17/11):** cron rodando, `/api/health` ok, 15 páginas sem 5xx, robô com as 6 matérias do teto (8h às 13h,
      0 falhas, 13 chamadas ao Gemini sem erro; 398 a 730 palavras, parágrafos curtos, fonte no fim, canonical e RSS certos).
      Teto do robô subido para 10 às 22h25 (vale a partir das 8h de 18/11). **Falta:** (18/11) dump final e a exportação final;
@@ -148,10 +148,17 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 3b. **`/login` do administrador:** feito em 2026-11-19 (fase 1 do [plano-contas-login.md](plano-contas-login.md)). Só o admin entra, com **e-mail ou usuário** (usuário padrão `animeprofile`, opcional `ADMIN_USERNAME`;
     variáveis `ADMIN_*` do hPanel), sem cadastro; menu do usuário com "Administração"; `/admin/login` leva a `/login`; marcador `ap_logado` e
     `GET /api/eu` mantêm o cache da CDN. Falta conferir em produção com o dono logado.
-3b2. **Menus de logado ([plano-menus-logado.md](plano-menus-logado.md)):** executar em 4 entregas, cada uma com build, testes,
-    push e conferência: (1) marcador com papéis + menu lateral logado (Feed, Missões, Ranking, Quarto "em breve"; Blog e
-    Figurinhas; grupo Equipe com Administração); (2) sino de notificações no topo (vazio honesto); (3) menu do usuário no
-    formato do antigo (`USER_MENU`); (4) barra lateral do painel `/admin` (Visitas real + 8 "em breve").
+3b2. **Menus de logado ([plano-menus-logado.md](plano-menus-logado.md)): feitos em 2026-11-19, nas 4 entregas** (menu lateral com grupo Equipe e itens só
+    de logado; Check-in, Mensagens e sino no topo; menu do usuário no formato do antigo; barra lateral do `/admin` com os 27 itens do antigo, grupos
+    iguais). Sem selo "em breve" (decisão do dono): os destinos que não existem levam à página "volta em breve" das contas (site) ou "Esta tela
+    ainda está sendo construída" (painel, rota coringa `admin/*`). O marcador `ap_logado` agora leva os papéis (`ap_logado=admin`).
+    **Falta:** o dono conferir em produção logado.
+3b3. **Telas do painel, na ordem do dono (2026-11-19).** Primeiro o que o recebimento de usuários exige, depois o resto. Para cada tela, olhar antes
+    como era no `animeprofile-old` (`src/routes/admin*.tsx`). Ordem: Painel (feito: Visitas) · Métricas · Posts · Notícias IA · Artigos com IA ·
+    Quizzes · WhatsApp (ver se ainda é necessário) · Títulos no Google (idem) · Quarto otaku (refazer com three.js, como o QG) · Redes sociais ·
+    Blog dos usuários · Categorias e tags · Mídias · Denúncias · Bug reports · Eventos · Usuários · Segurança · Molduras · Emblemas · Figurinhas ·
+    Níveis e recompensas · Custos e recompensas · Receita · Sistemas (provavelmente não precisa mais) · Agendamentos (talvez não) · E-mails.
+    Código da barra em `app/lib/admin-nav.ts` (campo `pronto` marca as telas feitas).
 3c. **Contas de todos e Google (fases 2 e 3 do mesmo plano): não agora** (decisão do dono em 2026-11-19). Quando voltar: importação dos
     171 usuários do dump final (64 com senha, 114 identidades do Google) com todos os dados, login para todos, SMTP, Turnstile, Google OAuth.
 4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
@@ -167,9 +174,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 - **`/login` do administrador ([plano-contas-login.md](plano-contas-login.md)):** nada bloqueia. Se quiser, responda as 3 perguntas do
   plano (botão do Google visível e desativado ou escondido; limite global de 30 tentativas ou 60; itens só para logados escondidos
   também para o admin). Sem resposta, sigo com as recomendadas (visível, 30, escondidos). Depois do deploy: entrar pelo `/login`.
-- **Menus de logado ([plano-menus-logado.md](plano-menus-logado.md)):** se quiser, responda as 5 perguntas do fim do plano
-  (itens "em breve" visíveis para logado; topo só com o sino ou também Check-in e Mensagens; Blog e Figurinhas para
-  visitantes; os 8 "em breve" na barra do admin; próxima tela real do painel). Sem resposta, sigo com as recomendadas.
+- **Menus de logado:** entrar pelo `/login` e conferir o menu lateral (grupo Equipe), os três ícones do topo, o menu do usuário e a barra do `/admin`
+  (no celular também). Dizer o que ajustar. Decidir quais itens do painel saem (WhatsApp, Títulos no Google, Sistemas, Agendamentos).
 - **Robô de notícias:** nada pendente seu agora (config e chave feitas, prévias aprovadas). Eu ligo `publicar` com teto 6
   depois da virada (17/11); no dia 18 sobe para 10.
 - **SMTP:** não é mais necessário para o Contato (decisão do dono em 2026-11-17: sem formulário, só e-mail por `mailto:`). Volta a ser
