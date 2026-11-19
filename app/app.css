@@ -8,6 +8,7 @@
 
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant mini (&:where([data-sidebar="mini"], [data-sidebar="mini"] *));
+@custom-variant logado (&:where([data-logado], [data-logado] *));
 
 :root {
   --paper: #faf7f7;

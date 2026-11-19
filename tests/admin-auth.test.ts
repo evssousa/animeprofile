@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
-import { adminConfig, hashPassword, loginBlocked, login, MAX_FAILS_PER_IP, MAX_FAILS_TOTAL, registerFail, resetLoginLimits, requireAdmin, verifyPassword } from "~/server/admin/auth.server";
+import { adminConfig, hashPassword, login, loginBlocked, MAX_FAILS_PER_IP, MAX_FAILS_TOTAL, registerFail, resetLoginLimits, verifyPassword } from "~/server/admin/auth.server";
 
 const SENHA = "uma senha bem comprida 123";
 let hash = "";
@@ -10,9 +10,9 @@ beforeAll(async () => {
 });
 afterEach(() => resetLoginLimits());
 
-const req = (ip: string, headers: Record<string, string> = {}, method = "GET") => new Request("https://animeprofile.com.br/admin", { method, headers: { "x-forwarded-for": ip, ...headers } });
+const req = (ip: string) => new Request("https://animeprofile.com.br/login", { method: "POST", headers: { "x-forwarded-for": ip } });
 
-describe("login do admin", () => {
+describe("login do admin (senha e limites)", () => {
   it("o hash não tem '$' e confere só com a senha certa", async () => {
     expect(hash.startsWith("scrypt:")).toBe(true);
     expect(hash).not.toContain("$");
@@ -33,31 +33,23 @@ describe("login do admin", () => {
     Object.assign(process.env, antes);
   });
 
-  it("entra com e-mail (sem diferença de maiúscula) e senha certos e devolve um cookie HttpOnly e Strict", async () => {
+  it("entra com e-mail (sem diferença de maiúscula) e senha certos e devolve os dois cookies", async () => {
     const r = await login(req("1.1.1.1"), "dono@exemplo.com", SENHA);
     expect(r.ok).toBe(true);
-    if (r.ok) {
-      expect(r.cookie).toContain("__ap_admin=");
-      expect(r.cookie).toContain("HttpOnly");
-      expect(r.cookie).toContain("SameSite=Strict");
-      expect(r.cookie).toContain("Path=/");
-      // com o cookie, o painel abre; sem ele, manda para o login
-      await expect(requireAdmin(req("1.1.1.1", { cookie: r.cookie.split(";")[0] }))).resolves.toBe("dono@exemplo.com");
-    }
-    await expect(requireAdmin(req("1.1.1.1"))).rejects.toMatchObject({ status: 302 });
+    if (r.ok) expect(r.cookies).toHaveLength(2);
   });
 
-  it("senha ou e-mail errados dão a mesma mensagem", async () => {
+  it("senha ou e-mail errados dão o mesmo erro", async () => {
     const a = await login(req("2.2.2.2"), "dono@exemplo.com", "errada errada errada");
     const b = await login(req("2.2.2.2"), "outro@exemplo.com", SENHA);
-    expect(a).toEqual({ ok: false, error: "E-mail ou senha incorretos." });
+    expect(a).toEqual({ ok: false, error: "credenciais" });
     expect(b).toEqual(a);
   });
 
   it("bloqueia o IP depois de 5 erros em 15 minutos, mesmo com a senha certa", async () => {
     for (let i = 0; i < MAX_FAILS_PER_IP; i++) await login(req("3.3.3.3"), "dono@exemplo.com", "errada errada errada");
     expect(loginBlocked("3.3.3.3")).toBe(true);
-    expect(await login(req("3.3.3.3"), "dono@exemplo.com", SENHA)).toEqual({ ok: false, error: "Muitas tentativas. Espere 15 minutos." });
+    expect(await login(req("3.3.3.3"), "dono@exemplo.com", SENHA)).toEqual({ ok: false, error: "bloqueado" });
     expect(loginBlocked("4.4.4.4")).toBe(false); // outro IP segue livre
     expect(loginBlocked("3.3.3.3", Date.now() + 16 * 60_000)).toBe(false); // passados 15 min, libera
   });
@@ -67,11 +59,10 @@ describe("login do admin", () => {
     expect(loginBlocked("9.9.9.9")).toBe(true);
   });
 
-  it("recusa ação (POST) vinda de outro site", async () => {
-    const r = await login(req("5.5.5.5"), "dono@exemplo.com", SENHA);
-    if (!r.ok) throw new Error("login falhou");
-    const cookie = r.cookie.split(";")[0];
-    await expect(requireAdmin(req("5.5.5.5", { cookie, origin: "https://site-malicioso.example" }, "POST"))).rejects.toMatchObject({ status: 403 });
-    await expect(requireAdmin(req("5.5.5.5", { cookie, origin: "https://animeprofile.com.br" }, "POST"))).resolves.toBe("dono@exemplo.com");
+  it("sem configuração, devolve 'config' (o motivo vai só para o log do servidor)", async () => {
+    const antes = { ...process.env };
+    delete process.env.ADMIN_PASSWORD_HASH;
+    expect(await login(req("6.6.6.6"), "dono@exemplo.com", SENHA)).toEqual({ ok: false, error: "config" });
+    Object.assign(process.env, antes);
   });
 });

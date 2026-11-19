@@ -1,6 +1,7 @@
 // Peças de formulário com o visual do site. Rótulo sempre visível, erro abaixo do campo e ligado a
 // ele por aria-describedby.
-import { useId } from "react";
+import { useId, useState } from "react";
+import { Eye, EyeOff, Loader2, Lock, type LucideIcon } from "lucide-react";
 
 const control =
   "w-full rounded-xl border bg-surface px-3.5 py-2.5 text-[1rem] placeholder:text-ink-soft/70 focus:outline-none focus:ring-2 focus:ring-link/40 aria-[invalid=true]:border-brand";
@@ -33,22 +34,58 @@ function describedBy(id: string, error?: string, hint?: string) {
   return error ? `${id}-error` : hint ? `${id}-hint` : undefined;
 }
 
-export function TextField({ defaultValue, type = "text", ...props }: BaseProps & { defaultValue?: string; type?: string; autoComplete?: string; maxLength?: number; placeholder?: string }) {
+export function TextField({ defaultValue, type = "text", icon: Icon, ...props }: BaseProps & { defaultValue?: string; type?: string; autoComplete?: string; maxLength?: number; placeholder?: string; icon?: LucideIcon }) {
   const id = useId();
   const { label, name, error, hint, optional, ...rest } = props;
   return (
     <Wrapper id={id} label={label} name={name} error={error} hint={hint} optional={optional}>
-      <input
-        id={id}
-        name={name}
-        type={type}
-        defaultValue={defaultValue}
-        required={!optional}
-        aria-invalid={error ? true : undefined}
-        aria-describedby={describedBy(id, error, hint)}
-        className={`${control} border-line`}
-        {...rest}
-      />
+      <div className="relative">
+        {Icon && <Icon className="pointer-events-none absolute top-1/2 left-3.5 size-[18px] -translate-y-1/2 text-ink-soft" aria-hidden />}
+        <input
+          id={id}
+          name={name}
+          type={type}
+          defaultValue={defaultValue}
+          required={!optional}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy(id, error, hint)}
+          className={`${control} border-line ${Icon ? "pl-10" : ""}`}
+          {...rest}
+        />
+      </div>
+    </Wrapper>
+  );
+}
+
+/** Campo de senha: cadeado à esquerda e olho para mostrar ou esconder à direita. */
+export function PasswordField(props: BaseProps & { autoComplete?: string; maxLength?: number; placeholder?: string }) {
+  const id = useId();
+  const [visivel, setVisivel] = useState(false);
+  const { label, name, error, hint, optional, ...rest } = props;
+  return (
+    <Wrapper id={id} label={label} name={name} error={error} hint={hint} optional={optional}>
+      <div className="relative">
+        <Lock className="pointer-events-none absolute top-1/2 left-3.5 size-[18px] -translate-y-1/2 text-ink-soft" aria-hidden />
+        <input
+          id={id}
+          name={name}
+          type={visivel ? "text" : "password"}
+          required={!optional}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy(id, error, hint)}
+          className={`${control} border-line pr-12 pl-10`}
+          {...rest}
+        />
+        <button
+          type="button"
+          onClick={() => setVisivel((v) => !v)}
+          aria-label={visivel ? "Esconder senha" : "Mostrar senha"}
+          aria-pressed={visivel}
+          className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-lg text-ink-soft hover:bg-sunken hover:text-ink"
+        >
+          {visivel ? <EyeOff className="size-[18px]" aria-hidden /> : <Eye className="size-[18px]" aria-hidden />}
+        </button>
+      </div>
     </Wrapper>
   );
 }
@@ -112,14 +149,15 @@ export function Honeypot() {
   );
 }
 
-export function SubmitButton({ busy, children }: { busy: boolean; children: React.ReactNode }) {
+export function SubmitButton({ busy, children, className = "", busyLabel = "Enviando..." }: { busy: boolean; children: React.ReactNode; className?: string; busyLabel?: string }) {
   return (
     <button
       type="submit"
       disabled={busy}
-      className="rounded-[9px] bg-brand px-6 py-3 font-bold text-brand-ink hover:brightness-110 disabled:cursor-wait disabled:opacity-70"
+      className={`inline-flex items-center justify-center gap-2 rounded-[9px] bg-brand px-6 py-3 font-bold text-brand-ink hover:brightness-110 disabled:cursor-wait disabled:opacity-70 ${className}`}
     >
-      {busy ? "Enviando..." : children}
+      {busy && <Loader2 className="size-[18px] animate-spin motion-reduce:animate-none" aria-hidden />}
+      {busy ? busyLabel : children}
     </button>
   );
 }

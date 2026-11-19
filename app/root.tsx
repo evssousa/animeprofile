@@ -18,6 +18,7 @@ import { Header } from "./components/layout/Header";
 import { SideNav, sidebarBootstrap } from "./components/layout/SideNav";
 import { themeBootstrap } from "./components/layout/ThemeToggle";
 import { PageHeader } from "./components/PageHeader";
+import { sessionHintBootstrap } from "./lib/session-hint";
 import { SITE } from "./lib/site";
 import { VisitBeacon } from "./visitas/client/VisitBeacon";
 
@@ -56,6 +57,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="theme-color" content="#0d0d10" />
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: sidebarBootstrap }} />
+        <script dangerouslySetInnerHTML={{ __html: sessionHintBootstrap }} />
         <Meta />
         <Links />
       </head>

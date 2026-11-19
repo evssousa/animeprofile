@@ -49,7 +49,7 @@ async function main() {
   }
   app.use(compression());
   // Painel, contas e rotas internas nunca entram no Google nem em cache compartilhado.
-  app.use(["/admin", "/api"], (_req, res, next) => {
+  app.use(["/admin", "/api", "/login", "/sair"], (_req, res, next) => {
     res.setHeader("X-Robots-Tag", "noindex, nofollow");
     res.setHeader("Cache-Control", "no-store");
     next();
@@ -64,7 +64,7 @@ async function main() {
   // Páginas públicas (sem sessão nem cookie): a CDN pode guardar 60 s e servir a versão antiga por mais 2 min enquanto
   // busca a nova. Aguenta a virada do domínio sem pesar no banco. Notícia nova demora no máximo ~1 min para aparecer.
   app.use((req, res, next) => {
-    if ((req.method === "GET" || req.method === "HEAD") && !res.getHeader("Cache-Control") && !/^\/(api|admin|unsubscribe)\b/.test(req.path)) {
+    if ((req.method === "GET" || req.method === "HEAD") && !res.getHeader("Cache-Control") && !/^\/(api|admin|unsubscribe|login|sair)\b/.test(req.path)) {
       res.setHeader("Cache-Control", "public, max-age=0, s-maxage=60, stale-while-revalidate=120");
     }
     next();

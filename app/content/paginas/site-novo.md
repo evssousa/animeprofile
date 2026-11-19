@@ -25,7 +25,7 @@ ficou mais rápido e passou para uma hospedagem própria.
 3. **Chat, quarto otaku e o resto** que depende de conta.
 
 Não há data fechada para cada etapa. Para ser avisado quando as contas voltarem, deixe o seu e-mail em
-[Login e contas](/login).
+[Login e contas](/cadastro).
 
 ## Os seus dados estão guardados
 

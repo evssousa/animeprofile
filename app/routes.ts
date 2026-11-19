@@ -18,7 +18,7 @@ const TEXT_PAGES = [
 // Endereços que dependem de conta (login, perfil, economia, feed...): mostram "volta em breve" (200, noindex) até as
 // contas voltarem. Cada um sai desta lista quando a página for construída.
 const ACCOUNT_PENDING = [
-  "login", "cadastro", "esqueci-senha", "redefinir-senha", "configuracoes", "perfil", "notificacoes", "salvos", "u/:username",
+  "cadastro", "esqueci-senha", "redefinir-senha", "configuracoes", "perfil", "notificacoes", "salvos", "u/:username",
   "check-in", "missoes", "conquistas", "ranking", "loja", "premium", "rubi", "pagamentos", "convidar", "indicacoes",
   "convite/:code", "w/:code", "feed", "feed/post/:id", "mensagens", "explorar", "quarto", "animes/favoritos", "animes/seguindo",
   "blog/editor", "blog/dashboard",
@@ -53,6 +53,8 @@ export default [
   route("animes/:id", "routes/anime.tsx"),
   ...TEXT_PAGES.map((path) => route(path, "routes/pagina.tsx", { id: `pagina-${path}` })),
   route("contato", "routes/contato.tsx"),
+  route("login", "routes/login.tsx"),
+  route("sair", "routes/sair.ts"),
   route("admin/login", "routes/admin/login.tsx"),
   route("admin/sair", "routes/admin/sair.ts"),
   route("admin", "routes/admin/layout.tsx", [index("routes/admin/visitas.tsx")]),
@@ -65,6 +67,7 @@ export default [
   route("api/public/payments/webhook", "routes/api.mp-webhook.ts", { id: "mp-webhook" }),
   route("api/public/payments/mercado-pago", "routes/api.mp-webhook.ts", { id: "mp-webhook-2" }),
   route("api/health", "routes/api.health.ts"),
+  route("api/eu", "routes/api.eu.ts"),
   route("api/v", "routes/api.v.ts"),
   route("api/cron/:job", "routes/api.cron.ts"),
   route("api/importar/:what", "routes/api.importar.ts"),

@@ -21,7 +21,8 @@ import {
 export type NavItem = { label: string; to: string; icon: LucideIcon; soon?: true; also?: string[]; auth?: true };
 export type NavGroup = { label: string; items: NavItem[] };
 
-/** Enquanto as contas não voltam, ninguém está logado. Quando o login existir, isto passa a vir da sessão. */
+/** Fase 1 das contas (2026-11-19): só o administrador entra (em /login) e os itens `auth` seguem escondidos também para ele.
+ * Na fase 2, `visibleNav` recebe o estado do usuário logado (UserMenu/api/eu). */
 export const LOGGED_IN = false;
 
 /** Menus visíveis: tira os itens `auth` de quem não está logado e some com grupos que ficarem vazios. */

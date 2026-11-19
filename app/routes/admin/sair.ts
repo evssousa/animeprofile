@@ -1,4 +1,4 @@
-// Sair do painel: só por POST (um link não deve deslogar ninguém).
+// Sair do painel: igual ao /sair do site (apaga os dois cookies e volta para o início).
 import { redirect } from "react-router";
 import type { Route } from "./+types/sair";
 import { logout } from "~/server/admin/auth.server";
@@ -10,5 +10,7 @@ export function loader() {
 
 export async function action({ request }: Route.ActionArgs) {
   if (!sameOrigin(request)) return new Response("Origem inválida", { status: 403 });
-  return redirect("/admin/login", { headers: { "Set-Cookie": await logout(request) } });
+  const headers = new Headers();
+  for (const c of await logout(request)) headers.append("Set-Cookie", c);
+  return redirect("/", { headers });
 }

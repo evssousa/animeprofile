@@ -27,6 +27,7 @@ Lovable Cloud. Por isso, o domínio animeprofile.com.br passa para cá numa **vi
 | [plano-robo-noticias.md](plano-robo-noticias.md) | Plano (temporário): robô de notícias por IA no cron do site novo (fase A, antes das contas), com inventário do robô antigo, migration 012, ensaio sem publicar e ligação na virada |
 | [plano-otaku-tv.md](plano-otaku-tv.md) | Plano (temporário): Otaku TV com cara de "YouTube" como no site antigo (palco escuro com player e "A seguir", abas, busca, grade com fileiras de outras categorias, músicas no mesmo player, troca de vídeo sem recarregar, SEO) |
 | [plano-painel-visitas.md](plano-painel-visitas.md) | Plano (temporário): painel `/admin` com contador de visitas próprio, sem cookie (sinal `/api/v`, agregado por dia, login do admin por variáveis de ambiente) e o módulo `app/visitas/` copiável para criasite, vibecoin e respawnou |
+| [plano-contas-login.md](plano-contas-login.md) | Plano (temporário): `/login` no formato do site antigo, **fase 1 só para o administrador** (sessão das variáveis `ADMIN_*`, menu do usuário com "Administração", estado lido no navegador por `/api/eu` sem quebrar o cache da CDN); fases 2 (contas de todos, importação) e 3 (Google) resumidas, "não agora" |
 | [plano-sidebars.md](plano-sidebars.md) | Plano (temporário): inventário das barras laterais do site antigo e o sistema único de lateral (blocos por página, cache curto) para a matéria, Central, categoria/tag, blog, Otaku TV e quiz |
 
 ## Status
@@ -57,7 +58,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Catálogo de figurinhas (só ver), com as imagens copiadas para `/media` e a Coleção da home com dados reais ([plano](plano-quiz-blog-figurinhas.md) §3) | ✅ código pronto e testado, figurinhas em silhueta; falta enviar o catálogo e as imagens do site antigo (2026-11-16, depois das 15h) |
 | 2 | Barras laterais do site antigo: sistema único de lateral na matéria, Central, categoria/tag, blog, Otaku TV ("A seguir") e quiz ([plano](plano-sidebars.md)) | ✅ feito (passos 1 a 8 e 10); o dono respondeu as 3 perguntas com as recomendadas em 2026-11-17 |
 | 2 | Otaku TV no esquema do site antigo ("YouTube"): palco com player e "A seguir", fileiras por categoria, músicas no mesmo player ([plano](plano-otaku-tv.md)) | ✅ feito em 2026-11-17 (passos 1 a 7; dono conferindo). Recomendadas aplicadas: `?v=`, sem botões de conta, "A seguir" com 3 itens no celular. Falta o `VideoObject` na página da matéria |
-| 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha | 💤 por último (decisão do dono) |
+| 2 | `/login` do administrador no formato do antigo, menu do usuário com "Administração", `/admin/login` → `/login`, sem cadastro ([plano](plano-contas-login.md), fase 1) | ✅ feito em 2026-11-19 (fase 1; recomendadas aplicadas) |
+| 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha, Google ([plano](plano-contas-login.md), fases 2 e 3) | 💤 não agora (decisão do dono em 2026-11-19) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
 | 4 | Social: Feed, mensagens, blog, comentários, quarto otaku, Otaku TV | 💤 |
@@ -141,9 +143,11 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 3a. **Painel de visitas** ([plano-painel-visitas.md](plano-painel-visitas.md)): passos 1 a 12 feitos em 2026-11-19. Falta: conferir em produção
     com o login do dono, **textos legais (13)**, país ou idioma (14, olhar os cabeçalhos da CDN por 1 dia) e docs finais (15). Depois, os irmãos
     (criasite, vibecoin, respawnou) com o módulo `app/visitas/`. Importar do backup os totais por dia do site antigo (pergunta 2) fica num passo extra.
-3b. **Contas com login do Google (pedido do dono em 2026-11-19):** a fase das contas deve incluir "Entrar com o Google" e a importação dos
-    usuários do site antigo que entraram com o Google (114 identidades no backup de 15/11), com todos os dados deles. É uma tarefa G
-    (planejador antes), separada do painel; depende de: cliente OAuth do Google com o endereço novo, SMTP e Turnstile.
+3b. **`/login` do administrador:** feito em 2026-11-19 (fase 1 do [plano-contas-login.md](plano-contas-login.md)). Só o admin entra
+    (variáveis `ADMIN_*` do hPanel), sem cadastro; menu do usuário com "Administração"; `/admin/login` leva a `/login`; marcador `ap_logado` e
+    `GET /api/eu` mantêm o cache da CDN. Falta conferir em produção com o dono logado.
+3c. **Contas de todos e Google (fases 2 e 3 do mesmo plano): não agora** (decisão do dono em 2026-11-19). Quando voltar: importação dos
+    171 usuários do dump final (64 com senha, 114 identidades do Google) com todos os dados, login para todos, SMTP, Turnstile, Google OAuth.
 4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
    [deploy-hostinger.md](deploy-hostinger.md).
 5. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
@@ -154,6 +158,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 - **Painel de visitas:** as variáveis `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` e `SESSION_SECRET` já estão no hPanel (2026-11-19). Depois do deploy,
   entrar em `/admin` e conferir; aprovar o texto novo da Privacidade e dos Cookies (passo 13).
+- **`/login` do administrador ([plano-contas-login.md](plano-contas-login.md)):** nada bloqueia. Se quiser, responda as 3 perguntas do
+  plano (botão do Google visível e desativado ou escondido; limite global de 30 tentativas ou 60; itens só para logados escondidos
+  também para o admin). Sem resposta, sigo com as recomendadas (visível, 30, escondidos). Depois do deploy: entrar pelo `/login`.
 - **Robô de notícias:** nada pendente seu agora (config e chave feitas, prévias aprovadas). Eu ligo `publicar` com teto 6
   depois da virada (17/11); no dia 18 sobe para 10.
 - **SMTP:** não é mais necessário para o Contato (decisão do dono em 2026-11-17: sem formulário, só e-mail por `mailto:`). Volta a ser

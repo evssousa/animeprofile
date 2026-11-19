@@ -1,10 +1,11 @@
-// Acesso ao painel /admin: um único administrador, definido por variáveis de ambiente (até as contas voltarem; depois,
-// só esta função `requireAdmin` passa a ler o papel "admin" da sessão da conta).
+// Acesso do administrador: um único admin, definido por variáveis de ambiente (até as contas voltarem; na fase 2,
+// `getViewer` passa a ler a sessão do banco e `user_roles`, e este arquivo some).
 //   ADMIN_EMAIL           e-mail de login
 //   ADMIN_PASSWORD_HASH   hash scrypt da senha (gerado por `npm run admin:hash`, nunca a senha)
 //   SESSION_SECRET        segredo que assina o cookie de sessão (32+ caracteres aleatórios)
-import { createCookieSessionStorage, redirect } from "react-router";
-import { clientIp, sameOrigin } from "../http.server";
+import { createCookieSessionStorage } from "react-router";
+import { SESSION_HINT } from "~/lib/session-hint";
+import { clientIp } from "../http.server";
 import { parseHash, verifyPassword } from "./hash";
 
 export { hashPassword, verifyPassword } from "./hash";
@@ -17,7 +18,7 @@ export function adminConfig() {
   const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
   const hash = process.env.ADMIN_PASSWORD_HASH?.trim();
   const secret = process.env.SESSION_SECRET?.trim();
-  // O que falta ou está inválido (só nomes, nunca valores): mostrado na tela de login.
+  // O que falta ou está inválido (só nomes, nunca valores): vai para o log do servidor, nunca para a página.
   const problems: string[] = [];
   if (!email) problems.push("ADMIN_EMAIL não encontrada");
   else if (!email.includes("@")) problems.push("ADMIN_EMAIL não parece um e-mail");
@@ -51,6 +52,12 @@ function sessions() {
   return storage;
 }
 
+/** Cookie marcador (sem segredo, legível pelo navegador): só avisa que vale perguntar a /api/eu quem está logado. */
+export function hintCookie(ligado: boolean): string {
+  const base = `${SESSION_HINT}=${ligado ? "1" : ""}; Path=/; SameSite=Lax; Max-Age=${ligado ? 7 * 24 * 3600 : 0}`;
+  return process.env.NODE_ENV === "production" ? `${base}; Secure` : base;
+}
+
 // ───────────── Limite de tentativas (em memória) ─────────────
 
 const WINDOW_MS = 15 * 60_000;
@@ -80,37 +87,36 @@ export function registerFail(ip: string, now = Date.now()) {
 
 // ───────────── Sessão ─────────────
 
-export async function login(request: Request, email: string, password: string): Promise<{ ok: true; cookie: string } | { ok: false; error: string }> {
+export type LoginResult = { ok: true; cookies: string[] } | { ok: false; error: "config" | "bloqueado" | "credenciais" };
+
+/** Confere e-mail e senha. Devolve os dois cookies (sessão HttpOnly + marcador) ou o motivo da recusa. */
+export async function login(request: Request, email: string, password: string): Promise<LoginResult> {
   const cfg = adminConfig();
-  if (!cfg.ready) return { ok: false, error: "Painel não configurado." };
+  if (!cfg.ready) {
+    console.error(`[login] configuração incompleta: ${cfg.problems.join("; ")}`);
+    return { ok: false, error: "config" };
+  }
   const ip = clientIp(request) || "local";
-  if (loginBlocked(ip)) return { ok: false, error: "Muitas tentativas. Espere 15 minutos." };
+  if (loginBlocked(ip)) return { ok: false, error: "bloqueado" };
   const emailOk = email.trim().toLowerCase() === cfg.email;
   // Sempre calcula o hash (mesmo com e-mail errado) para não revelar pelo tempo de resposta.
   const passOk = await verifyPassword(password, cfg.hash!);
   if (!emailOk || !passOk) {
     registerFail(ip);
-    return { ok: false, error: "E-mail ou senha incorretos." };
+    return { ok: false, error: "credenciais" };
   }
   fails.delete(ip);
   const session = await sessions().getSession();
   session.set("admin", cfg.email!);
-  return { ok: true, cookie: await sessions().commitSession(session) };
+  return { ok: true, cookies: [await sessions().commitSession(session), hintCookie(true)] };
 }
 
-export async function logout(request: Request) {
-  const session = await sessions().getSession(request.headers.get("Cookie"));
-  return sessions().destroySession(session);
-}
-
-/** Exige sessão de admin; sem ela, manda para o login. Em ações (POST), confere também a origem. */
-export async function requireAdmin(request: Request) {
+/** Os dois cookies, apagados. */
+export async function logout(request: Request): Promise<string[]> {
   const cfg = adminConfig();
-  if (!cfg.ready) throw redirect("/admin/login");
+  if (!cfg.ready) return [hintCookie(false)];
   const session = await sessions().getSession(request.headers.get("Cookie"));
-  if (session.get("admin") !== cfg.email) throw redirect("/admin/login");
-  if (request.method !== "GET" && !sameOrigin(request)) throw new Response("Origem inválida", { status: 403 });
-  return cfg.email!;
+  return [await sessions().destroySession(session), hintCookie(false)];
 }
 
 /** Há sessão de admin válida? (sem redirecionar) */

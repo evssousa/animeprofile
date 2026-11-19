@@ -5,6 +5,7 @@ import { HEADER_LINKS, isActive } from "~/lib/nav";
 import { Logo } from "./Logo";
 import { MenuFooter, NavGroups } from "./SideNav";
 import { ThemeToggle } from "./ThemeToggle";
+import { UserMenu, UserMenuDrawer } from "./UserMenu";
 
 /**
  * Topo do site: faixa escura (a "night"), que continua no cabeçalho de cada página (PageHeader), como na capa
@@ -53,13 +54,14 @@ export function Header() {
             <Search className="size-[19px]" aria-hidden />
           </Link>
           <ThemeToggle className="text-white/80 hover:bg-white/10 hover:text-white lg:hidden" />
-          <Link to="/login" className="hidden px-2 py-2 font-semibold hover:text-glow sm:inline-block">
+          <Link to="/login" className="hidden px-2 py-2 font-semibold hover:text-glow sm:inline-block logado:hidden!">
             Entrar
           </Link>
-          <Link to="/login" className="rounded-[9px] bg-brand px-3.5 py-2.5 text-[0.9rem] font-bold whitespace-nowrap sm:px-4 sm:text-[0.95rem] text-brand-ink shadow-[0_8px_24px_rgba(194,53,43,.35)] hover:brightness-110">
+          <Link to="/login" className="logado:hidden! rounded-[9px] bg-brand px-3.5 py-2.5 text-[0.9rem] font-bold whitespace-nowrap sm:px-4 sm:text-[0.95rem] text-brand-ink shadow-[0_8px_24px_rgba(194,53,43,.35)] hover:brightness-110">
             <span className="min-[400px]:hidden">Em breve</span>
             <span className="hidden min-[400px]:inline">Contas em breve</span>
           </Link>
+          <UserMenu />
         </div>
       </div>
     </header>
@@ -108,9 +110,10 @@ function MobileMenu() {
           <nav aria-label="Menu completo">
             <NavGroups variant="drawer" onNavigate={close} />
           </nav>
-          <Link to="/login" onClick={close} className="mx-3 rounded-xl border border-line py-3 text-center font-semibold hover:bg-sunken">
+          <Link to="/login" onClick={close} className="mx-3 rounded-xl border border-line py-3 text-center font-semibold hover:bg-sunken logado:hidden!">
             Entrar
           </Link>
+          <UserMenuDrawer onNavigate={close} />
           <div className="flex flex-col gap-1">
             <MenuFooter variant="drawer" />
           </div>

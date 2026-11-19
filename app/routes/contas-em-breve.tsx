@@ -11,7 +11,7 @@ import { routePath } from "~/lib/route-path";
 
 export function loader({ request }: Route.LoaderArgs) {
   const path = routePath(request);
-  const label = NAV.flatMap((g) => g.items).find((i) => i.to === path)?.label ?? null;
+  const label = path === "/cadastro" ? "Cadastro" : (NAV.flatMap((g) => g.items).find((i) => i.to === path)?.label ?? null);
   const invite = /^\/(convite|w)\//.test(path);
   return { label, invite };
 }

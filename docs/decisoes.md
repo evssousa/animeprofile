@@ -2,6 +2,27 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-19 (plano) — `/login` só para o administrador; contas de todos depois
+
+Detalhes em [plano-contas-login.md](plano-contas-login.md).
+
+- **Decisão do dono:** por enquanto só o login do administrador e nenhuma conta nova. Importação dos usuários, login
+  para todos, Google, SMTP, Turnstile e cadastro aberto ficam para as fases 2 e 3 ("não agora").
+- **Decisões do plano (fase 1):**
+  - `/login` no formato do site antigo (marca, título, cartão com Google, divisor, e-mail e senha, rodapé), no visual
+    novo e dentro da moldura do site; Google visível e desativado com "Em breve"; sem "Esqueci minha senha"; aviso de
+    que as contas da comunidade voltam em breve. `/admin/login` redireciona para `/login?redirect=/admin`.
+  - O admin continua definido pelas variáveis `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` e `SESSION_SECRET` (sem tabela
+    nova, sem migration). Uma função `getViewer(request)` devolve o usuário com `papeis: ["admin"]`, e `requireAdmin`
+    passa a conferir o papel; na fase 2 só `getViewer` muda.
+  - O cabeçalho lê o estado no navegador (`GET /api/eu`, `no-store`) e só quando existe o cookie marcador `ap_logado`
+    (sem segredo); um script no `<head>` evita o "Entrar" piscar. O HTML público continua igual para todos, com
+    `s-maxage=60`. `/login` e `/sair` sem cache.
+  - Menu do usuário: avatar com a inicial, "Administrador", "Administração" (só com o papel admin) e "Sair". Os itens
+    do menu só para logados continuam escondidos também para o admin (`LOGGED_IN = false`).
+- **Por quê:** o dono quer entrar pela mesma porta que todos vão usar, sem depender de SMTP, Turnstile ou Google agora;
+  ler a sessão no navegador mantém o cache da CDN, que segura o tráfego do site.
+
 ## 2026-11-19 (plano) — Contador de visitas próprio, sem cookie, e painel `/admin` sem contas
 
 Detalhes em [plano-painel-visitas.md](plano-painel-visitas.md).

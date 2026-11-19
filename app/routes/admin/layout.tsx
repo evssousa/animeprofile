@@ -2,7 +2,7 @@
 import { Outlet } from "react-router";
 import type { Route } from "./+types/layout";
 import { AdminShell } from "~/components/admin/AdminShell";
-import { requireAdmin } from "~/server/admin/auth.server";
+import { requireAdmin } from "~/server/auth/viewer.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
   await requireAdmin(request);
