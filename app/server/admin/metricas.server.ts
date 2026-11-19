@@ -1,5 +1,4 @@
-// Métricas do painel (/admin/retention): audiência e conteúdo com dado real (visitas sem cookie, matérias, quiz), retrato semanal
-// e registro de decisões. As métricas de contas (ativação, retenção, NPS, pagamento) só nascem quando o cadastro abrir.
+// Métricas do painel (/admin/retention): audiência e conteúdo com dado real (visitas sem cookie, matérias, quiz) e retrato semanal. As métricas de contas (ativação, retenção, NPS, pagamento) só nascem quando o cadastro abrir.
 // Datas em Brasília (`diaBrasilia`); a semana começa na segunda-feira. Docs: docs/plano-telas-painel.md, tela 2.
 import { exec, query } from "../db.server";
 import { diaBrasilia, ddmm, somarDias } from "~/visitas/core/dia";
@@ -99,46 +98,12 @@ export function montarCartoes(a: Retrato, b: Retrato): CartaoMetrica[] {
   ];
 }
 
-// ───────────── Rendimento do conteúdo ─────────────
+// ───────────── Matérias que mais trouxeram entradas ─────────────
 
-export type Rendimento = {
-  porOrigem: { origem: "robo" | "agenda" | "painel" | "old"; materias: number; mediaVistas: number }[];
-  topEntradas: { path: string; titulo: string; entradas: number }[];
-};
+export type MaisEntradas = { path: string; titulo: string; entradas: number };
 
-const chunk = <T,>(a: T[], n: number) => Array.from({ length: Math.ceil(a.length / n) }, (_, i) => a.slice(i * n, i * n + n));
-
-/** Vistas por matéria nos 7 primeiros dias (só matérias publicadas há 7+ dias e nos últimos 60) e as que mais trouxeram entradas em 30 dias. */
-export async function rendimento(hoje: string): Promise<Rendimento> {
-  const limiteNovo = utc(somarDias(hoje, -7));
-  const desde = utc(somarDias(hoje, -60));
-  const posts = await query<{ slug: string; post_type: string; cls: string; dia: string }>(
-    `SELECT slug, post_type, CASE WHEN source_url LIKE 'agenda de animes%' THEN 'agenda' WHEN origin = 'robo' THEN 'robo' WHEN origin = 'old' THEN 'old' ELSE 'painel' END AS cls,
-            DATE_FORMAT(DATE_SUB(published_at, INTERVAL 3 HOUR), '%Y-%m-%d') AS dia
-     FROM posts WHERE status = 'published' AND published_at >= ? AND published_at <= ?`,
-    [desde, limiteNovo],
-  );
-  const caminho = (p: { slug: string; post_type: string }) => `/${p.post_type === "article" ? "artigos" : "noticias"}/${p.slug}`;
-  const vistas = new Map<string, Map<string, number>>(); // path -> dia -> views
-  for (const parte of chunk(posts.map(caminho), 200)) {
-    if (!parte.length) continue;
-    const rows = await query<{ path: string; dia: string; v: number }>(
-      `SELECT path, DATE_FORMAT(day, '%Y-%m-%d') AS dia, views AS v FROM visit_pages WHERE path IN (${parte.map(() => "?").join(",")}) AND day >= ?`,
-      [...parte, somarDias(hoje, -67)],
-    );
-    for (const r of rows) (vistas.get(r.path) ?? vistas.set(r.path, new Map()).get(r.path)!).set(r.dia, num(r.v));
-  }
-  const soma = new Map<string, { n: number; total: number }>();
-  for (const p of posts) {
-    const dias = vistas.get(caminho(p));
-    let total = 0;
-    for (let i = 0; i < 7; i++) total += dias?.get(somarDias(p.dia, i)) ?? 0;
-    const s = soma.get(p.cls) ?? { n: 0, total: 0 };
-    soma.set(p.cls, { n: s.n + 1, total: s.total + total });
-  }
-  const ordem = ["robo", "agenda", "painel", "old"] as const;
-  const porOrigem = ordem.filter((o) => soma.has(o)).map((o) => ({ origem: o, materias: soma.get(o)!.n, mediaVistas: Math.round(soma.get(o)!.total / soma.get(o)!.n) }));
-
+/** As 5 matérias que mais trouxeram entradas no site nos últimos 30 dias. */
+export async function maisEntradas(hoje: string): Promise<MaisEntradas[]> {
   const top = await query<{ path: string; e: number }>(
     "SELECT path, SUM(entries) AS e FROM visit_pages WHERE kind = 'materia' AND day BETWEEN ? AND ? GROUP BY path HAVING e > 0 ORDER BY e DESC, path LIMIT 5",
     [somarDias(hoje, -29), hoje],
@@ -146,7 +111,7 @@ export async function rendimento(hoje: string): Promise<Rendimento> {
   const slugs = top.map((t) => t.path.split("/")[2]).filter(Boolean);
   const nomes = slugs.length ? await query<{ slug: string; title: string }>(`SELECT slug, title FROM posts WHERE slug IN (${slugs.map(() => "?").join(",")})`, slugs) : [];
   const titulo = new Map(nomes.map((n) => [n.slug, n.title]));
-  return { porOrigem, topEntradas: top.map((t) => ({ path: t.path, titulo: titulo.get(t.path.split("/")[2]) ?? t.path, entradas: num(t.e) })) };
+  return top.map((t) => ({ path: t.path, titulo: titulo.get(t.path.split("/")[2]) ?? t.path, entradas: num(t.e) }));
 }
 
 // ───────────── De onde vêm, semana a semana ─────────────
@@ -214,61 +179,15 @@ export async function gravarRetrato(segunda: string): Promise<Retrato> {
   return dados;
 }
 
-export type Decisao = { id: number; problema: string; decisao: string; motivo: string | null; quem: string | null; revisarEm: string | null; discordancia: string | null; status: "aberta" | "revista"; criadaEm: string; vencida: boolean };
-
-export async function decisoes(hoje: string): Promise<Decisao[] | null> {
-  try {
-    const rows = await query<{ id: number; problem: string; decision: string; reason: string | null; owner: string | null; review: string | null; dissent: string | null; status: string; criada: string }>(
-      "SELECT id, problem, decision, reason, owner, DATE_FORMAT(review_at, '%Y-%m-%d') AS review, dissent, status, DATE_FORMAT(created_at, '%Y-%m-%d') AS criada FROM metrics_decisions ORDER BY status ASC, COALESCE(review_at, '9999-12-31') ASC, id DESC LIMIT 50",
-    );
-    return rows.map((r) => ({
-      id: num(r.id),
-      problema: r.problem,
-      decisao: r.decision,
-      motivo: r.reason,
-      quem: r.owner,
-      revisarEm: r.review,
-      discordancia: r.dissent,
-      status: r.status === "revista" ? "revista" : "aberta",
-      criadaEm: r.criada,
-      vencida: r.status !== "revista" && !!r.review && r.review <= hoje,
-    }));
-  } catch (e) {
-    if (faltaTabela(e)) return null;
-    throw e;
-  }
-}
-
-export type NovaDecisao = { problema: string; decisao: string; motivo?: string; quem?: string; revisarEm?: string; discordancia?: string };
-
-/** Registra a decisão junto com os números do momento (últimos 7 dias). */
-export async function registrarDecisao(d: NovaDecisao, hoje: string): Promise<void> {
-  const retrato = await calcularPeriodo(somarDias(hoje, -7), somarDias(hoje, -1));
-  await exec("INSERT INTO metrics_decisions (problem, decision, reason, owner, review_at, dissent, snapshot) VALUES (?, ?, ?, ?, ?, ?, ?)", [
-    d.problema,
-    d.decisao,
-    d.motivo || null,
-    d.quem || null,
-    d.revisarEm || null,
-    d.discordancia || null,
-    JSON.stringify(retrato),
-  ]);
-}
-
-export async function marcarRevista(id: number): Promise<void> {
-  await exec("UPDATE metrics_decisions SET status = 'revista' WHERE id = ?", [id]);
-}
-
 // ───────────── Tudo da tela ─────────────
 
 export async function resumoMetricas(hoje = diaBrasilia()) {
-  const [a, b, rend, semanas, hist, decs] = await Promise.all([
+  const [a, b, entradas, semanas, hist] = await Promise.all([
     calcularPeriodo(somarDias(hoje, -7), somarDias(hoje, -1)),
     calcularPeriodo(somarDias(hoje, -14), somarDias(hoje, -8)),
-    rendimento(hoje),
+    maisEntradas(hoje),
     origensSemanais(hoje),
     historico(),
-    decisoes(hoje),
   ]);
-  return { hoje, cartoes: montarCartoes(a, b), rendimento: rend, semanas, historico: hist, decisoes: decs, semBase: a.visitantesDia === 0 && b.visitantesDia === 0 };
+  return { hoje, cartoes: montarCartoes(a, b), maisEntradas: entradas, semanas, historico: hist, semBase: a.visitantesDia === 0 && b.visitantesDia === 0 };
 }

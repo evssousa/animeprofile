@@ -16,25 +16,28 @@ const semanas = Array.from({ length: 8 }, (_, i) => ({ semana: `2026-10-${String
 const dados = (extra: Record<string, unknown> = {}) => ({
   hoje: "2026-11-19",
   cartoes: montarCartoes(r(), r({ visitantesDia: 50, buscaPct: 20 })),
-  rendimento: { porOrigem: [{ origem: "robo", materias: 38, mediaVistas: 142 }], topEntradas: [{ path: "/noticias/a", titulo: "Matéria A", entradas: 820 }] },
+  maisEntradas: [{ path: "/noticias/a", titulo: "Matéria A", entradas: 820 }],
   semanas,
   historico: [{ semana: "2026-11-09", dados: r() }],
-  decisoes: [{ id: 1, problema: "Busca caiu", decisao: "Rever títulos", motivo: null, quem: "Dono", revisarEm: "2026-11-19", discordancia: null, status: "aberta", criadaEm: "2026-11-12", vencida: true }],
   semBase: false,
   ...extra,
 });
 
 describe("tela de Métricas", () => {
-  it("mostra os 5 cartões, rendimento, origens, histórico, decisões e o bloco das contas", async () => {
+  it("mostra os 5 cartões, as matérias com mais entradas, origens, histórico e o bloco das contas", async () => {
     const h = await render(<Tela loaderData={{ erro: false, hora: "14:32", dados: dados() }} />);
-    for (const t of ["Visitantes por dia", "Páginas por visita", "Vindas da busca", "Conclusão do quiz", "Procura pelas contas", "Se piorar:", "Rendimento do conteúdo", "142", "Matéria A", "De onde vêm, semana a semana", "Histórico semanal", "Busca caiu", "revisar", "Registrar decisão", "Contas: começa quando o cadastro abrir", "Gravar retrato da semana"]) expect(h).toContain(t);
+    for (const t of ["Visitantes por dia", "Páginas por visita", "Vindas da busca", "Conclusão do quiz", "Procura pelas contas", "Se piorar:", "Matérias que mais trouxeram entradas", "Matéria A", "De onde vêm, semana a semana", "Histórico semanal", "Contas: começa quando o cadastro abrir"]) expect(h).toContain(t);
     expect(h).toContain("50 pts"); // 70% contra 20%
   });
 
-  it("sem a migration 014, avisa no histórico e nas decisões; erro de banco mostra o aviso padrão", async () => {
-    const h = await render(<Tela loaderData={{ erro: false, hora: "14:32", dados: dados({ historico: null, decisoes: null }) }} />);
+  it("não tem botão de gravar retrato nem decisões nem gráfico por origem de matéria", async () => {
+    const h = await render(<Tela loaderData={{ erro: false, hora: "14:32", dados: dados() }} />);
+    for (const t of ["Gravar retrato", "Decisões", "Registrar decisão", "Site antigo", "Rendimento do conteúdo"]) expect(h).not.toContain(t);
+  });
+
+  it("sem a migration 014, avisa no histórico; erro de banco mostra o aviso padrão", async () => {
+    const h = await render(<Tela loaderData={{ erro: false, hora: "14:32", dados: dados({ historico: null }) }} />);
     expect(h).toContain("Falta rodar a migration 014 para guardar o histórico");
-    expect(h).toContain("Falta rodar a migration 014 para registrar decisões");
     const e = await render(<Tela loaderData={{ erro: true }} />);
     expect(e).toContain("Não deu para ler as métricas agora");
   });

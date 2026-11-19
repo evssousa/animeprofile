@@ -1,9 +1,9 @@
-// Métricas do painel com banco: números do período, os 5 cartões, rendimento por origem, origens por semana, retrato e decisões.
+// Métricas do painel com banco: números do período, os 5 cartões, matérias com mais entradas, origens por semana e retrato semanal.
 import { createDB } from "mysql-memory-server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { migrate } from "../db/migrate.mjs";
 import { createPool, exec, query, setPool } from "~/server/db.server";
-import { calcularPeriodo, decisoes, gravarRetrato, historico, marcarRevista, montarCartoes, origensSemanais, registrarDecisao, rendimento, resumoMetricas, segundaDe, ultimaSemanaCompleta } from "~/server/admin/metricas.server";
+import { calcularPeriodo, gravarRetrato, historico, maisEntradas, montarCartoes, origensSemanais, resumoMetricas, segundaDe, ultimaSemanaCompleta } from "~/server/admin/metricas.server";
 
 let server: Awaited<ReturnType<typeof createDB>>;
 const HOJE = "2026-11-19"; // quinta-feira
@@ -68,12 +68,10 @@ describe("números do período e os 5 cartões", () => {
   });
 });
 
-describe("rendimento do conteúdo e origens", () => {
-  it("soma só os 7 primeiros dias de cada matéria, separa a agenda do robô e ignora as muito novas", async () => {
-    const r = await rendimento(HOJE);
-    expect(r.porOrigem.find((o) => o.origem === "robo")).toEqual({ origem: "robo", materias: 1, mediaVistas: 30 }); // 10 + 20; os 100 do dia 12 ficam de fora
-    expect(r.porOrigem.find((o) => o.origem === "agenda")).toEqual({ origem: "agenda", materias: 1, mediaVistas: 0 });
-    expect(r.topEntradas[0]).toEqual({ path: "/noticias/a", titulo: "Título a", entradas: 15 });
+describe("entradas e origens", () => {
+  it("lista as matérias que mais trouxeram entradas em 30 dias, com o título", async () => {
+    const r = await maisEntradas(HOJE);
+    expect(r[0]).toEqual({ path: "/noticias/a", titulo: "Título a", entradas: 15 });
   });
 
   it("origens por semana: 8 semanas, a última é a atual, sem a navegação interna", async () => {
@@ -86,7 +84,7 @@ describe("rendimento do conteúdo e origens", () => {
   });
 });
 
-describe("retrato semanal e decisões", () => {
+describe("retrato semanal", () => {
   it("gravar o retrato duas vezes mantém uma linha só (a semana é a chave)", async () => {
     await gravarRetrato("2026-11-09");
     await gravarRetrato("2026-11-09");
@@ -95,27 +93,13 @@ describe("retrato semanal e decisões", () => {
     expect(h![0]).toMatchObject({ semana: "2026-11-09", dados: { v: 1, visitantesDia: 79 } });
   });
 
-  it("registra decisão com os números do momento, marca vencida e marca como revista", async () => {
-    await registrarDecisao({ problema: "Busca caiu", decisao: "Revisar títulos", revisarEm: "2026-11-19" }, HOJE);
-    await registrarDecisao({ problema: "Outra", decisao: "Esperar", revisarEm: "2026-12-30" }, HOJE);
-    let d = (await decisoes(HOJE))!;
-    expect(d.map((x) => [x.problema, x.vencida])).toEqual([["Busca caiu", true], ["Outra", false]]);
-    const [row] = await query<{ snapshot: unknown }>("SELECT snapshot FROM metrics_decisions WHERE problem = 'Busca caiu'");
-    expect(JSON.stringify(row.snapshot)).toContain("visitantesDia");
-    await marcarRevista(d[0].id);
-    d = (await decisoes(HOJE))!;
-    expect(d.find((x) => x.problema === "Busca caiu")).toMatchObject({ status: "revista", vencida: false });
-  });
-
-  it("resumo da tela junta tudo e avisa quando falta a migration (tabelas ausentes viram null)", async () => {
+  it("resumo da tela junta tudo e avisa quando falta a migration (tabela ausente vira null)", async () => {
     const r = await resumoMetricas(HOJE);
     expect(r.cartoes).toHaveLength(5);
     expect(r.semBase).toBe(false);
     expect(r.historico).not.toBeNull();
-    await exec("DROP TABLE metrics_decisions");
     await exec("DROP TABLE metrics_snapshots");
     const sem = await resumoMetricas(HOJE);
     expect(sem.historico).toBeNull();
-    expect(sem.decisoes).toBeNull();
   });
 });

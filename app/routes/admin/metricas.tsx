@@ -1,15 +1,13 @@
-// Métricas (/admin/retention): audiência e conteúdo com dado real, retrato semanal e decisões. As métricas de contas só
+// Métricas (/admin/retention): audiência e conteúdo com dado real e retrato semanal. As métricas de contas só
 // começam a contar quando o cadastro abrir (docs/plano-telas-painel.md, tela 2).
-import { Form, Link, useNavigation } from "react-router";
-import { ArrowDown, ArrowUp, Camera, ClipboardList, Lock, PlusCircle, Sprout } from "lucide-react";
-import { z } from "zod";
+import { Link } from "react-router";
+import { ArrowDown, ArrowUp, Camera, Lock, Newspaper } from "lucide-react";
 import type { Route } from "./+types/metricas";
 import "~/visitas/ui/visitas.css";
-import { Aviso, Botao, Cabecalho, Cartao, Numero, Selo, Vazio } from "~/components/admin/ui";
+import { Aviso, Cabecalho, Cartao, Numero, Vazio } from "~/components/admin/ui";
 import { adminMeta } from "~/lib/admin-meta";
-import { gravarRetrato, marcarRevista, registrarDecisao, resumoMetricas, ultimaSemanaCompleta, type CartaoMetrica, type Retrato } from "~/server/admin/metricas.server";
+import { resumoMetricas, type CartaoMetrica, type Retrato } from "~/server/admin/metricas.server";
 import { requireAdmin } from "~/server/auth/viewer.server";
-import { diaBrasilia } from "~/visitas/core/dia";
 
 export const meta = () => adminMeta("Métricas");
 
@@ -20,45 +18,6 @@ export async function loader({ request }: Route.LoaderArgs) {
   } catch (e) {
     console.error(`[metricas] não consegui ler: ${String((e as Error)?.message ?? e).slice(0, 120)}`);
     return { erro: true as const };
-  }
-}
-
-const texto = (max: number) => z.string().trim().max(max);
-const Decisao = z.object({
-  problema: texto(300).min(3, "Conte qual é o problema (com o número)."),
-  decisao: texto(2000).min(3, "Diga o que vamos fazer."),
-  motivo: texto(2000).optional(),
-  quem: texto(120).optional(),
-  revisarEm: z.union([z.literal(""), z.string().regex(/^\d{4}-\d{2}-\d{2}$/)]).optional(),
-  discordancia: texto(2000).optional(),
-});
-
-export async function action({ request }: Route.ActionArgs) {
-  await requireAdmin(request);
-  const form = await request.formData();
-  const intent = String(form.get("intent") ?? "");
-  try {
-    if (intent === "gravar-retrato") {
-      const semana = ultimaSemanaCompleta(diaBrasilia());
-      await gravarRetrato(semana);
-      return { ok: `Retrato da semana de ${semana.slice(8, 10)}/${semana.slice(5, 7)} gravado.` };
-    }
-    if (intent === "nova-decisao") {
-      const r = Decisao.safeParse(Object.fromEntries([...form.entries()].map(([k, v]) => [k, String(v)])));
-      if (!r.success) return { erro: r.error.issues[0]?.message ?? "Confira os campos." };
-      await registrarDecisao(r.data, diaBrasilia());
-      return { ok: "Decisão registrada." };
-    }
-    if (intent === "decisao-revista") {
-      const id = Number(form.get("id"));
-      if (!Number.isInteger(id) || id <= 0) return { erro: "Decisão inválida." };
-      await marcarRevista(id);
-      return { ok: "Marcada como revista." };
-    }
-    return { erro: "Ação desconhecida." };
-  } catch (e) {
-    console.error(`[metricas] ação ${intent} falhou: ${String((e as Error)?.message ?? e).slice(0, 120)}`);
-    return { erro: "Não deu para salvar agora. Se a migration 014 não rodou, rode-a antes." };
   }
 }
 
@@ -90,10 +49,8 @@ const ORIGENS = [
   { id: "site", rotulo: "Sites" },
   { id: "campanha", rotulo: "Campanhas" },
 ];
-const ROTULO_ORIGEM: Record<string, string> = { robo: "Robô", agenda: "Agenda", painel: "Você", old: "Site antigo" };
 
-export default function Metricas({ loaderData, actionData }: Route.ComponentProps) {
-  const ocupado = useNavigation().state === "submitting";
+export default function Metricas({ loaderData }: Route.ComponentProps) {
   if (loaderData.erro)
     return (
       <div>
@@ -106,26 +63,14 @@ export default function Metricas({ loaderData, actionData }: Route.ComponentProp
       </div>
     );
   const { dados, hora } = loaderData;
-  const maxMedia = Math.max(1, ...dados.rendimento.porOrigem.map((o) => o.mediaVistas));
   const retratos = dados.historico;
-  const decs = dados.decisoes;
   return (
     <div className="flex flex-col gap-6">
       <Cabecalho
         titulo="Métricas"
         desc="Audiência e conteúdo, sem cookies. As métricas das contas começam a contar quando o cadastro abrir."
-        acoes={
-          <Form method="post">
-            <input type="hidden" name="intent" value="gravar-retrato" />
-            <Botao type="submit" variante="primario" icone={Camera} ocupado={ocupado}>
-              Gravar retrato da semana
-            </Botao>
-          </Form>
-        }
       />
       <p className="-mt-3 text-[0.8rem] text-ink-soft">Calculado às {hora} · últimos 7 dias fechados contra os 7 anteriores</p>
-      {actionData && "ok" in actionData && <Aviso tom="ok">{actionData.ok}</Aviso>}
-      {actionData && "erro" in actionData && <Aviso tom="erro">{actionData.erro}</Aviso>}
       {dados.semBase && <Aviso tom="info">Ainda não há visitas contadas nos últimos 14 dias para comparar. Os números aparecem conforme o contador acumula.</Aviso>}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -142,39 +87,21 @@ export default function Metricas({ loaderData, actionData }: Route.ComponentProp
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        <Cartao titulo="Rendimento do conteúdo" icone={Sprout} dica="Vistas por matéria nos 7 primeiros dias (matérias dos últimos 60 dias)." className="lg:col-span-7">
-          {dados.rendimento.porOrigem.length === 0 ? (
-            <Vazio titulo="Ainda sem matérias com 7 dias de vida" texto="Quando houver matérias publicadas há mais de uma semana, o rendimento por origem aparece aqui." />
+        <Cartao titulo="Matérias que mais trouxeram entradas" icone={Newspaper} dica="Últimos 30 dias: quem chegou ao site por cada matéria." className="lg:col-span-7">
+          {dados.maisEntradas.length === 0 ? (
+            <Vazio titulo="Ainda sem dados" texto="Quando o contador acumular entradas, as matérias que mais trazem gente aparecem aqui." />
           ) : (
-            <ul className="flex flex-col gap-3">
-              {dados.rendimento.porOrigem.map((o) => (
-                <li key={o.origem} className="grid grid-cols-[5.5rem_1fr_auto] items-center gap-3 text-[0.9rem]">
-                  <span className="font-semibold">{ROTULO_ORIGEM[o.origem]}</span>
-                  <span className="h-2.5 overflow-hidden rounded-full bg-sunken">
-                    <span className={`block h-full rounded-full ${o.origem === "painel" ? "bg-info" : "bg-brand"}`} style={{ width: `${Math.max(2, (o.mediaVistas / maxMedia) * 100)}%` }} />
-                  </span>
-                  <span className="tabular-nums">
-                    <b>{fmt.format(o.mediaVistas)}</b> <span className="text-[0.75rem] text-ink-soft">({fmt.format(o.materias)} matérias)</span>
-                  </span>
+            <ol className="flex flex-col gap-2">
+              {dados.maisEntradas.map((t, i) => (
+                <li key={t.path} className="flex items-baseline gap-3 text-[0.9rem]">
+                  <span className="w-4 text-ink-soft tabular-nums">{i + 1}</span>
+                  <a href={t.path} target="_blank" rel="noreferrer" className="line-clamp-2 min-w-0 flex-1 hover:underline">
+                    {t.titulo}
+                  </a>
+                  <b className="tabular-nums">{fmt.format(t.entradas)}</b>
                 </li>
               ))}
-            </ul>
-          )}
-          {dados.rendimento.topEntradas.length > 0 && (
-            <div className="mt-5 border-t border-line pt-4">
-              <h3 className="text-[0.7rem] font-bold tracking-[0.08em] text-ink-soft uppercase">Mais entradas em 30 dias</h3>
-              <ol className="mt-2 flex flex-col gap-1.5">
-                {dados.rendimento.topEntradas.map((t, i) => (
-                  <li key={t.path} className="flex items-baseline gap-2 text-[0.88rem]">
-                    <span className="w-4 text-ink-soft tabular-nums">{i + 1}</span>
-                    <a href={t.path} target="_blank" rel="noreferrer" className="line-clamp-1 min-w-0 flex-1 hover:underline">
-                      {t.titulo}
-                    </a>
-                    <b className="tabular-nums">{fmt.format(t.entradas)}</b>
-                  </li>
-                ))}
-              </ol>
-            </div>
+            </ol>
           )}
         </Cartao>
 
@@ -243,7 +170,7 @@ export default function Metricas({ loaderData, actionData }: Route.ComponentProp
         {retratos === null ? (
           <Aviso>Falta rodar a migration 014 para guardar o histórico.</Aviso>
         ) : retratos.length === 0 ? (
-          <Vazio titulo="Ainda sem retratos" texto="O primeiro sai na segunda às 9h30. Se quiser, grave agora o da última semana fechada." />
+          <Vazio titulo="Ainda sem retratos" texto="O primeiro sai sozinho na segunda às 9h30, com os números da semana que acabou." />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[40rem] text-left text-[0.88rem] tabular-nums">
@@ -275,65 +202,6 @@ export default function Metricas({ loaderData, actionData }: Route.ComponentProp
         )}
       </Cartao>
 
-      <Cartao titulo="Decisões" icone={ClipboardList} dica="O que decidimos olhando estes números, e quando rever.">
-        {decs === null ? (
-          <Aviso>Falta rodar a migration 014 para registrar decisões.</Aviso>
-        ) : (
-          <>
-            <details className="group rounded-xl border border-line">
-              <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 px-3 text-[0.9rem] font-bold">
-                <PlusCircle className="size-4 text-brand dark:text-glow" aria-hidden /> Registrar decisão
-              </summary>
-              <Form method="post" className="grid gap-3 border-t border-line p-3 sm:grid-cols-2">
-                <input type="hidden" name="intent" value="nova-decisao" />
-                <Campo nome="problema" rotulo="Problema (com o número)" obrigatorio className="sm:col-span-2" />
-                <Campo nome="decisao" rotulo="O que vamos fazer" obrigatorio longo className="sm:col-span-2" />
-                <Campo nome="motivo" rotulo="Motivo (e o que perdemos)" longo />
-                <Campo nome="discordancia" rotulo="Discordâncias" longo />
-                <Campo nome="quem" rotulo="Quem faz" />
-                <Campo nome="revisarEm" rotulo="Revisar em" tipo="date" />
-                <div className="sm:col-span-2">
-                  <Botao type="submit" variante="primario" ocupado={ocupado} className="w-full sm:w-auto">
-                    Salvar decisão
-                  </Botao>
-                  <p className="mt-1.5 text-[0.75rem] text-ink-soft">Guarda junto os números dos últimos 7 dias.</p>
-                </div>
-              </Form>
-            </details>
-            {decs.length === 0 ? (
-              <Vazio titulo="Nenhuma decisão registrada" />
-            ) : (
-              <ul className="mt-3 divide-y divide-line">
-                {decs.map((d) => (
-                  <li key={d.id} className="flex flex-col gap-2 py-3 sm:flex-row sm:items-start sm:justify-between">
-                    <div className="min-w-0">
-                      <p className="font-bold">{d.problema}</p>
-                      <p className="mt-0.5 text-[0.9rem]">{d.decisao}</p>
-                      <p className="mt-1 text-[0.75rem] text-ink-soft">
-                        {d.quem ? `${d.quem} · ` : ""}registrada em {ddmm(d.criadaEm)}
-                        {d.revisarEm ? ` · revisar em ${ddmm(d.revisarEm)}` : ""}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                      {d.status === "revista" ? <Selo tom="ok">revista</Selo> : d.vencida && <Selo tom="aviso">revisar</Selo>}
-                      {d.status === "aberta" && (
-                        <Form method="post">
-                          <input type="hidden" name="intent" value="decisao-revista" />
-                          <input type="hidden" name="id" value={d.id} />
-                          <Botao type="submit" variante="fantasma" ocupado={ocupado} className="h-9 sm:h-9">
-                            Marcar como revista
-                          </Botao>
-                        </Form>
-                      )}
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-      </Cartao>
-
       <section className="rounded-[14px] border border-dashed border-line p-4 text-ink-soft sm:p-5" aria-labelledby="contas-metricas">
         <h2 id="contas-metricas" className="flex items-center gap-2 text-[1rem] font-bold text-ink">
           <Lock className="size-4" aria-hidden /> Contas: começa quando o cadastro abrir
@@ -351,13 +219,3 @@ export default function Metricas({ loaderData, actionData }: Route.ComponentProp
 }
 
 const totalPub = (r: Retrato) => r.publicadas.robo + r.publicadas.agenda + r.publicadas.painel + r.publicadas.old;
-
-function Campo({ nome, rotulo, obrigatorio, longo, tipo = "text", className = "" }: { nome: string; rotulo: string; obrigatorio?: boolean; longo?: boolean; tipo?: string; className?: string }) {
-  const base = "mt-1 w-full rounded-[10px] border border-line bg-surface px-3 text-[0.9rem] placeholder:text-ink-soft focus:outline-none";
-  return (
-    <label className={`block text-[0.8rem] font-semibold ${className}`}>
-      {rotulo}
-      {longo ? <textarea name={nome} required={obrigatorio} rows={2} maxLength={2000} className={`${base} py-2`} /> : <input name={nome} type={tipo} required={obrigatorio} maxLength={300} className={`${base} h-10`} />}
-    </label>
-  );
-}
