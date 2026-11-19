@@ -4,9 +4,12 @@ import { data, useLocation } from "react-router";
 import { Hammer } from "lucide-react";
 import type { Route } from "./+types/em-construcao";
 import { adminItem } from "~/lib/admin-nav";
+import { routePath } from "~/lib/route-path";
+import { requireAdmin } from "~/server/auth/viewer.server";
 
-export function loader({ request }: Route.LoaderArgs) {
-  if (!adminItem(new URL(request.url).pathname)) throw data("Não encontrado", { status: 404 });
+export async function loader({ request }: Route.LoaderArgs) {
+  await requireAdmin(request);
+  if (!adminItem(routePath(request))) throw data("Não encontrado", { status: 404 });
   return null;
 }
 

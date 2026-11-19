@@ -49,9 +49,12 @@ async function main() {
   }
   app.use(compression());
   // Painel, contas e rotas internas nunca entram no Google nem em cache compartilhado.
-  app.use(["/admin", "/api", "/login", "/sair"], (_req, res, next) => {
-    res.setHeader("X-Robots-Tag", "noindex, nofollow");
-    res.setHeader("Cache-Control", "no-store");
+  // Inclui os endereços ".data" (o que o navegador pede ao navegar por clique, ex. /admin.data), que o prefixo sozinho não pega.
+  app.use((req, res, next) => {
+    if (/^\/(admin|api|login|sair)(\.data)?(\/|$)/.test(req.path)) {
+      res.setHeader("X-Robots-Tag", "noindex, nofollow");
+      res.setHeader("Cache-Control", "no-store");
+    }
     next();
   });
 

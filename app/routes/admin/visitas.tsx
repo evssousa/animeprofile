@@ -7,8 +7,10 @@ import { VISITAS } from "~/visitas/config";
 import { agora } from "~/visitas/server/coleta.server";
 import { cartoes, dimensoes, paginas, resumoPeriodo, serie30 } from "~/visitas/server/consultas.server";
 import { Painel } from "~/visitas/ui/Painel";
+import { requireAdmin } from "~/server/auth/viewer.server";
 
 export async function loader({ request }: Route.LoaderArgs) {
+  await requireAdmin(request); // o layout não roda quando o navegador pede só este loader (/admin.data): conferir aqui também
   const url = new URL(request.url);
   const rawP = url.searchParams.get("p");
   const periodo: Periodo = isPeriodo(rawP) && rawP !== "ontem" ? rawP : "7d";

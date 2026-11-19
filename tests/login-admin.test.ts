@@ -103,3 +103,13 @@ describe("/api/eu corrige o marcador", () => {
     expect((await certo.json()).papeis).toEqual(["admin"]);
   });
 });
+
+describe("loaders do painel exigem a sessão (o layout não roda quando o navegador pede só o loader filho, /admin.data)", () => {
+  it("visitas e telas em construção recusam quem não está logado", async () => {
+    const { loader: visitas } = await import("~/routes/admin/visitas");
+    const { loader: construcao } = await import("~/routes/admin/em-construcao");
+    for (const [loader, url] of [[visitas, "https://animeprofile.com.br/admin.data?_routes=routes%2Fadmin%2Fvisitas"], [construcao, "https://animeprofile.com.br/admin/posts.data"]] as const) {
+      await expect((loader as (a: unknown) => unknown)({ request: new Request(url) })).rejects.toMatchObject({ status: 302 });
+    }
+  });
+});

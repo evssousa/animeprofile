@@ -2,6 +2,32 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-19 (plano) — Próximas telas do painel `/admin`, com a segurança dos loaders antes
+
+Detalhes em [plano-telas-painel.md](plano-telas-painel.md).
+
+- **Decisão (proposta; 10 perguntas ao dono, nenhuma bloqueia):**
+  - **Etapa 0 antes de qualquer tela:** todo `loader`/`action` de `app/routes/admin/*` chama `requireAdmin` (não basta o
+    layout: na navegação por clique o React Router pede só o loader filho, `/admin.data?_routes=...`, e o do layout não
+    roda, então os números do painel ficavam legíveis sem login); `server-app.js` passa a dar `no-store` e `noindex` também
+    a `/admin.data` e `/login.data`; `em-construcao.tsx` usa `routePath`. Um teste percorre todas as rotas do admin.
+  - **Painel em `/admin`** (pendências, hoje, robô, recentes) e as visitas completas em `/admin/visitas`.
+  - **Métricas sem número falso:** audiência e conteúdo com dado real (visitantes, páginas por visita, busca, conclusão
+    do quiz, procura pelas contas, rendimento por origem), retrato semanal e registro de decisões (migration 014); o funil
+    das contas aparece só como esqueleto "começa quando o cadastro abrir".
+  - **Posts:** lista paginada no servidor e editor Tiptap (como no antigo), endereço travado depois de publicado, excluir
+    só rascunho, versões e aviso de conflito, agendamento por tarefa de 5 em 5 min, imagens próprias em `/media/painel`,
+    e a importação do antigo não sobrescreve matéria editada no painel (`edited_at`, migration 015).
+  - **Notícias IA:** 9 abas sobre as tabelas da 012 (sai Desempenho, Tendências e Títulos alternativos por enquanto); o
+    painel chama as funções do robô direto, sem o `CRON_TOKEN` no navegador.
+  - **Artigos e quizzes por IA numa fila só** (`ai_requests`, migration 016, tarefa `pedidos-ia`), com a cota do Gemini
+    dividida e prioridade do robô de notícias. Banco de imagens e ideias de quiz ficam para depois.
+  - **Itens da barra:** Agendamentos fica (o site tem `cron_jobs`) e vem logo depois dos 6; recomendado tirar Eventos e
+    Sistemas (os sistemas saíram) e, até decisão do dono, WhatsApp e Títulos no Google.
+- **Por quê:** é a ordem do dono (primeiro o que o recebimento de usuários exige); o painel precisa estar seguro antes de
+  guardar mais dados; reaproveitar o robô, a agenda, o módulo de Visitas e as tabelas que já existem evita refazer o que
+  funciona; números de contas zerados confundiriam a leitura.
+
 ## 2026-11-19 (plano) — Menus de logado no formato do antigo, sem mudar o HTML público
 
 Detalhes em [plano-menus-logado.md](plano-menus-logado.md).
