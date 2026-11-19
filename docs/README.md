@@ -163,6 +163,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     Blog dos usuários · Categorias e tags · Mídias · Denúncias · Bug reports · Eventos · Usuários · Segurança · Molduras · Emblemas · Figurinhas ·
     Níveis · Custos · Receita · Sistemas (provavelmente não precisa mais) · Agendamentos (talvez não) · E-mails.
     Código da barra em `app/lib/admin-nav.ts` (campo `pronto` marca as telas feitas).
+    **Posts (`/admin/posts`), em andamento (2026-11-19):** feitos os passos 9 e 10 do plano (migration 015 `edited_at` + `post_revisions`, a importação do
+    antigo não mexe em matéria editada no painel, lista paginada com abas, filtros e exclusão de rascunhos). **Falta o editor** (passos 11 a 15: `post-editor.ts`, Tiptap,
+    salvar/publicar/agendar com versões, imagens, prévia) e marcar `pronto` na barra.
     **Métricas (`/admin/retention`): feita em 2026-11-19** (migration 014 `metrics_snapshots` + `metrics_decisions` (esta ficou sem uso: o dono dispensou "Decisões" e o botão de gravar retrato manual, 2026-11-19), tarefa `metricas-semanal` segunda 9h30,
     `app/server/admin/metricas.server.ts`, kit `app/components/admin/ui.tsx` e tokens ok/warn/info). Mostra só audiência e conteúdo com dado real; o funil das contas
     é um bloco "começa quando o cadastro abrir". Falta o dono conferir logado. A Etapa 0 do plano está feita (segurança dos loaders, kit visual); o

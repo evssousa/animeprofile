@@ -1,7 +1,7 @@
 // Kit visual do painel /admin (docs/plano-telas-painel.md, "Base visual"): o mesmo jeito do painel de Visitas em todas as telas.
 // Cartões brancos com borda fina, vermelho só no que é ação ou ativo, números com tabular-nums. Entram aqui só os componentes
 // que as telas feitas já usam; os demais (Abas, Interruptor, Confirmar...) entram junto com a primeira tela que precisar deles.
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Link } from "react-router";
 import { AlertTriangle, Loader2, type LucideIcon } from "lucide-react";
 
@@ -122,5 +122,60 @@ export function Aviso({ tom = "aviso", children }: { tom?: "aviso" | "erro" | "o
       <AlertTriangle className={`mt-0.5 size-4 shrink-0 ${cor}`} aria-hidden />
       <div className="min-w-0">{children}</div>
     </div>
+  );
+}
+
+/** Confirmação em diálogo nativo (no lugar do window.confirm). `Esc` e clique no fundo cancelam; o foco começa em "Cancelar". */
+export function Confirmar({ aberto, titulo, texto, botao, tom = "perigo", onConfirmar, onCancelar }: { aberto: boolean; titulo: string; texto: ReactNode; botao: string; tom?: "perigo" | "primario"; onConfirmar: () => void; onCancelar: () => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (aberto && !d.open) d.showModal();
+    if (!aberto && d.open) d.close();
+  }, [aberto]);
+  return (
+    <dialog
+      ref={ref}
+      onCancel={(e) => {
+        e.preventDefault();
+        onCancelar();
+      }}
+      onClick={(e) => e.target === ref.current && onCancelar()}
+      aria-labelledby="confirmar-titulo"
+      className="m-auto w-[min(26rem,calc(100vw-2rem))] rounded-2xl border border-line bg-surface p-5 text-ink shadow-[0_20px_50px_-20px_rgba(0,0,0,.35)] backdrop:bg-black/60"
+    >
+      <h2 id="confirmar-titulo" className="text-[1.1rem] font-extrabold">
+        {titulo}
+      </h2>
+      <div className="mt-2 text-[0.9rem] text-ink-soft">{texto}</div>
+      <div className="mt-5 flex justify-end gap-2">
+        <Botao autoFocus variante="secundario" onClick={onCancelar}>
+          Cancelar
+        </Botao>
+        <Botao variante={tom} onClick={onConfirmar}>
+          {botao}
+        </Botao>
+      </div>
+    </dialog>
+  );
+}
+
+/** Abas com sublinhado (links). `n` é o contador ao lado do rótulo. */
+export function Abas({ itens, ativo }: { itens: { id: string; rotulo: string; href: string; n?: number }[]; ativo: string }) {
+  return (
+    <nav aria-label="Abas" className="flex overflow-x-auto border-b border-line [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      {itens.map((i) => (
+        <Link
+          key={i.id}
+          to={i.href}
+          aria-current={i.id === ativo ? "page" : undefined}
+          className={`inline-flex h-11 shrink-0 items-center border-b-2 px-3 text-[0.9rem] font-semibold whitespace-nowrap ${i.id === ativo ? "border-brand text-ink" : "border-transparent text-ink-soft hover:text-ink"}`}
+        >
+          {i.rotulo}
+          {i.n !== undefined && <span className="ml-1.5 text-[0.75rem] font-normal tabular-nums opacity-70">{new Intl.NumberFormat("pt-BR").format(i.n)}</span>}
+        </Link>
+      ))}
+    </nav>
   );
 }

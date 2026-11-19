@@ -154,6 +154,22 @@ describe("importação e consultas", () => {
     expect(await getPost("bleach-arte-ichigo")).toBeNull();
     OLD.posts.splice(2, 0, ...removed);
   });
+
+  it("matéria editada no painel (edited_at) não é sobrescrita, apagada nem religada pela importação", async () => {
+    await importOld();
+    await pool.query("UPDATE posts SET title = 'Editado no painel', edited_at = UTC_TIMESTAMP(3) WHERE slug = 'bleach-arte-ichigo'");
+    await pool.query("DELETE FROM post_tags WHERE post_id = '00000000-0000-4000-8000-000000000003'");
+    await importOld();
+    expect((await getPost("bleach-arte-ichigo"))?.title).toBe("Editado no painel");
+    expect((await getPost("bleach-arte-ichigo"))?.tags).toEqual([]); // os vínculos dela não foram refeitos
+    const removed = OLD.posts.splice(2, 1);
+    await importOld();
+    expect((await getPost("bleach-arte-ichigo"))?.title).toBe("Editado no painel"); // saiu do antigo, mas é do painel: fica
+    OLD.posts.splice(2, 0, ...removed);
+    await pool.query("UPDATE posts SET edited_at = NULL WHERE slug = 'bleach-arte-ichigo'");
+    await importOld(); // volta ao normal
+    expect((await getPost("bleach-arte-ichigo"))?.title).toBe("Bleach: arte inédita de Ichigo");
+  });
 });
 
 describe("redirecionamentos do que saiu", () => {

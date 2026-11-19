@@ -113,8 +113,8 @@ export async function upsert(conn: PoolConnection, table: string, rows: Record<s
 }
 
 async function replaceLinks(conn: PoolConnection, table: "post_categories" | "post_tags", col: string, rows: { post_id: string; id: string }[]) {
-  // Só os vínculos das matérias do site antigo: as publicadas pelo robô (origin = 'robo') ficam como estão.
-  await conn.query(`DELETE t FROM ${table} t JOIN posts p ON p.id = t.post_id WHERE p.origin = 'old'`);
+  // Só os vínculos das matérias do site antigo: as publicadas pelo robô (origin = 'robo') e as editadas no painel ficam como estão.
+  await conn.query(`DELETE t FROM ${table} t JOIN posts p ON p.id = t.post_id WHERE p.origin = 'old' AND p.edited_at IS NULL`);
   for (let i = 0; i < rows.length; i += 500) {
     const chunk = rows.slice(i, i + 500);
     await conn.query(`INSERT IGNORE INTO ${table} (post_id, ${col}) VALUES ${chunk.map(() => "(?, ?)").join(", ")}`, chunk.flatMap((r) => [r.post_id, r.id]));
@@ -123,7 +123,9 @@ async function replaceLinks(conn: PoolConnection, table: "post_categories" | "po
 
 export async function applySnapshot(s: OldSnapshot) {
   const posts = s.posts.filter((p) => p.status === "published");
-  const postRows = posts.map(mapPost);
+  // Matérias editadas no painel (edited_at) são do painel: a importação não as sobrescreve, não as apaga nem religa categorias e tags.
+  const editadas = new Set((await query<{ id: string }>("SELECT id FROM posts WHERE edited_at IS NOT NULL")).map((r) => r.id));
+  const postRows = posts.map(mapPost).filter((r) => !editadas.has(r.id as string));
   const postIds = new Set(postRows.map((p) => p.id));
   const comments = s.post_comments ?? [];
   const authorIds = new Set([
@@ -165,7 +167,7 @@ export async function applySnapshot(s: OldSnapshot) {
     await conn.query("DELETE FROM tag_redirects");
     await upsert(conn, "tag_redirects", s.tag_redirects, ["old_slug"]);
     // O que deixou de estar publicado no site antigo sai daqui também.
-    const [existing] = await conn.query<RowDataPacket[]>("SELECT id FROM posts WHERE origin = 'old'");
+    const [existing] = await conn.query<RowDataPacket[]>("SELECT id FROM posts WHERE origin = 'old' AND edited_at IS NULL");
     const gone = existing.map((r) => r.id as string).filter((id) => !postIds.has(id));
     for (let i = 0; i < gone.length; i += 500) await conn.query("DELETE FROM posts WHERE id IN (?)", [gone.slice(i, i + 500)]);
   });
