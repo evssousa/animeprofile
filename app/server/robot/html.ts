@@ -21,7 +21,7 @@ const balanced = (t: string) =>
  * Pedaços com tag aberta (um link atravessando o corte) não são divididos. Parágrafos com atributos ou blocos
  * (figure, details, iframe) ficam como estão.
  */
-export function splitLongParagraphs(html: string, maxWords = 40): string {
+export function splitLongParagraphs(html: string, maxWords = 65): string {
   return html.replace(/<p>([\s\S]*?)<\/p>/gi, (full, inner: string) => {
     if (wordCount(inner) <= maxWords) return full;
     const sentences = inner.split(/(?<=[.!?…])\s+(?=[A-ZÀ-ÖØ-Ý"“‘(\d])/);
