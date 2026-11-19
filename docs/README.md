@@ -157,15 +157,15 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     **Falta:** o dono conferir em produção logado.
 3b3. **Telas do painel, na ordem do dono (2026-11-19).** Primeiro o que o recebimento de usuários exige, depois o resto. Para cada tela, olhar antes
     como era no `animeprofile-old` (`src/routes/admin*.tsx`). Ordem: Painel (feito: Visitas) · Métricas · Posts · Notícias IA · Artigos com IA ·
-    Quizzes · WhatsApp (ver se ainda é necessário) · Títulos no Google (idem) · Quarto otaku (refazer com three.js, como o QG) · Redes sociais ·
+    Quizzes · Títulos no Google (idem) · Quarto otaku (refazer com three.js, como o QG) · Redes sociais ·
     Blog dos usuários · Categorias e tags · Mídias · Denúncias · Bug reports · Eventos · Usuários · Segurança · Molduras · Emblemas · Figurinhas ·
-    Níveis e recompensas · Custos e recompensas · Receita · Sistemas (provavelmente não precisa mais) · Agendamentos (talvez não) · E-mails.
+    Níveis · Custos · Receita · Sistemas (provavelmente não precisa mais) · Agendamentos (talvez não) · E-mails.
     Código da barra em `app/lib/admin-nav.ts` (campo `pronto` marca as telas feitas).
     **Plano pronto em [plano-telas-painel.md](plano-telas-painel.md) (2026-11-19).** Ordem de execução: **etapa 0 primeiro** (passo 1:
     os loaders filhos do `/admin` não conferem a sessão e `/admin.data` sai sem `no-store`; passo 2: kit visual) → Painel (Visitas vai para
     `/admin/visitas`) → Métricas (migration 014) → Posts (015, editor Tiptap) → Notícias IA → Artigos com IA (016) → Quizzes. Depois:
     Agendamentos → Categorias e tags → Mídias; Usuários, Segurança e E-mails na fase 2; economia na fase D. Recomendado tirar da barra
-    Eventos, Sistemas, WhatsApp e Títulos no Google (pergunta 8 do plano).
+    Eventos, Sistemas e Títulos no Google (pergunta 8 do plano; WhatsApp já saiu por decisão do dono).
 3c. **Contas de todos e Google (fases 2 e 3 do mesmo plano): não agora** (decisão do dono em 2026-11-19). Quando voltar: importação dos
     171 usuários do dump final (64 com senha, 114 identidades do Google) com todos os dados, login para todos, SMTP, Turnstile, Google OAuth.
 4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
@@ -182,7 +182,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
   plano (botão do Google visível e desativado ou escondido; limite global de 30 tentativas ou 60; itens só para logados escondidos
   também para o admin). Sem resposta, sigo com as recomendadas (visível, 30, escondidos). Depois do deploy: entrar pelo `/login`.
 - **Menus de logado:** entrar pelo `/login` e conferir o menu lateral (grupo Equipe), os três ícones do topo, o menu do usuário e a barra do `/admin`
-  (no celular também). Dizer o que ajustar. Decidir quais itens do painel saem (WhatsApp, Títulos no Google, Sistemas, Agendamentos).
+  (no celular também). Dizer o que ajustar. Decidir quais itens do painel saem (Títulos no Google, Sistemas, Agendamentos).
 - **Telas do painel ([plano-telas-painel.md](plano-telas-painel.md)):** nada bloqueia. Se quiser, responda as 10 perguntas do fim do plano
   (as mais importantes: 1, Visitas em `/admin/visitas`; 2, com que autor você assina os posts; 4, se a exportação final do site antigo já
   rodou; 8, quais itens saem da barra). Sem resposta, sigo com as recomendadas. Rodar/aprovar as migrations 014, 015 e 016 quando eu colar

@@ -401,6 +401,6 @@ Detalhes em [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md).
 
 - Sem selo "em breve" nos menus de logado: tudo será construído antes de importar as contas dos outros usuários, testando com o admin (`animeprofile`).
 - Topo logado: Check-in, Mensagens e sino, como no antigo (sem saldos nem nível por enquanto). Blog e Figurinhas só para logados.
-- Barra do painel mostra os itens do antigo (27, sem "Ver escritório"); telas feitas na ordem listada no README (3b3), primeiro o que o recebimento de usuários exige.
-- Quarto otaku do painel será refeito com three.js; WhatsApp, Títulos no Google, Sistemas e Agendamentos a reavaliar.
-
+- Barra do painel mostra os itens do antigo (26, sem "Ver escritório" e sem WhatsApp); telas feitas na ordem listada no README (3b3), primeiro o que o recebimento de usuários exige.
+- Quarto otaku do painel será refeito com three.js; Títulos no Google, Sistemas e Agendamentos a reavaliar.
+- Menu WhatsApp removido do painel (não será mais usado, 2026-11-19). "Níveis e recompensas" virou "Níveis" e "Custos e recompensas" virou "Custos".

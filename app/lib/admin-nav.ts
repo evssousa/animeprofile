@@ -1,7 +1,7 @@
 // Barra lateral do painel /admin, nos grupos e na ordem do site antigo (components/admin/AdminLayout.tsx).
 // `pronto`: a tela existe. As demais abrem uma página "em construção" (rota coringa do painel) até serem feitas, na ordem
 // combinada com o dono (docs/plano-menus-logado.md): primeiro o que o recebimento de usuários exige, depois o resto.
-// Itens a reavaliar com o dono: WhatsApp, Títulos no Google, Sistemas, Agendamentos (talvez não façam mais sentido) e
+// Itens a reavaliar com o dono: Títulos no Google, Sistemas, Agendamentos (talvez não façam mais sentido) e
 // Quarto otaku (será refeito com three.js).
 import {
   Activity,
@@ -19,7 +19,6 @@ import {
   Image as ImageIcon,
   LayoutDashboard,
   Mail,
-  MessageCircle,
   Newspaper,
   PenLine,
   Power,
@@ -55,7 +54,6 @@ export const ADMIN_NAV: AdminNavGroup[] = [
       { label: "Notícias IA", href: "/admin/ai-news", icon: Bot, desc: "Motor de notícias por IA, autores e desempenho.", papeis: ADMIN },
       { label: "Artigos com IA", href: "/admin/artigos-ia", icon: PenLine, desc: "Rascunhos de artigos evergreen para revisar e publicar.", papeis: ADMIN },
       { label: "Quizzes", href: "/admin/quizzes", icon: Puzzle, desc: "Quiz de personalidade e de conhecimento, com página própria em /quiz.", papeis: ADMIN },
-      { label: "WhatsApp", href: "/admin/whatsapp", icon: MessageCircle, desc: "Mensagens prontas para o grupo: pacote do dia, agenda e enquete.", papeis: ["admin", "moderator"] },
       { label: "Títulos no Google", href: "/admin/titulos-google", icon: SearchCheck, desc: "Páginas com poucos cliques no Google: títulos novos e o antes e depois.", papeis: ADMIN },
       { label: "Quarto otaku", href: "/admin/quarto", icon: Sofa, desc: "Móveis da loja do quarto: imagem, tamanho, preço e teste no quarto.", papeis: ADMIN },
       { label: "Redes sociais", href: "/admin/redes-sociais", icon: Share2, desc: "Carrossel, imagem vertical e legenda de cada notícia para Instagram e TikTok.", papeis: ADMIN },
@@ -85,8 +83,8 @@ export const ADMIN_NAV: AdminNavGroup[] = [
       { label: "Molduras", href: "/admin/molduras", icon: Frame, desc: "Catálogo de molduras, encaixe e preços.", papeis: ADMIN },
       { label: "Emblemas", href: "/admin/emblemas", icon: Award, desc: "Emblemas personalizados e de nick.", papeis: ADMIN },
       { label: "Figurinhas", href: "/admin/figurinhas", icon: Album, desc: "Álbuns, figurinhas, sorteio e atributos do Fig Battle.", papeis: ADMIN },
-      { label: "Níveis e recompensas", href: "/admin/gamificacao", icon: Sparkles, desc: "Trilha de níveis e o que cada um dá.", papeis: ADMIN },
-      { label: "Custos e recompensas", href: "/admin/configuracoes", icon: SlidersHorizontal, desc: "Valores do sistema: preços, prêmios e limites.", papeis: ADMIN },
+      { label: "Níveis", href: "/admin/gamificacao", icon: Sparkles, desc: "Trilha de níveis e o que cada um dá.", papeis: ADMIN },
+      { label: "Custos", href: "/admin/configuracoes", icon: SlidersHorizontal, desc: "Valores do sistema: preços, prêmios e limites.", papeis: ADMIN },
     ],
   },
   {
