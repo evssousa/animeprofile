@@ -3,7 +3,9 @@
 // Quem está logado vem de GET /api/eu, perguntado só quando há o marcador.
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Form, Link, useLocation } from "react-router";
-import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
+import { USER_MENU } from "~/lib/nav";
+import { podeVer } from "~/lib/papeis";
 import { clearSessionHint, setPapeisAttr } from "~/lib/session-hint";
 
 type Estado = { fase: "carregando" } | { fase: "pronto"; nome: string; inicial: string; papeis: string[] } | { fase: "erro" };
@@ -60,21 +62,23 @@ function Avatar({ inicial, tamanho }: { inicial: string; tamanho: "g" | "p" }) {
   );
 }
 
-function Itens({ papeis, onNavigate, refPrimeiro }: { papeis: string[]; onNavigate?: () => void; refPrimeiro?: React.Ref<HTMLAnchorElement | HTMLButtonElement> }) {
-  const admin = papeis.includes("admin");
+function Itens({ papeis, onNavigate, refPrimeiro }: { papeis: string[]; onNavigate?: () => void; refPrimeiro?: React.Ref<HTMLAnchorElement> }) {
+  const blocos = USER_MENU.map((b) => b.filter((i) => podeVer(i.papeis, papeis))).filter((b) => b.length > 0);
   return (
     <>
-      {admin && (
-        <>
-          <div className="my-1 h-px bg-line" />
-          <Link to="/admin" role="menuitem" onClick={onNavigate} className={item} ref={refPrimeiro as React.Ref<HTMLAnchorElement>}>
-            <LayoutDashboard className="size-[18px]" aria-hidden /> Administração
-          </Link>
-        </>
-      )}
       <div className="my-1 h-px bg-line" />
+      {blocos.map((bloco, bi) => (
+        <div key={bi}>
+          {bloco.map(({ label, to, icon: Icon }, i) => (
+            <Link key={label} to={to} role="menuitem" onClick={onNavigate} className={item} ref={bi === 0 && i === 0 ? refPrimeiro : undefined}>
+              <Icon className="size-[18px] shrink-0 text-ink-soft" aria-hidden /> <span className="min-w-0 flex-1 truncate">{label}</span>
+            </Link>
+          ))}
+          <div className="my-1 h-px bg-line" />
+        </div>
+      ))}
       <Form method="post" action="/sair" onSubmit={() => clearSessionHint()}>
-        <button type="submit" role="menuitem" className={`${item} text-brand dark:text-glow`} ref={admin ? undefined : (refPrimeiro as React.Ref<HTMLButtonElement>)}>
+        <button type="submit" role="menuitem" className={`${item} text-brand dark:text-glow`}>
           <LogOut className="size-[18px]" aria-hidden /> Sair
         </button>
       </Form>
@@ -89,7 +93,7 @@ export function UserMenu() {
   const { pathname } = useLocation();
   const raiz = useRef<HTMLDivElement>(null);
   const gatilho = useRef<HTMLButtonElement>(null);
-  const primeiro = useRef<HTMLAnchorElement | HTMLButtonElement>(null);
+  const primeiro = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => setAberto(false), [pathname]);
   useEffect(() => {
@@ -101,11 +105,12 @@ export function UserMenu() {
         setAberto(false);
         gatilho.current?.focus();
       }
-      if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (["ArrowDown", "ArrowUp", "Home", "End"].includes(e.key)) {
         e.preventDefault();
         const itens = [...(raiz.current?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [])];
         const i = itens.indexOf(document.activeElement as HTMLElement);
-        itens[(i + (e.key === "ArrowDown" ? 1 : -1) + itens.length) % itens.length]?.focus();
+        const alvo = e.key === "Home" ? 0 : e.key === "End" ? itens.length - 1 : (i + (e.key === "ArrowDown" ? 1 : -1) + itens.length) % itens.length;
+        itens[alvo]?.focus();
       }
     };
     document.addEventListener("mousedown", fora);
@@ -137,7 +142,7 @@ export function UserMenu() {
             <ChevronDown className={`hidden size-4 text-white/70 transition-transform motion-reduce:transition-none lg:block ${aberto ? "rotate-180" : ""}`} aria-hidden />
           </button>
           {aberto && (
-            <div id="menu-usuario" role="menu" className="absolute top-[calc(100%+8px)] right-0 z-40 w-[min(16rem,calc(100vw-2rem))] rounded-2xl border border-line bg-surface p-1.5 text-ink shadow-[0_20px_50px_-20px_rgba(0,0,0,.35)]">
+            <div id="menu-usuario" role="menu" className="absolute top-[calc(100%+8px)] right-0 z-40 max-h-[calc(100dvh-90px)] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto overscroll-contain rounded-2xl border border-line bg-surface p-1.5 text-ink shadow-[0_20px_50px_-20px_rgba(0,0,0,.35)]">
               <div className="flex items-center gap-3 px-3 py-2.5">
                 <Avatar inicial={v.inicial} tamanho="g" />
                 <div className="min-w-0">

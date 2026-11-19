@@ -3,7 +3,11 @@ import {
   Award,
   Bell,
   BookOpen,
+  Bookmark,
+  Bug,
   CalendarCheck,
+  Crown,
+  Gift,
   Home,
   LayoutDashboard,
   MessageCircle,
@@ -12,10 +16,16 @@ import {
   Newspaper,
   PenSquare,
   Puzzle,
+  Receipt,
+  Settings2,
+  ShieldCheck,
+  ShoppingBag,
+  Smartphone,
   Sofa,
   Sparkles,
   Trophy,
   Tv,
+  User,
   type LucideIcon,
 } from "lucide-react";
 import { EQUIPE, type Papel } from "./papeis";
@@ -81,6 +91,26 @@ export const HEADER_ACOES: { id: "checkin" | "mensagens" | "notificacoes"; label
   { id: "checkin", label: "Check-in do dia", icon: CalendarCheck, to: "/check-in" },
   { id: "mensagens", label: "Mensagens", icon: MessageCircle, to: "/mensagens" },
   { id: "notificacoes", label: "Notificações", icon: Bell },
+];
+
+/** Menu do usuário (dropdown do topo e gaveta), na ordem do site antigo. "Sair" fica fixo no fim. Os destinos que ainda não existem levam à página "volta em breve" das contas. */
+export type UserMenuItem = { label: string; to: string; icon: LucideIcon; papeis?: Papel[] };
+export const USER_MENU: UserMenuItem[][] = [
+  [
+    { label: "Meu perfil", to: "/perfil", icon: User },
+    { label: "Editar perfil", to: "/configuracoes", icon: Settings2 },
+    { label: "App e notificações", to: "/notificacoes", icon: Smartphone },
+    { label: "Loja", to: "/loja", icon: ShoppingBag },
+    { label: "Premium", to: "/premium", icon: Crown },
+  ],
+  [
+    { label: "Salvos", to: "/salvos", icon: Bookmark },
+    { label: "Indicações", to: "/indicacoes", icon: Gift },
+    { label: "Pagamentos", to: "/pagamentos", icon: Receipt },
+    { label: "Privacidade e dados", to: "/configuracoes", icon: ShieldCheck },
+    { label: "Reportar um problema", to: "/contato", icon: Bug },
+  ],
+  [{ label: "Administração", to: "/admin", icon: LayoutDashboard, papeis: EQUIPE }],
 ];
 
 export const FOOTER_LINKS: NavGroup[] = [

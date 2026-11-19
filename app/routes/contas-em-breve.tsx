@@ -6,12 +6,12 @@ import { Coins, Flame, Sparkles } from "lucide-react";
 import type { Route } from "./+types/contas-em-breve";
 import { Notice } from "~/components/form";
 import { PageHeader } from "~/components/PageHeader";
-import { NAV } from "~/lib/nav";
+import { NAV, USER_MENU } from "~/lib/nav";
 import { routePath } from "~/lib/route-path";
 
 export function loader({ request }: Route.LoaderArgs) {
   const path = routePath(request);
-  const label = path === "/cadastro" ? "Cadastro" : (NAV.flatMap((g) => g.items).find((i) => i.to === path)?.label ?? null);
+  const label = path === "/cadastro" ? "Cadastro" : ([...NAV.flatMap((g) => g.items), ...USER_MENU.flat()].find((i) => i.to === path)?.label ?? null);
   const invite = /^\/(convite|w)\//.test(path);
   return { label, invite };
 }

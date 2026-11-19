@@ -48,3 +48,19 @@ describe("menus só para quem está logado", () => {
     expect(podeVer(["author"], ["moderator"])).toBe(false);
   });
 });
+
+describe("menu do usuário", () => {
+  it("na ordem do antigo, com Reportar um problema em /contato e Administração só para a equipe", async () => {
+    const { USER_MENU } = await import("~/lib/nav");
+    const todos = USER_MENU.flat();
+    expect(todos.map((i) => i.label)).toEqual([
+      "Meu perfil", "Editar perfil", "App e notificações", "Loja", "Premium",
+      "Salvos", "Indicações", "Pagamentos", "Privacidade e dados", "Reportar um problema", "Administração",
+    ]);
+    expect(todos.find((i) => i.label === "Reportar um problema")?.to).toBe("/contato");
+    expect(todos.every((i) => i.to.startsWith("/"))).toBe(true);
+    const visiveis = (papeis: string[]) => USER_MENU.flat().filter((i) => podeVer(i.papeis, papeis)).map((i) => i.label);
+    expect(visiveis(["admin"])).toContain("Administração");
+    expect(visiveis([])).not.toContain("Administração");
+  });
+});
