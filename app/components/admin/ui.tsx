@@ -95,7 +95,7 @@ const BOTOES = {
 } as const;
 
 /** Botão (ou link, se vier `href`). `ocupado` troca o ícone por um círculo girando e trava o clique. */
-export function Botao({ variante = "secundario", icone: Icone, ocupado, href, className = "", children, ...resto }: { variante?: keyof typeof BOTOES; icone?: LucideIcon; ocupado?: boolean; href?: string; className?: string; children: ReactNode } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "className">) {
+export function Botao({ variante = "secundario", icone: Icone, ocupado, href, className = "", children, ...resto }: { variante?: keyof typeof BOTOES; icone?: LucideIcon; ocupado?: boolean; href?: string; className?: string; children?: ReactNode } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "className">) {
   const classes = `inline-flex h-11 items-center justify-center gap-2 rounded-full px-4 text-[0.9rem] font-bold whitespace-nowrap transition-colors disabled:opacity-50 sm:h-10 motion-reduce:transition-none ${BOTOES[variante]} ${className}`;
   const icone = ocupado ? <Loader2 className="size-4 animate-spin motion-reduce:animate-none" aria-hidden /> : Icone ? <Icone className="size-4" aria-hidden /> : null;
   if (href)

@@ -178,6 +178,11 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     card reconhece também a forma `class="anime-card-embed"` com o link `anime-card-fallback`); anime sem ficha no banco é buscado no AniList; notícia sem `anilist_id` ganha o card do
     anime cujo título é IGUAL à palavra-chave ou a uma tag (só igualdade, sem palpite). Topo do visitante no computador: botão de tema, atalho "Calendário" (≥1280 px) e até 3 assuntos em alta
     (1 a partir de 1400 px, 2 a partir de 1700, 3 a partir de 1900), com dado real de `/api/agora`.
+    **Notícias IA (`/admin/ai-news`): feita em 2026-11-19** (passos 16 a 19 do plano): submenu com 9 abas (Visão geral com modo, "Ensaio agora" e "Rodada agora", hoje x/teto, horários, Gemini 24 h,
+    motivos de descarte e últimas rodadas; Aprovação dos rascunhos do robô; Candidatos por status com prévia e ensaio de endereço; Histórico; Fontes com "Testar"; Tópicos e bloqueios; Horários e limites;
+    Autores IA; Configurações com modelo, imagens, limites e guia editorial). Código em `app/server/robot/painel.server.ts` (o `/api/robo/*` passou a usar `statusRobo` e `previewHtml` de lá, sem mudar o
+    comportamento). O painel nunca expõe o `CRON_TOKEN` nem valores de variáveis de ambiente. Fora desta entrega (como no plano): Desempenho, Tendências e Títulos alternativos. Falta o dono conferir logado
+    (trocar o modo, "Ensaio agora" e ver a rodada aparecer).
     **Métricas (`/admin/retention`): feita em 2026-11-19** (migration 014 `metrics_snapshots` + `metrics_decisions` (esta ficou sem uso: o dono dispensou "Decisões" e o botão de gravar retrato manual, 2026-11-19), tarefa `metricas-semanal` segunda 9h30,
     `app/server/admin/metricas.server.ts`, kit `app/components/admin/ui.tsx` e tokens ok/warn/info). Mostra só audiência e conteúdo com dado real; o funil das contas
     é um bloco "começa quando o cadastro abrir". Falta o dono conferir logado. A Etapa 0 do plano está feita (segurança dos loaders, kit visual); o

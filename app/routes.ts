@@ -57,7 +57,7 @@ export default [
   route("sair", "routes/sair.ts"),
   route("admin/login", "routes/admin/login.tsx"),
   route("admin/sair", "routes/admin/sair.ts"),
-  route("admin", "routes/admin/layout.tsx", [index("routes/admin/visitas.tsx"), route("retention", "routes/admin/metricas.tsx"), route("posts", "routes/admin/posts.tsx"), route("posts/imagem", "routes/admin/posts-imagem.ts"), route("posts/anime", "routes/admin/posts-anime.ts"), route("posts/novo", "routes/admin/posts-editar.tsx", { id: "posts-novo" }), route("posts/:id", "routes/admin/posts-editar.tsx", { id: "posts-editar" }), route("posts/:id/previa", "routes/admin/posts-previa.tsx"), route("*", "routes/admin/em-construcao.tsx")]),
+  route("admin", "routes/admin/layout.tsx", [index("routes/admin/visitas.tsx"), route("retention", "routes/admin/metricas.tsx"), route("ai-news", "routes/admin/ai-news.tsx"), route("ai-news/previa/:id", "routes/admin/ai-news-previa.ts"), route("posts", "routes/admin/posts.tsx"), route("posts/imagem", "routes/admin/posts-imagem.ts"), route("posts/anime", "routes/admin/posts-anime.ts"), route("posts/novo", "routes/admin/posts-editar.tsx", { id: "posts-novo" }), route("posts/:id", "routes/admin/posts-editar.tsx", { id: "posts-editar" }), route("posts/:id/previa", "routes/admin/posts-previa.tsx"), route("*", "routes/admin/em-construcao.tsx")]),
   ...ACCOUNT_PENDING.map((path) => route(path, "routes/contas-em-breve.tsx", { id: `contas-${path}` })),
   route("robots.txt", "routes/robots.ts"),
   ...["sitemap.xml", "sitemap-static.xml", "sitemap-news.xml", "sitemap-articles.xml", "sitemap-taxonomy.xml", "sitemap-animes.xml", "sitemap-quiz.xml", "sitemap-blog.xml", "sitemap-figurinhas.xml", "rss.xml"].map((f) =>
