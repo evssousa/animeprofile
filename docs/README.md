@@ -174,6 +174,10 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     matérias (hoje não há papéis importados; na fase das contas passa a ser por papel admin/autor); (4) a capa agora aparece sempre como imagem no topo do texto (só não repete se o
     texto já começa com ela); (5) topo de quem está logado ganha sequência, AP Coins, Rubis e barra de nível no computador (valores iniciais 0 em `app/server/economia-topo.server.ts`
     até a economia ser refeita); no celular ficam só Check-in, Mensagens e Notificações; a faixa da equipe passou a aparecer só a partir de 1500 px.
+    **Mais ajustes (2026-11-19, noite):** o link "Sobre o anime: ..." das matérias importadas do antigo agora vira o card completo (a limpeza da importação tinha apagado o `data-anime-card`; o
+    card reconhece também a forma `class="anime-card-embed"` com o link `anime-card-fallback`); anime sem ficha no banco é buscado no AniList; notícia sem `anilist_id` ganha o card do
+    anime cujo título é IGUAL à palavra-chave ou a uma tag (só igualdade, sem palpite). Topo do visitante no computador: botão de tema, atalho "Calendário" (≥1280 px) e até 3 assuntos em alta
+    (1 a partir de 1400 px, 2 a partir de 1700, 3 a partir de 1900), com dado real de `/api/agora`.
     **Métricas (`/admin/retention`): feita em 2026-11-19** (migration 014 `metrics_snapshots` + `metrics_decisions` (esta ficou sem uso: o dono dispensou "Decisões" e o botão de gravar retrato manual, 2026-11-19), tarefa `metricas-semanal` segunda 9h30,
     `app/server/admin/metricas.server.ts`, kit `app/components/admin/ui.tsx` e tokens ok/warn/info). Mostra só audiência e conteúdo com dado real; o funil das contas
     é um bloco "começa quando o cadastro abrir". Falta o dono conferir logado. A Etapa 0 do plano está feita (segurança dos loaders, kit visual); o

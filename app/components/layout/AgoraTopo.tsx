@@ -3,12 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { timeAgo } from "~/lib/format";
-import type { Agora } from "~/server/topo.server";
+import { aguardarAgora, useAgora } from "~/lib/use-agora";
 
 const KEY_VISTO = "ap-agora-visto";
 const DUAS_HORAS = 2 * 3600_000;
-
-type Estado = { fase: "carregando" } | { fase: "ok"; dados: Agora } | { fase: "erro" };
 
 const lerVisto = () => {
   try {
@@ -22,7 +20,7 @@ const linha = "flex items-center gap-3 rounded-xl px-2.5 py-2 hover:bg-sunken";
 const rotulo = "px-2.5 pt-2 pb-1 text-[0.7rem] font-bold tracking-[0.14em] uppercase";
 
 export function AgoraTopo() {
-  const [estado, setEstado] = useState<Estado>({ fase: "carregando" });
+  const estado = useAgora();
   const [aberto, setAberto] = useState(false);
   const [visto, setVisto] = useState("");
   const { pathname } = useLocation();
@@ -30,22 +28,7 @@ export function AgoraTopo() {
   const gatilho = useRef<HTMLButtonElement>(null);
   const titulo = useRef<HTMLHeadingElement>(null);
 
-  const carregar = () =>
-    fetch("/api/agora")
-      .then((r) => (r.ok ? (r.json() as Promise<Agora>) : Promise.reject(new Error(String(r.status)))))
-      .then((dados) => setEstado({ fase: "ok", dados }))
-      .catch(() => setEstado({ fase: "erro" }));
-
-  useEffect(() => {
-    setVisto(lerVisto());
-    // espera o navegador ficar livre; depois atualiza a cada 5 min, só com a aba visível
-    const inicio = setTimeout(carregar, 1500);
-    const volta = setInterval(() => document.visibilityState === "visible" && carregar(), 5 * 60_000);
-    return () => {
-      clearTimeout(inicio);
-      clearInterval(volta);
-    };
-  }, []);
+  useEffect(() => setVisto(lerVisto()), []);
   useEffect(() => setAberto(false), [pathname]);
   useEffect(() => {
     if (!aberto) return;
@@ -77,10 +60,7 @@ export function AgoraTopo() {
       }
       setVisto(maisNova);
     }
-    if (!aberto && estado.fase === "erro") {
-      setEstado({ fase: "carregando" });
-      carregar();
-    }
+    if (!aberto && estado.fase === "erro") void aguardarAgora();
     setAberto((a) => !a);
   }
 
@@ -130,10 +110,7 @@ export function AgoraTopo() {
               <p className="text-[0.9rem] text-ink-soft">Não deu para carregar agora.</p>
               <button
                 type="button"
-                onClick={() => {
-                  setEstado({ fase: "carregando" });
-                  carregar();
-                }}
+                onClick={() => void aguardarAgora()}
                 className="mt-3 h-8 rounded-full border border-line px-3 text-[0.82rem] font-semibold hover:bg-sunken"
               >
                 Tentar de novo

@@ -4,6 +4,7 @@ import { Menu, Search, X } from "lucide-react";
 import { HEADER_LINKS, isActive } from "~/lib/nav";
 import { AcoesLogado } from "./AcoesLogado";
 import { AgoraTopo } from "./AgoraTopo";
+import { AtalhosVisitante } from "./AtalhosVisitante";
 import { EconomiaTopo } from "./EconomiaTopo";
 import { InstalarGaveta, InstalarTopo } from "./InstalarApp";
 import { PainelEquipeTopo } from "./PainelEquipeTopo";
@@ -50,10 +51,11 @@ export function Header() {
         <AgoraTopo />
         <BuscaTopo />
         <div className="ml-auto flex items-center gap-1.5 sm:gap-3 lg:ml-0">
+          <AtalhosVisitante />
           <PainelEquipeTopo />
           <InstalarTopo />
           <BuscaCelular />
-          <ThemeToggle className="text-white/80 hover:bg-white/10 hover:text-white lg:hidden logado:max-sm:hidden!" />
+          <ThemeToggle className="text-white/80 hover:bg-white/10 hover:text-white lg:logado:hidden! logado:max-sm:hidden!" />
           <Link to="/login" className="hidden px-2 py-2 font-semibold hover:text-glow sm:inline-block logado:hidden!">
             Entrar
           </Link>

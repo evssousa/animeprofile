@@ -278,7 +278,7 @@ export function BuscaTopo() {
       onSubmit={() => {
         if (b.q.trim().length >= 2) b.ir(`/busca?q=${encodeURIComponent(b.q.trim())}`, b.q);
       }}
-      className="relative mx-auto hidden w-[min(22rem,26vw)] lg:block xl:w-[min(28rem,30vw)]"
+      className="relative mx-auto hidden w-[min(22rem,26vw)] min-w-[13rem] lg:block xl:w-[min(28rem,30vw)]"
     >
       <Search className="pointer-events-none absolute top-1/2 left-3.5 size-4 -translate-y-1/2 text-white/60" aria-hidden />
       <input
