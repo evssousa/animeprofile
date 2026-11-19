@@ -41,7 +41,8 @@ export type Versao = { id: number; titulo: string; status: string; salvaPor: str
 export type OpcoesEditor = {
   categorias: { id: string; nome: string; tipo: string; slug: string }[];
   tags: { id: string; nome: string; usos: number }[];
-  autores: { id: string; nome: string }[];
+  /** Quem pode assinar: autores de IA e quem já escreveu matérias (autores e administradores). Quem só comentou fica de fora. */
+  autores: { id: string; nome: string; ia: boolean }[];
 };
 
 /** Quem fez a versão anterior: o painel (se já tinha sido editada aqui) ou a origem da matéria. */
@@ -96,12 +97,12 @@ export async function opcoesEditor(): Promise<OpcoesEditor> {
   const [categorias, tags, autores] = await Promise.all([
     query<{ id: string; name: string; kind: string; slug: string }>("SELECT id, name, kind, slug FROM categories ORDER BY name"),
     query<{ id: string; name: string; usos: number }>("SELECT t.id, t.name, COUNT(pt.post_id) AS usos FROM tags t LEFT JOIN post_tags pt ON pt.tag_id = t.id GROUP BY t.id, t.name ORDER BY t.name LIMIT 5000"),
-    query<{ id: string; name: string }>("SELECT id, name FROM post_authors ORDER BY name LIMIT 200"),
+    query<{ id: string; name: string; kind: string }>("SELECT a.id, a.name, a.kind FROM post_authors a WHERE a.kind = 'ai' OR EXISTS (SELECT 1 FROM posts p WHERE p.author_id = a.id) ORDER BY a.kind, a.name LIMIT 200"),
   ]);
   return {
     categorias: categorias.map((c) => ({ id: c.id, nome: c.name, tipo: c.kind, slug: c.slug })),
     tags: tags.map((t) => ({ id: t.id, nome: t.name, usos: Number(t.usos) })),
-    autores: autores.map((a) => ({ id: a.id, nome: a.name })),
+    autores: autores.map((a) => ({ id: a.id, nome: a.name, ia: a.kind === "ai" })),
   };
 }
 

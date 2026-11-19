@@ -1,11 +1,13 @@
 // Quem está logado (GET /api/eu). O navegador só pergunta quando existe o cookie marcador `ap_logado`.
 // Sem cache. Nunca devolve e-mail. Se o marcador do pedido estiver desatualizado (ex.: sem os papéis), corrige.
+// Para todo logado, devolve também `economia` (sequência, AP Coins, Rubis e nível do topo).
 // Só para admin ou moderador, devolve também `painel` (robô de hoje e visitas de hoje) para a faixa da equipe no topo.
 import type { Route } from "./+types/api.eu";
 import { SESSION_HINT } from "~/lib/session-hint";
 import { hintCookie } from "~/server/admin/auth.server";
 import { getViewer } from "~/server/auth/viewer.server";
 import { cached } from "~/server/cache.server";
+import { economiaDoUsuario } from "~/server/economia-topo.server";
 import { getConfig, roboPostsToday } from "~/server/robot/config.server";
 import { diaBrasilia } from "~/visitas/core/dia";
 import { visitantesHoje } from "~/visitas/server/consultas.server";
@@ -34,5 +36,5 @@ export async function loader({ request }: Route.LoaderArgs) {
     if (atual !== esperado) headers.append("Set-Cookie", hintCookie(v.papeis));
   }
   const painel = v && (v.papeis.includes("admin") || v.papeis.includes("moderator")) ? await painelEquipe() : undefined;
-  return Response.json(v ? { logado: true, nome: v.nome, inicial: v.inicial, papeis: v.papeis, ...(painel ? { painel } : {}) } : { logado: false }, { headers });
+  return Response.json(v ? { logado: true, nome: v.nome, inicial: v.inicial, papeis: v.papeis, economia: await economiaDoUsuario(v), ...(painel ? { painel } : {}) } : { logado: false }, { headers });
 }

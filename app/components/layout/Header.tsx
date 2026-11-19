@@ -4,6 +4,7 @@ import { Menu, Search, X } from "lucide-react";
 import { HEADER_LINKS, isActive } from "~/lib/nav";
 import { AcoesLogado } from "./AcoesLogado";
 import { AgoraTopo } from "./AgoraTopo";
+import { EconomiaTopo } from "./EconomiaTopo";
 import { InstalarGaveta, InstalarTopo } from "./InstalarApp";
 import { PainelEquipeTopo } from "./PainelEquipeTopo";
 import { registrarApp } from "~/lib/pwa";
@@ -61,6 +62,7 @@ export function Header() {
             <span className="hidden min-[400px]:inline">Contas em breve</span>
           </Link>
           <AcoesLogado />
+          <EconomiaTopo />
           <UserMenu />
         </div>
       </div>

@@ -9,8 +9,9 @@ import { podeVer } from "~/lib/papeis";
 import { clearSessionHint, setPapeisAttr } from "~/lib/session-hint";
 
 import type { PainelEquipe } from "~/routes/api.eu";
+import type { EconomiaTopo } from "~/server/economia-topo.server";
 
-export type Estado = { fase: "carregando" } | { fase: "pronto"; nome: string; inicial: string; papeis: string[]; painel?: PainelEquipe } | { fase: "erro" };
+export type Estado = { fase: "carregando" } | { fase: "pronto"; nome: string; inicial: string; papeis: string[]; painel?: PainelEquipe; economia?: EconomiaTopo } | { fase: "erro" };
 
 // Uma consulta só para o topo e a gaveta.
 let estado: Estado = { fase: "carregando" };
@@ -27,10 +28,10 @@ function consultar() {
   iniciou = true;
   fetch("/api/eu", { credentials: "same-origin" })
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-    .then((j: { logado: boolean; nome?: string; inicial?: string; papeis?: string[]; painel?: PainelEquipe }) => {
+    .then((j: { logado: boolean; nome?: string; inicial?: string; papeis?: string[]; painel?: PainelEquipe; economia?: EconomiaTopo }) => {
       if (j.logado) {
         setPapeisAttr(j.papeis ?? []); // confirma os papéis no <html> (o menu lateral acompanha)
-        publicar({ fase: "pronto", nome: j.nome ?? "Conta", inicial: j.inicial ?? "?", papeis: j.papeis ?? [], painel: j.painel });
+        publicar({ fase: "pronto", nome: j.nome ?? "Conta", inicial: j.inicial ?? "?", papeis: j.papeis ?? [], painel: j.painel, economia: j.economia });
       } else {
         clearSessionHint(); // sessão vencida: volta ao "Entrar"
         publicar({ fase: "erro" });
@@ -140,7 +141,17 @@ export function UserMenu() {
             <span className="mx-auto xl:mx-0">
               <Avatar inicial={v.inicial} tamanho="p" />
             </span>
-            <span className="hidden max-w-[10rem] truncate text-[0.9rem] font-semibold xl:inline">{v.nome}</span>
+            <span className="hidden min-w-0 flex-col items-start xl:flex">
+              <span className="max-w-[10rem] truncate text-[0.9rem] leading-tight font-semibold">{v.nome}</span>
+              {v.economia && (
+                <span className="mt-0.5 flex items-center gap-1.5 text-[0.68rem] leading-none whitespace-nowrap text-white/60 tabular-nums" title={`Nível ${v.economia.nivel}: ${v.economia.xp}/${v.economia.xpProximo} XP`}>
+                  Nv. {v.economia.nivel}
+                  <span className="h-1 w-14 overflow-hidden rounded-full bg-white/15" role="progressbar" aria-label="Progresso para o próximo nível" aria-valuemin={0} aria-valuemax={v.economia.xpProximo} aria-valuenow={v.economia.xp}>
+                    <span className="block h-full rounded-full bg-glow" style={{ width: `${Math.min(100, Math.round((v.economia.xp / Math.max(1, v.economia.xpProximo)) * 100))}%` }} />
+                  </span>
+                </span>
+              )}
+            </span>
             <ChevronDown className={`hidden size-4 text-white/70 transition-transform motion-reduce:transition-none xl:block ${aberto ? "rotate-180" : ""}`} aria-hidden />
           </button>
           {aberto && (

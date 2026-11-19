@@ -86,7 +86,7 @@ describe("GET /api/eu", () => {
     expect(await sem.json()).toEqual({ logado: false });
     const com = await eu({ request: req("7.7.7.7", cookieHeader(await entrar("7.7.7.7"))) } as never);
     const corpo = await com.json();
-    expect(corpo).toEqual({ logado: true, nome: "Administrador", inicial: "A", papeis: ["admin"] });
+    expect(corpo).toMatchObject({ logado: true, nome: "Administrador", inicial: "A", papeis: ["admin"], economia: { nivel: 1 } });
     expect(JSON.stringify(corpo)).not.toContain("@");
   });
 });
@@ -100,7 +100,9 @@ describe("/api/eu corrige o marcador", () => {
     expect(antigo.headers.get("set-cookie")).toContain("ap_logado=admin;");
     const certo = await chamar(`${sessao}; ap_logado=admin`);
     expect(certo.headers.get("set-cookie")).toBeNull();
-    expect((await certo.json()).papeis).toEqual(["admin"]);
+    const corpo = await certo.json();
+    expect(corpo.papeis).toEqual(["admin"]);
+    expect(corpo.economia).toEqual({ sequencia: 0, apCoins: 0, rubis: 0, nivel: 1, xp: 0, xpProximo: 100 }); // chips do topo (economia ainda não refeita)
   });
 });
 

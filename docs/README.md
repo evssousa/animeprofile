@@ -168,6 +168,12 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     capa e imagens enviadas para `/media/painel`; categorias e tags; palavra-chave e 4 checagens de SEO; checklist "Para publicar"; marcações ✍️; salvar rascunho, publicar,
     agendar (tarefa `publicar-agendados` a cada 5 min), despublicar; endereço travado depois de publicado; 20 versões com ver/restaurar; aviso de conflito; cópia local; Ctrl+S; prévia em `/admin/posts/:id/previa`).
     Migration 015 no ar. O Tiptap só entra no chunk do editor. **Falta o dono conferir** logado (enviar imagem, publicar de verdade) e dizer com qual autor assinar (pergunta 2 do plano; hoje "Sem assinatura").
+    **Ajustes pedidos depois (2026-11-19):** (1) imagem, vídeo e card selecionados no editor ganham borda (`.ProseMirror-selectednode`); (2) **card de anime**: botão "Anime" no editor
+    (busca no banco e, se achar pouco, no AniList), guardado como `<div data-anime-card="ID">` e trocado no site pelo card completo (`app/server/anime/card-html.server.ts`); o
+    mesmo card aparece no fim de toda matéria com `anilist_id` (a não ser que o texto já tenha o card desse anime); (3) "Assinado por" lista só autores de IA e quem já escreveu
+    matérias (hoje não há papéis importados; na fase das contas passa a ser por papel admin/autor); (4) a capa agora aparece sempre como imagem no topo do texto (só não repete se o
+    texto já começa com ela); (5) topo de quem está logado ganha sequência, AP Coins, Rubis e barra de nível no computador (valores iniciais 0 em `app/server/economia-topo.server.ts`
+    até a economia ser refeita); no celular ficam só Check-in, Mensagens e Notificações; a faixa da equipe passou a aparecer só a partir de 1500 px.
     **Métricas (`/admin/retention`): feita em 2026-11-19** (migration 014 `metrics_snapshots` + `metrics_decisions` (esta ficou sem uso: o dono dispensou "Decisões" e o botão de gravar retrato manual, 2026-11-19), tarefa `metricas-semanal` segunda 9h30,
     `app/server/admin/metricas.server.ts`, kit `app/components/admin/ui.tsx` e tokens ok/warn/info). Mostra só audiência e conteúdo com dado real; o funil das contas
     é um bloco "começa quando o cadastro abrir". Falta o dono conferir logado. A Etapa 0 do plano está feita (segurança dos loaders, kit visual); o

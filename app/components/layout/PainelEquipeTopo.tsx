@@ -1,4 +1,4 @@
-// Faixa da equipe no topo (só admin/moderador, a partir de 1280 px): o robô de notícias de hoje e as visitas de hoje, ambos levam ao painel.
+// Faixa da equipe no topo (só admin/moderador, a partir de 1500 px): o robô de notícias de hoje e as visitas de hoje, ambos levam ao painel.
 // Os números vêm de /api/eu (só com sessão válida); quem forja o cookie marcador não recebe `painel`, então a faixa não aparece.
 import { Link } from "react-router";
 import { Bot, Eye } from "lucide-react";
@@ -21,7 +21,7 @@ export function PainelEquipeTopo() {
   const bolinha = modo === "publicar" ? "bg-glow" : modo === "desligado" ? "bg-white/30" : "bg-white/60";
   const rotuloRobo = modo === "publicar" ? `Robô de notícias: ${p.robo.hoje} de ${p.robo.teto} publicadas hoje, modo publicar` : `Robô de notícias: modo ${modo}`;
   return (
-    <div className="hidden items-center gap-1.5 xl:equipe:flex!">
+    <div className="hidden items-center gap-1.5 min-[1500px]:equipe:flex!">
       <Link to={DESTINO_ROBO} className={pilula} aria-label={rotuloRobo} title={rotuloRobo}>
         <span className={`size-1.5 rounded-full ${bolinha}`} aria-hidden />
         <Bot className="size-[15px]" aria-hidden />

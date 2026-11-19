@@ -259,3 +259,152 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Card "Sobre o anime" (no fim da matéria e onde o editor colocou um): banner, pôster, dados e o link para a página do anime. */
+a.anime-news-card,
+.prose-ap a.anime-news-card {
+  display: block;
+  margin: 2rem 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  font-weight: 400;
+  text-decoration: none;
+  transition: border-color 150ms;
+}
+a.anime-news-card:hover,
+.prose-ap a.anime-news-card:hover {
+  border-color: var(--brand);
+  text-decoration: none;
+}
+.anime-news-card > span {
+  display: block;
+}
+.anime-news-card .anc-banner {
+  position: relative;
+  height: 8rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--night), #3a1b19);
+}
+.anime-news-card .anc-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  margin: 0;
+  border-radius: 0;
+  transition: transform 300ms;
+}
+.anime-news-card:hover .anc-banner img {
+  transform: scale(1.04);
+}
+.anime-news-card .anc-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(13, 13, 16, 0.85) 0%, rgba(13, 13, 16, 0.25) 60%, rgba(13, 13, 16, 0.1) 100%);
+}
+.anime-news-card .anc-kicker {
+  position: absolute;
+  top: 0.75rem;
+  left: 1rem;
+  color: var(--glow);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.anime-news-card .anc-title {
+  position: absolute;
+  right: 1rem;
+  bottom: 0.75rem;
+  left: 1rem;
+  overflow: hidden;
+  color: #fff;
+  font-size: 1.2rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.anime-news-card .anc-body {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+}
+.anime-news-card .anc-cover {
+  flex: none;
+  width: 4.5rem;
+  height: 6.3rem;
+  margin: -2.75rem 0 0;
+  border-radius: 12px;
+  object-fit: cover;
+  box-shadow: 0 0 0 4px var(--surface), 0 8px 20px rgba(0, 0, 0, 0.25);
+}
+.anime-news-card .anc-info {
+  min-width: 0;
+  flex: 1;
+}
+.anime-news-card .anc-meta {
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+}
+.anime-news-card .anc-syn {
+  display: -webkit-box;
+  margin-top: 0.4rem;
+  overflow: hidden;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+.anime-news-card .anc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+.anime-news-card .anc-tag {
+  padding: 0.1rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+}
+.anime-news-card .anc-stream {
+  padding: 0.1rem 0.45rem;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.anime-news-card .anc-cta {
+  padding: 0.65rem 1rem;
+  border-top: 1px solid var(--line);
+  color: var(--brand);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: right;
+}
+[data-theme="dark"] .anime-news-card .anc-cta {
+  color: var(--glow);
+}
+
+/* Editor de matérias: a imagem, o vídeo e o card selecionados ganham uma borda para mostrar o que está "circulado". */
+.ProseMirror .ProseMirror-selectednode,
+.ProseMirror img.ProseMirror-selectednode {
+  border-radius: 12px;
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+}
+.ProseMirror figure.ProseMirror-selectednode img {
+  outline: 3px solid var(--brand);
+  outline-offset: 3px;
+}
+.ProseMirror figure.ProseMirror-selectednode {
+  outline: none;
+}
+.ProseMirror figure img {
+  cursor: pointer;
+}

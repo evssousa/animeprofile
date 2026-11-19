@@ -8,7 +8,7 @@ import Placeholder from "@tiptap/extension-placeholder";
 import Youtube from "@tiptap/extension-youtube";
 import StarterKit from "@tiptap/starter-kit";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
-import { Bold, Code2, EyeOff, Heading2, Heading3, Image as ImageIcon, Italic, Link as LinkIcon, List, ListOrdered, Loader2, Minus, Quote, Redo, Strikethrough, Underline as UnderlineIcon, Undo, Video } from "lucide-react";
+import { Bold, Clapperboard, Code2, EyeOff, Heading2, Heading3, Image as ImageIcon, Italic, Link as LinkIcon, List, ListOrdered, Loader2, Minus, Quote, Redo, Search, Strikethrough, Underline as UnderlineIcon, Undo, Video, X } from "lucide-react";
 
 const YT_RE = /^(?:https?:\/\/)?(?:www\.|m\.)?(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{6,})/i;
 
@@ -109,6 +109,155 @@ const Spoiler = Node.create({
   },
 });
 
+/**
+ * Card "Sobre o anime" dentro do texto (bom para artigos em lista: um card por item). Fica salvo como
+ * <div data-anime-card="ID" data-title="..."> com um link simples dentro; a página pública troca isso pelo card completo
+ * (banner, pôster, dados e link para a página do anime). No editor aparece como uma caixa com o nome do anime.
+ */
+const CardAnime = Node.create({
+  name: "cardAnime",
+  group: "block",
+  atom: true,
+  draggable: true,
+  selectable: true,
+  addAttributes() {
+    return {
+      id: { default: null as number | null, parseHTML: (el) => Number((el as HTMLElement).getAttribute("data-anime-card")) || null, renderHTML: () => ({}) },
+      title: { default: "", parseHTML: (el) => (el as HTMLElement).getAttribute("data-title") ?? "", renderHTML: () => ({}) },
+      cover: { default: null as string | null, parseHTML: () => null, renderHTML: () => ({}) },
+    };
+  },
+  parseHTML() {
+    return [{ tag: "div[data-anime-card]" }];
+  },
+  renderHTML({ node }) {
+    const id = node.attrs.id as number;
+    const titulo = (node.attrs.title as string) || "Ver anime";
+    return ["div", { "data-anime-card": String(id), "data-title": titulo, class: "anime-card-embed" }, ["a", { href: `/animes/${id}`, class: "anime-card-fallback" }, `Sobre o anime: ${titulo}`]];
+  },
+  addNodeView() {
+    return ({ node, getPos, editor }) => {
+      const dom = document.createElement("div");
+      dom.className = "my-5 flex items-center gap-3 rounded-2xl border border-line bg-surface p-3";
+      dom.contentEditable = "false";
+      if (node.attrs.cover) {
+        const img = document.createElement("img");
+        img.src = node.attrs.cover as string;
+        img.alt = "";
+        img.className = "h-16 w-11 shrink-0 rounded-md object-cover";
+        dom.append(img);
+      }
+      const texto = document.createElement("div");
+      texto.className = "min-w-0 flex-1";
+      const rotulo = document.createElement("p");
+      rotulo.className = "text-[0.65rem] font-bold tracking-[0.16em] text-brand uppercase";
+      rotulo.textContent = "Card do anime";
+      const nome = document.createElement("p");
+      nome.className = "truncate font-extrabold";
+      nome.textContent = (node.attrs.title as string) || "Anime";
+      const dica = document.createElement("p");
+      dica.className = "text-[0.78rem] text-ink-soft";
+      dica.textContent = "No site aparece o card completo, que leva à página do anime.";
+      texto.append(rotulo, nome, dica);
+      const tirar = document.createElement("button");
+      tirar.type = "button";
+      tirar.textContent = "Tirar";
+      tirar.className = "shrink-0 rounded-lg border border-line px-2.5 py-1 text-[0.8rem] font-semibold text-ink-soft hover:text-brand";
+      tirar.addEventListener("click", () => {
+        const pos = typeof getPos === "function" ? getPos() : null;
+        if (pos == null) return;
+        editor.view.dispatch(editor.view.state.tr.delete(pos, pos + node.nodeSize));
+      });
+      dom.append(texto, tirar);
+      return { dom, stopEvent: (e: Event) => e.target === tirar, ignoreMutation: () => true };
+    };
+  },
+});
+
+type AnimeBusca = { id: number; titulo: string; capa: string | null; info: string };
+
+/** Busca de anime (diálogo nativo): digitou, espera 350 ms, procura em /admin/posts/anime e entrega o escolhido. */
+function DialogoAnime({ aberto, onFechar, onEscolher }: { aberto: boolean; onFechar: () => void; onEscolher: (a: AnimeBusca) => void }) {
+  const ref = useRef<HTMLDialogElement>(null);
+  const [q, setQ] = useState("");
+  const [itens, setItens] = useState<AnimeBusca[]>([]);
+  const [estado, setEstado] = useState<"vazio" | "buscando" | "ok" | "erro">("vazio");
+  useEffect(() => {
+    const d = ref.current;
+    if (!d) return;
+    if (aberto && !d.open) d.showModal();
+    if (!aberto && d.open) d.close();
+    if (!aberto) {
+      setQ("");
+      setItens([]);
+      setEstado("vazio");
+    }
+  }, [aberto]);
+  useEffect(() => {
+    const termo = q.trim();
+    if (!aberto || termo.length < 2) return setEstado("vazio");
+    setEstado("buscando");
+    const ctl = new AbortController();
+    const t = setTimeout(() => {
+      fetch(`/admin/posts/anime?q=${encodeURIComponent(termo)}`, { signal: ctl.signal, credentials: "same-origin" })
+        .then((r) => (r.ok ? (r.json() as Promise<{ itens: AnimeBusca[] }>) : Promise.reject(new Error(String(r.status)))))
+        .then((j) => {
+          setItens(j.itens);
+          setEstado("ok");
+        })
+        .catch((e) => e?.name !== "AbortError" && setEstado("erro"));
+    }, 350);
+    return () => {
+      clearTimeout(t);
+      ctl.abort();
+    };
+  }, [q, aberto]);
+  return (
+    <dialog
+      ref={ref}
+      aria-labelledby="titulo-dialogo-anime"
+      onCancel={(e) => {
+        e.preventDefault();
+        onFechar();
+      }}
+      onClick={(e) => e.target === ref.current && onFechar()}
+      className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-2xl border border-line bg-surface p-5 text-ink shadow-[0_20px_50px_-20px_rgba(0,0,0,.35)] backdrop:bg-black/60"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 id="titulo-dialogo-anime" className="text-[1.1rem] font-extrabold">
+            Inserir card de anime
+          </h2>
+          <p className="mt-1 text-[0.82rem] text-ink-soft">O card leva o leitor para a página do anime. Em artigos de lista, coloque um em cada item.</p>
+        </div>
+        <button type="button" onClick={onFechar} aria-label="Fechar" className="grid size-9 shrink-0 place-items-center rounded-full text-ink-soft hover:bg-sunken">
+          <X className="size-4" aria-hidden />
+        </button>
+      </div>
+      <div className="relative mt-4">
+        <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-soft" aria-hidden />
+        <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} placeholder="Nome do anime (ex.: Frieren)" aria-label="Buscar anime" maxLength={60} className="h-11 w-full rounded-[10px] border border-line bg-surface pr-9 pl-9 text-[0.9rem] focus:outline-none" />
+        {estado === "buscando" && <Loader2 className="absolute top-1/2 right-3 size-4 -translate-y-1/2 animate-spin text-ink-soft" aria-hidden />}
+      </div>
+      <div className="mt-3 max-h-[50vh] overflow-y-auto" aria-live="polite">
+        {estado === "vazio" && <p className="py-6 text-center text-[0.82rem] text-ink-soft">Digite pelo menos 2 letras.</p>}
+        {estado === "erro" && <p className="py-6 text-center text-[0.82rem] text-brand">Não deu para buscar agora. Tente de novo.</p>}
+        {estado === "ok" && itens.length === 0 && <p className="py-6 text-center text-[0.82rem] text-ink-soft">Nenhum anime encontrado.</p>}
+        {estado === "ok" &&
+          itens.map((a) => (
+            <button key={a.id} type="button" onClick={() => onEscolher(a)} className="flex w-full items-center gap-3 rounded-xl p-2 text-left hover:bg-sunken">
+              {a.capa ? <img src={a.capa} alt="" className="h-14 w-10 shrink-0 rounded object-cover" /> : <span className="h-14 w-10 shrink-0 rounded bg-sunken" />}
+              <span className="min-w-0">
+                <span className="line-clamp-1 text-[0.92rem] font-semibold">{a.titulo}</span>
+                {a.info && <span className="block text-[0.78rem] text-ink-soft">{a.info}</span>}
+              </span>
+            </button>
+          ))}
+      </div>
+    </dialog>
+  );
+}
+
 /** Limpa o HTML colado do Google Docs, Word ou de outros sites (tira estilos e classes que vêm do site de origem). */
 function limparColado(html: string): string {
   return html
@@ -127,6 +276,7 @@ const divisor = <span aria-hidden className="mx-1 h-5 w-px shrink-0 bg-line" />;
 export function EditorTexto({ value, onChange, onEnviarImagem, desabilitado }: Props) {
   const [verHtml, setVerHtml] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  const [animeAberto, setAnimeAberto] = useState(false);
   const arquivo = useRef<HTMLInputElement>(null);
   const ultimo = useRef(value);
   const editor = useEditor({
@@ -135,6 +285,7 @@ export function EditorTexto({ value, onChange, onEnviarImagem, desabilitado }: P
     extensions: [
       StarterKit.configure({ heading: { levels: [2, 3] }, link: { openOnClick: false, autolink: true } }),
       Figura,
+      CardAnime,
       Spoiler,
       Youtube.configure({ controls: true, nocookie: true, HTMLAttributes: { class: "w-full aspect-video rounded-xl" } }),
       Placeholder.configure({ placeholder: "Escreva a matéria aqui…" }),
@@ -244,6 +395,7 @@ export function EditorTexto({ value, onChange, onEnviarImagem, desabilitado }: P
           {enviando ? <Loader2 className="size-4 animate-spin" aria-hidden /> : <ImageIcon className="size-4" aria-hidden />}
         </button>
         <button type="button" className={botao(false)} onClick={video} title="Vídeo do YouTube" aria-label="Vídeo do YouTube"><Video className="size-4" aria-hidden /></button>
+        <button type="button" className={`${botao(false)} !w-auto gap-1 px-2 text-[0.8rem] font-semibold`} onClick={() => setAnimeAberto(true)} title="Card de anime (leva para a página do anime)" aria-label="Card de anime"><Clapperboard className="size-4" aria-hidden /> Anime</button>
         <button type="button" className={botao(editor.isActive("spoiler"))} onClick={() => (editor.isActive("spoiler") ? c().lift("spoiler").run() : c().wrapIn("spoiler").run())} title="Esconder trecho com spoiler (selecione os parágrafos)" aria-label="Spoiler"><EyeOff className="size-4" aria-hidden /></button>
         {divisor}
         <button type="button" className={botao(verHtml)} onClick={() => setVerHtml((v) => !v)} title="Ver o HTML" aria-label="Ver o HTML" aria-pressed={verHtml}><Code2 className="size-4" aria-hidden /></button>
@@ -270,6 +422,14 @@ export function EditorTexto({ value, onChange, onEnviarImagem, desabilitado }: P
       ) : (
         <EditorContent editor={editor} />
       )}
+      <DialogoAnime
+        aberto={animeAberto}
+        onFechar={() => setAnimeAberto(false)}
+        onEscolher={(a) => {
+          editor.chain().focus().insertContent({ type: "cardAnime", attrs: { id: a.id, title: a.titulo, cover: a.capa } }).run();
+          setAnimeAberto(false);
+        }}
+      />
     </div>
   );
 }

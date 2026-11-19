@@ -294,6 +294,8 @@ export default function EditarPost({ loaderData }: Route.ComponentProps) {
   }, [buscaTag, tags, f.tagIds]);
   const tagsEscolhidas = f.tagIds.map((id) => tags.find((t) => t.id === id)).filter((t): t is (typeof tags)[number] => !!t);
   const travarSlug = jaPublicado;
+  // Quem assina hoje sempre aparece na lista, mesmo que não seja mais "autor" (para não perder a assinatura ao salvar).
+  const autoresOpcoes = post?.autorId && !opcoes.autores.some((a) => a.id === post.autorId) ? [...opcoes.autores, { id: post.autorId, nome: post.autor ?? "Autor", ia: false }] : opcoes.autores;
 
   return (
     <div className="pb-28">
@@ -369,8 +371,8 @@ export default function EditarPost({ loaderData }: Route.ComponentProps) {
                 Assinado por
                 <select value={f.autorId} onChange={(e) => setF((x) => ({ ...x, autorId: e.target.value }))} className={`${campo} h-10`}>
                   <option value="">Sem assinatura</option>
-                  {opcoes.autores.map((a) => (
-                    <option key={a.id} value={a.id}>{a.nome}</option>
+                  {autoresOpcoes.map((a) => (
+                    <option key={a.id} value={a.id}>{a.nome}{a.ia ? " (IA)" : ""}</option>
                   ))}
                 </select>
               </label>

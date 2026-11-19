@@ -12,6 +12,7 @@ import { SITE, absoluteUrl } from "~/lib/site";
 import { isWideImage } from "~/lib/images";
 import { getAnime } from "~/server/anime/anime.server";
 import { getPost, postComments, relatedPosts, withToc } from "~/server/content/posts.server";
+import { animeCardHtml, injetarCardsAnime } from "~/server/anime/card-html.server";
 import { loadSidebar } from "~/server/sidebar.server";
 import { splitLongParagraphs } from "~/server/robot/html";
 
@@ -20,11 +21,16 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   if (!post) throw data(null, { status: 404 });
   const path = routePath(request);
   if (path !== post.url) throw redirect(post.url, 301);
-  // Muitas matérias já trazem a capa no começo do texto: aí a capa do corpo não aparece, para não repetir.
+  // A capa aparece sempre como imagem de verdade no começo do texto (no cabeçalho ela é só o fundo escurecido atrás do título).
+  // Só não repete quando o texto JÁ COMEÇA com essa mesma imagem; se a imagem estiver mais para o meio, a capa continua no topo.
   const coverFile = post.image?.split("?")[0].split("/").pop()?.replace(/-\d+(\.\w+)$/, "$1") ?? "";
-  const showCover = Boolean(post.image) && !(coverFile && post.html.includes(coverFile.replace(/\.\w+$/, "")));
+  const coverBase = coverFile.replace(/\.\w+$/, "");
+  const inicioDoTexto = post.html.slice(0, 700);
+  const textoComecaComCapa = !!coverBase && /<img/i.test(inicioDoTexto) && inicioDoTexto.includes(coverBase);
+  const showCover = Boolean(post.image) && !textoComecaComCapa;
   // Parágrafos longos (as matérias do robô antigo vinham em blocos de 150+ palavras) viram parágrafos de 2 a 3 frases.
-  let { html, toc } = withToc(splitLongParagraphs(post.html));
+  const comCards = await injetarCardsAnime(post.html); // cards de anime colocados no texto pelo editor
+  let { html, toc } = withToc(splitLongParagraphs(comCards));
   // Vídeo no começo do texto: vai ANTES da matéria, em largura total. A capa, se existir, desce para logo abaixo do 1º título.
   let video: string | null = null;
   let coverBelowHeading = false;
@@ -51,8 +57,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     loadSidebar("materia", { now, type: post.type, excludeId: post.id, anilistId: post.anilistId, anime, toc }),
   ]);
   const label = <T extends { createdAt: string }>(c: T) => ({ ...c, ago: timeAgo(c.createdAt, now) });
+  // Card "Sobre o anime" no fim da matéria (quando ela é sobre um anime), a não ser que o texto já tenha o card desse anime.
+  const animeCard = anime && !html.includes(`data-anime-card-render="${anime.id}"`) ? animeCardHtml(anime) : null;
   return {
     post: { ...post, html },
+    animeCard,
     related,
     showCover: showCover && !coverBelowHeading,
     video,
@@ -91,7 +100,7 @@ export function meta({ loaderData: d }: Route.MetaArgs) {
 }
 
 export default function Post({ loaderData }: Route.ComponentProps) {
-  const { post, related, showCover, video, sidebar, comments } = loaderData;
+  const { post, related, showCover, video, sidebar, comments, animeCard } = loaderData;
   const section = post.type === "news" ? { label: "Notícias", to: "/noticias?tipo=noticias" } : { label: "Artigos", to: "/artigos" };
   return (
     <article>
@@ -150,6 +159,7 @@ export default function Post({ loaderData }: Route.ComponentProps) {
           {video && <div className="prose-ap mb-8 max-w-none" dangerouslySetInnerHTML={{ __html: video }} />}
           {showCover && post.image && <img src={post.image} alt="" className="mb-10 -mx-4 aspect-video w-[calc(100%+2rem)] max-w-none rounded-none object-cover sm:mx-0 sm:w-full sm:rounded-[18px] sm:shadow-[0_20px_40px_rgba(60,20,20,.16)]" />}
           <div className="prose-ap max-w-none" dangerouslySetInnerHTML={{ __html: post.html }} />
+          {animeCard && <div className="prose-ap mt-8 max-w-none" dangerouslySetInnerHTML={{ __html: animeCard }} />}
 
           {post.tags.length > 0 && (
             <div className="mt-12 flex flex-wrap gap-2" aria-label="Assuntos">
