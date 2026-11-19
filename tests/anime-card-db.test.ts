@@ -1,12 +1,15 @@
 // Card "Sobre o anime" das matérias (HTML gerado no servidor), cards colocados pelo editor e a lista "Assinado por".
 import { createDB } from "mysql-memory-server";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { migrate } from "../db/migrate.mjs";
 import { createPool, exec, setPool } from "~/server/db.server";
-import { getAnime } from "~/server/anime/anime.server";
+import { acharAnimePorNomes, getAnime } from "~/server/anime/anime.server";
 import { animeCardHtml, injetarCardsAnime } from "~/server/anime/card-html.server";
 import { sanitizePostHtml } from "~/server/content/sanitize.server";
 import { opcoesEditor, salvarPost } from "~/server/admin/posts-edit.server";
+
+// O AniList não é chamado nos testes: anime sem ficha no banco fica sem card.
+vi.mock("~/server/anime/anilist.server", async (original) => ({ ...(await original<typeof import("~/server/anime/anilist.server")>()), fetchDetails: async () => { throw new Error("sem rede nos testes"); } }));
 
 let server: Awaited<ReturnType<typeof createDB>>;
 
@@ -19,7 +22,8 @@ beforeAll(async () => {
   await exec(
     `INSERT INTO anime_catalog (anilist_id, title, cover_url, banner_url, format, status, episodes, season, season_year, genres, studios, synopsis_en, popularity, is_adult)
      VALUES (21, 'One Piece <b>"x"</b>', 'https://img.example/c.jpg', 'https://img.example/b.jpg', 'TV', 'RELEASING', 1100, 'FALL', 1999, '["Action","Adventure"]', '["Toei Animation"]', 'Um pirata atrás do tesouro.<br>Segunda linha.', 900, 0),
-            (22, 'Banner estranho', 'https://img.example/c2.jpg', 'javascript:alert(1)', 'MOVIE', 'FINISHED', 1, NULL, NULL, '[]', '[]', NULL, 10, 0)`,
+            (22, 'Banner estranho', 'https://img.example/c2.jpg', 'javascript:alert(1)', 'MOVIE', 'FINISHED', 1, NULL, NULL, '[]', '[]', NULL, 10, 0),
+            (23, 'Mato Seihei no Slave', 'https://img.example/c3.jpg', NULL, 'TV', 'FINISHED', 12, NULL, 2024, '["Action"]', '[]', NULL, 300, 0)`,
   );
 });
 afterAll(async () => {
@@ -55,6 +59,19 @@ describe("card do anime", () => {
 describe("card colocado pelo editor", () => {
   const embed = (id: number) => `<div data-anime-card="${id}" data-title="x" class="anime-card-embed"><a href="/animes/${id}" class="anime-card-fallback">Sobre o anime: x</a></div>`;
 
+  it("matéria importada do antigo (sem o marcador data-anime-card) e o link solto também viram card", async () => {
+    const importada = `<p>Texto</p><div class="anime-card-embed"><a href="/animes/23" class="anime-card-fallback">Sobre o anime: Mato Seihei no Slave</a></div><p>mais</p>`;
+    const html = await injetarCardsAnime(importada);
+    expect(html).toContain('data-anime-card-render="23"');
+    expect(html).not.toContain("Sobre o anime: Mato Seihei no Slave</a>"); // o link simples saiu
+    expect(html).toContain("<p>mais</p>");
+    const solto = await injetarCardsAnime('<p>a</p><a class="anime-card-fallback" href="/animes/21">Sobre o anime: One Piece</a>');
+    expect(solto).toContain('data-anime-card-render="21"');
+    // com <p> em volta e atributos em outra ordem
+    const embrulhado = await injetarCardsAnime('<div class="anime-card-embed"><p><a href="/animes/22" class="x anime-card-fallback" title="t">Sobre o anime: y</a></p></div>');
+    expect(embrulhado).toContain('data-anime-card-render="22"');
+  });
+
   it("a limpeza do HTML guarda o card; a página troca pelo card completo e deixa o link simples quando o anime não está no banco", async () => {
     const salvo = sanitizePostHtml(`<p>Texto</p>${embed(21)}${embed(999)}`);
     expect(salvo).toContain('data-anime-card="21"');
@@ -64,6 +81,16 @@ describe("card colocado pelo editor", () => {
     expect(html).toContain('data-anime-card="999"'); // sem ficha: continua o link simples
     expect(html).toContain("Sobre o anime: x");
     expect(await injetarCardsAnime("<p>sem card</p>")).toBe("<p>sem card</p>");
+  });
+});
+
+describe("anime pelo nome (matérias sem anime ligado)", () => {
+  it("acha por igualdade com o título (sem maiúscula nem acento), usa o mais popular e ignora nomes curtos e inexistentes", async () => {
+    expect(await acharAnimePorNomes(["MATO SEIHEI NO SLAVE"])).toBe(23);
+    expect(await acharAnimePorNomes(["Netflix", "mato seihei no slave", "X"])).toBe(23);
+    expect(await acharAnimePorNomes(["Mato Seihei"])).toBeNull(); // só igualdade: nada de palpite
+    expect(await acharAnimePorNomes(["Slave"])).toBeNull();
+    expect(await acharAnimePorNomes([])).toBeNull();
   });
 });
 

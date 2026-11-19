@@ -282,3 +282,18 @@ export async function sugerirAnimes(q: string, limite = 4): Promise<AnimeCard[]>
   );
   return rows.map(toCard);
 }
+
+/**
+ * Acha, no banco, o anime cujo título (japonês romanizado ou inglês) é IGUAL a um dos nomes dados (sem diferenciar maiúscula nem acento).
+ * Só igualdade: serve para ligar uma matéria ao anime quando a palavra-chave ou uma tag é o nome dele, sem arriscar um anime errado.
+ */
+export async function acharAnimePorNomes(nomes: string[]): Promise<number | null> {
+  const lista = [...new Set(nomes.map((n) => n.trim()).filter((n) => n.length >= 5))].slice(0, 8);
+  if (!hasDatabase() || !lista.length) return null;
+  const marcas = lista.map(() => "?").join(",");
+  const [r] = await query<{ anilist_id: number }>(
+    `SELECT c.anilist_id FROM anime_catalog c WHERE c.is_adult = 0 AND (c.title IN (${marcas}) OR c.title_english IN (${marcas})) ORDER BY c.popularity DESC LIMIT 1`,
+    [...lista, ...lista],
+  );
+  return r ? Number(r.anilist_id) : null;
+}

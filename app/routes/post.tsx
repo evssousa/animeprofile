@@ -12,7 +12,8 @@ import { SITE, absoluteUrl } from "~/lib/site";
 import { isWideImage } from "~/lib/images";
 import { getAnime } from "~/server/anime/anime.server";
 import { getPost, postComments, relatedPosts, withToc } from "~/server/content/posts.server";
-import { animeCardHtml, injetarCardsAnime } from "~/server/anime/card-html.server";
+import { acharAnimePorNomes, type AnimeFull } from "~/server/anime/anime.server";
+import { animeCardHtml, animeParaCard, injetarCardsAnime } from "~/server/anime/card-html.server";
 import { loadSidebar } from "~/server/sidebar.server";
 import { splitLongParagraphs } from "~/server/robot/html";
 
@@ -58,7 +59,15 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   ]);
   const label = <T extends { createdAt: string }>(c: T) => ({ ...c, ago: timeAgo(c.createdAt, now) });
   // Card "Sobre o anime" no fim da matéria (quando ela é sobre um anime), a não ser que o texto já tenha o card desse anime.
-  const animeCard = anime && !html.includes(`data-anime-card-render="${anime.id}"`) ? animeCardHtml(anime) : null;
+  // Quem não tem anime ligado (anilist_id) pode ter um com o mesmo nome da palavra-chave ou de uma tag; e o anime que ainda não tem ficha
+  // no banco é buscado no AniList (que guarda para as próximas visitas).
+  let paraCard: AnimeFull | null = anime;
+  if (!paraCard && post.anilistId) paraCard = await animeParaCard(post.anilistId);
+  if (!paraCard && post.type === "news") {
+    const idPorNome = await acharAnimePorNomes([post.focusKeyword ?? "", ...post.tags.map((t) => t.name)]).catch(() => null);
+    if (idPorNome) paraCard = await animeParaCard(idPorNome);
+  }
+  const animeCard = paraCard && !html.includes(`data-anime-card-render="${paraCard.id}"`) ? animeCardHtml(paraCard) : null;
   return {
     post: { ...post, html },
     animeCard,
