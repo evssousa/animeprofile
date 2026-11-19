@@ -9,6 +9,7 @@ import { PostCard, PostOverlay, PostRow, SectionHead } from "~/components/posts"
 import { SEASON_PT, brDay } from "~/lib/anime";
 import { readingLabel } from "~/lib/format";
 import { seo } from "~/lib/seo";
+import { SITE } from "~/lib/site";
 import { isWideImage } from "~/lib/images";
 import { ytThumb } from "~/components/otaku-tv";
 import { QuizCard } from "~/components/quiz";
@@ -47,7 +48,7 @@ export async function loader() {
 
 export function meta() {
   return seo({
-    title: "Anime Profile",
+    title: SITE.homeTitle,
     description: "Notícias de anime, artigos, coleção de figurinhas, quizzes e comunidade otaku em português.",
     path: "/",
   });

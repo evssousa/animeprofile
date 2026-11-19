@@ -76,11 +76,10 @@ export default function Login({ actionData }: Route.ComponentProps) {
             Anime <span className="text-brand dark:text-glow">Profile</span>
           </p>
           <p className="mt-1 text-[0.72rem] font-semibold tracking-[0.2em] text-ink-soft uppercase">Sua comunidade otaku</p>
-          <h1 className="mt-6 text-[1.75rem] leading-tight font-extrabold tracking-[-0.02em] sm:text-[2rem]">Entrar na conta</h1>
-          <p className="mt-1.5 max-w-[300px] text-ink-soft">Continue de onde parou.</p>
+          <h1 className="sr-only">Entrar na conta</h1>
         </div>
 
-        <div className="mt-6 rounded-3xl border border-line bg-surface p-6 shadow-[0_20px_50px_-20px_rgba(28,20,20,.18)] sm:p-8 dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,.6)]">
+        <div className="mt-5 rounded-3xl border border-line bg-surface p-6 shadow-[0_20px_50px_-20px_rgba(28,20,20,.18)] sm:p-8 dark:shadow-[0_20px_50px_-20px_rgba(0,0,0,.6)]">
           <div role="note" className="flex gap-3 rounded-xl border border-brand/20 bg-brand-soft px-4 py-3 text-[0.9rem]">
             <Info className="mt-0.5 size-[18px] shrink-0 text-brand dark:text-glow" aria-hidden />
             <p>

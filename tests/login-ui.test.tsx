@@ -18,7 +18,8 @@ describe("página /login", () => {
   it("mostra o formato do antigo: título, aviso das contas, Google desativado, e-mail, senha com olho e rodapé", async () => {
     const html = await render(<Login actionData={undefined} />);
     expect(html).toContain("Entrar na conta");
-    expect(html).toContain("Continue de onde parou.");
+    expect(html).not.toContain("Continue de onde parou."); // o formulário sobe: sem título nem subtítulo na tela
+    expect(html).toMatch(/<h1 class="sr-only">Entrar na conta<\/h1>/); // o título continua para leitores de tela
     expect(html).toContain("As contas da comunidade voltam em breve");
     expect(html).toContain("Continuar com Google");
     expect(html).toMatch(/<button[^>]*disabled[^>]*>/);

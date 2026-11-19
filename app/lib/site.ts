@@ -1,6 +1,9 @@
 // Configuração geral do site (vale no servidor e no navegador).
 export const SITE = {
   name: "Anime Profile",
+  tagline: "Sua comunidade otaku",
+  /** Título da página inicial (as demais usam "Página | Anime Profile"). */
+  homeTitle: "Anime Profile - Sua comunidade otaku",
   url: (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, "") || "https://animeprofile.com.br",
   email: "contato@animeprofile.com.br",
 };

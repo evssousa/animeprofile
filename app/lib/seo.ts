@@ -16,7 +16,7 @@ type SeoInput = {
 
 /** Metatags padrão de uma página: título, descrição, canonical, Open Graph, Twitter e JSON-LD. */
 export function seo({ title, description, path, type = "website", image, publishedTime, modifiedTime, noindex, jsonLd, canonical }: SeoInput) {
-  const fullTitle = title === SITE.name ? title : `${title} | ${SITE.name}`;
+  const fullTitle = title === SITE.name || title === SITE.homeTitle ? title : `${title} | ${SITE.name}`;
   const url = absoluteUrl(canonical ?? path);
   const img = image ? (image.startsWith("http") ? image : absoluteUrl(image)) : absoluteUrl("/logo-192.png");
   return [
