@@ -44,8 +44,8 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
-  // O painel (/admin) tem a própria moldura: sem topo, menu, aviso, rodapé nem barra de baixo do site.
-  const inAdmin = /^\/admin(\/|$)/.test(useLocation().pathname);
+  // O painel (/admin) e o login (/login) são páginas à parte: sem topo, menu, aviso, rodapé nem barra de baixo do site.
+  const inAdmin = /^\/(admin|login)(\/|$)/.test(useLocation().pathname);
   return (
     <html lang="pt-BR" suppressHydrationWarning>
       <head>

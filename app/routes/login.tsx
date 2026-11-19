@@ -1,4 +1,4 @@
-// Login (/login), no formato do site antigo. Fase 1 das contas (2026-11-19): só o administrador entra; sem cadastro.
+// Login (/login), no formato do site antigo: uma página só com o login (sem topo, menu lateral nem rodapé; ver root.tsx). Fase 1 das contas (2026-11-19): só o administrador entra; sem cadastro.
 // Contas de todos, "esqueci a senha" e o Google voltam nas próximas fases (docs/plano-contas-login.md).
 import { useEffect, useRef } from "react";
 import { data, Form, Link, redirect, useNavigation } from "react-router";
@@ -60,7 +60,7 @@ export default function Login({ actionData }: Route.ComponentProps) {
     if (erro) avisoRef.current?.focus();
   }, [erro, actionData]);
   return (
-    <div className="flex min-h-[calc(100dvh-72px)] items-center justify-center bg-[radial-gradient(60%_45%_at_50%_0%,color-mix(in_oklab,var(--brand)_10%,transparent),transparent)] px-4 py-10 sm:py-16 dark:bg-[radial-gradient(60%_45%_at_50%_0%,color-mix(in_oklab,var(--brand)_16%,transparent),transparent)]">
+    <div className="flex min-h-dvh items-center justify-center bg-paper bg-[radial-gradient(60%_45%_at_50%_0%,color-mix(in_oklab,var(--brand)_10%,transparent),transparent)] px-4 py-10 sm:py-16 dark:bg-[radial-gradient(60%_45%_at_50%_0%,color-mix(in_oklab,var(--brand)_16%,transparent),transparent)]">
       <div className="w-full max-w-[440px]">
         <div className="flex flex-col items-center text-center">
           <Link to="/" className="rounded-2xl" aria-label="Anime Profile, página inicial">
