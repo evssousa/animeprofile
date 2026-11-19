@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { FOOTER_LINKS, INSTITUTIONAL, LEGAL_LINKS, SOCIAL, visibleNav } from "~/lib/nav";
+import { FOOTER_LINKS, INSTITUTIONAL, LEGAL_LINKS, SOCIAL } from "~/lib/nav";
 import { SITE } from "~/lib/site";
 import { Logo } from "./Logo";
 
@@ -20,6 +20,10 @@ function Column({ title, links }: { title: string; links: { label: string; to: s
   );
 }
 
+/** O rodapé é igual para todos: sem os itens só de logado (e sem grupos que ficam vazios). */
+const publico = <T extends { items: { auth?: true }[] }>(groups: T[]) =>
+  groups.map((g) => ({ ...g, items: g.items.filter((i) => !i.auth) })).filter((g) => g.items.length > 0);
+
 export function Footer() {
   return (
     <footer className="mt-20 border-t border-line bg-surface">
@@ -37,7 +41,7 @@ export function Footer() {
             ))}
           </ul>
         </div>
-        {visibleNav(FOOTER_LINKS).map((g) => (
+        {publico(FOOTER_LINKS).map((g) => (
           <Column key={g.label} title={g.label} links={g.items} />
         ))}
         <Column title="Anime Profile" links={INSTITUTIONAL} />

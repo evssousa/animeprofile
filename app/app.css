@@ -9,6 +9,8 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 @custom-variant mini (&:where([data-sidebar="mini"], [data-sidebar="mini"] *));
 @custom-variant logado (&:where([data-logado], [data-logado] *));
+@custom-variant papel-admin (&:where([data-papeis~="admin"], [data-papeis~="admin"] *));
+@custom-variant equipe (&:where([data-papeis~="admin"], [data-papeis~="admin"] *, [data-papeis~="moderator"], [data-papeis~="moderator"] *));
 
 :root {
   --paper: #faf7f7;

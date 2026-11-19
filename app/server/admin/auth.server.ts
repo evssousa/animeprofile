@@ -5,6 +5,7 @@
 //   ADMIN_PASSWORD_HASH   hash scrypt da senha (gerado por `npm run admin:hash`, nunca a senha)
 //   SESSION_SECRET        segredo que assina o cookie de sessão (32+ caracteres aleatórios)
 import { createCookieSessionStorage } from "react-router";
+import type { Papel } from "~/lib/papeis";
 import { SESSION_HINT } from "~/lib/session-hint";
 import { clientIp } from "../http.server";
 import { parseHash, verifyPassword } from "./hash";
@@ -55,8 +56,10 @@ function sessions() {
 }
 
 /** Cookie marcador (sem segredo, legível pelo navegador): só avisa que vale perguntar a /api/eu quem está logado. */
-export function hintCookie(ligado: boolean): string {
-  const base = `${SESSION_HINT}=${ligado ? "1" : ""}; Path=/; SameSite=Lax; Max-Age=${ligado ? 7 * 24 * 3600 : 0}`;
+export function hintCookie(papeis: Papel[] | null): string {
+  const ligado = papeis !== null;
+  const valor = !ligado ? "" : papeis.length ? papeis.join(".") : "1";
+  const base = `${SESSION_HINT}=${valor}; Path=/; SameSite=Lax; Max-Age=${ligado ? 7 * 24 * 3600 : 0}`;
   return process.env.NODE_ENV === "production" ? `${base}; Secure` : base;
 }
 
@@ -111,15 +114,15 @@ export async function login(request: Request, identificador: string, password: s
   fails.delete(ip);
   const session = await sessions().getSession();
   session.set("admin", cfg.email!);
-  return { ok: true, cookies: [await sessions().commitSession(session), hintCookie(true)] };
+  return { ok: true, cookies: [await sessions().commitSession(session), hintCookie(["admin"])] };
 }
 
 /** Os dois cookies, apagados. */
 export async function logout(request: Request): Promise<string[]> {
   const cfg = adminConfig();
-  if (!cfg.ready) return [hintCookie(false)];
+  if (!cfg.ready) return [hintCookie(null)];
   const session = await sessions().getSession(request.headers.get("Cookie"));
-  return [await sessions().destroySession(session), hintCookie(false)];
+  return [await sessions().destroySession(session), hintCookie(null)];
 }
 
 /** Há sessão de admin válida? (sem redirecionar) */

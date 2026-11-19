@@ -2,9 +2,10 @@
 // Na fase 2 esta função passa a ler a sessão do banco e `user_roles`; quem chama (`requireAdmin`, `/api/eu`) não muda.
 import { redirect } from "react-router";
 import { isAdmin } from "../admin/auth.server";
+import type { Papel } from "~/lib/papeis";
 import { sameOrigin } from "../http.server";
 
-export type Papel = "admin" | "moderator" | "author";
+export type { Papel };
 export type Viewer = { id: string; nome: string; inicial: string; papeis: Papel[] };
 
 export async function getViewer(request: Request): Promise<Viewer | null> {

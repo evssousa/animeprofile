@@ -28,6 +28,7 @@ Lovable Cloud. Por isso, o domínio animeprofile.com.br passa para cá numa **vi
 | [plano-otaku-tv.md](plano-otaku-tv.md) | Plano (temporário): Otaku TV com cara de "YouTube" como no site antigo (palco escuro com player e "A seguir", abas, busca, grade com fileiras de outras categorias, músicas no mesmo player, troca de vídeo sem recarregar, SEO) |
 | [plano-painel-visitas.md](plano-painel-visitas.md) | Plano (temporário): painel `/admin` com contador de visitas próprio, sem cookie (sinal `/api/v`, agregado por dia, login do admin por variáveis de ambiente) e o módulo `app/visitas/` copiável para criasite, vibecoin e respawnou |
 | [plano-contas-login.md](plano-contas-login.md) | Plano (temporário): `/login` no formato do site antigo, **fase 1 só para o administrador** (sessão das variáveis `ADMIN_*`, menu do usuário com "Administração", estado lido no navegador por `/api/eu` sem quebrar o cache da CDN); fases 2 (contas de todos, importação) e 3 (Google) resumidas, "não agora" |
+| [plano-menus-logado.md](plano-menus-logado.md) | Plano (temporário): menus de quem está logado no formato do antigo, em 4 entregas: menu lateral, navbar (sino), menu do usuário e barra lateral do painel `/admin`, sem quebrar o cache da CDN (itens por CSS `logado:`/papéis no marcador, sem links para "em breve" no HTML público) |
 | [plano-sidebars.md](plano-sidebars.md) | Plano (temporário): inventário das barras laterais do site antigo e o sistema único de lateral (blocos por página, cache curto) para a matéria, Central, categoria/tag, blog, Otaku TV e quiz |
 
 ## Status
@@ -59,6 +60,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 2 | Barras laterais do site antigo: sistema único de lateral na matéria, Central, categoria/tag, blog, Otaku TV ("A seguir") e quiz ([plano](plano-sidebars.md)) | ✅ feito (passos 1 a 8 e 10); o dono respondeu as 3 perguntas com as recomendadas em 2026-11-17 |
 | 2 | Otaku TV no esquema do site antigo ("YouTube"): palco com player e "A seguir", fileiras por categoria, músicas no mesmo player ([plano](plano-otaku-tv.md)) | ✅ feito em 2026-11-17 (passos 1 a 7; dono conferindo). Recomendadas aplicadas: `?v=`, sem botões de conta, "A seguir" com 3 itens no celular. Falta o `VideoObject` na página da matéria |
 | 2 | `/login` do administrador no formato do antigo, menu do usuário com "Administração", `/admin/login` → `/login`, sem cadastro ([plano](plano-contas-login.md), fase 1) | ✅ feito em 2026-11-19 (fase 1; recomendadas aplicadas) |
+| 2 | Menus de quem está logado no formato do antigo: lateral, navbar, menu do usuário e barra lateral do `/admin` ([plano](plano-menus-logado.md)) | ⏳ plano pronto em 2026-11-19; 4 entregas na ordem; 5 perguntas ao dono (nenhuma bloqueia) |
 | 2 | Contas: cadastro, login com senha (inclusive as do Supabase), sessão, recuperação de senha, Google ([plano](plano-contas-login.md), fases 2 e 3) | 💤 não agora (decisão do dono em 2026-11-19) |
 | 2 | Base: contas, login, perfis, notícias, artigos | 💤 |
 | 3 | Economia e coleção: check-in, missões, níveis, figurinhas, loja, Premium | 💤 |
@@ -146,6 +148,10 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 3b. **`/login` do administrador:** feito em 2026-11-19 (fase 1 do [plano-contas-login.md](plano-contas-login.md)). Só o admin entra, com **e-mail ou usuário** (usuário padrão `animeprofile`, opcional `ADMIN_USERNAME`;
     variáveis `ADMIN_*` do hPanel), sem cadastro; menu do usuário com "Administração"; `/admin/login` leva a `/login`; marcador `ap_logado` e
     `GET /api/eu` mantêm o cache da CDN. Falta conferir em produção com o dono logado.
+3b2. **Menus de logado ([plano-menus-logado.md](plano-menus-logado.md)):** executar em 4 entregas, cada uma com build, testes,
+    push e conferência: (1) marcador com papéis + menu lateral logado (Feed, Missões, Ranking, Quarto "em breve"; Blog e
+    Figurinhas; grupo Equipe com Administração); (2) sino de notificações no topo (vazio honesto); (3) menu do usuário no
+    formato do antigo (`USER_MENU`); (4) barra lateral do painel `/admin` (Visitas real + 8 "em breve").
 3c. **Contas de todos e Google (fases 2 e 3 do mesmo plano): não agora** (decisão do dono em 2026-11-19). Quando voltar: importação dos
     171 usuários do dump final (64 com senha, 114 identidades do Google) com todos os dados, login para todos, SMTP, Turnstile, Google OAuth.
 4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
@@ -161,6 +167,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 - **`/login` do administrador ([plano-contas-login.md](plano-contas-login.md)):** nada bloqueia. Se quiser, responda as 3 perguntas do
   plano (botão do Google visível e desativado ou escondido; limite global de 30 tentativas ou 60; itens só para logados escondidos
   também para o admin). Sem resposta, sigo com as recomendadas (visível, 30, escondidos). Depois do deploy: entrar pelo `/login`.
+- **Menus de logado ([plano-menus-logado.md](plano-menus-logado.md)):** se quiser, responda as 5 perguntas do fim do plano
+  (itens "em breve" visíveis para logado; topo só com o sino ou também Check-in e Mensagens; Blog e Figurinhas para
+  visitantes; os 8 "em breve" na barra do admin; próxima tela real do painel). Sem resposta, sigo com as recomendadas.
 - **Robô de notícias:** nada pendente seu agora (config e chave feitas, prévias aprovadas). Eu ligo `publicar` com teto 6
   depois da virada (17/11); no dia 18 sobe para 10.
 - **SMTP:** não é mais necessário para o Contato (decisão do dono em 2026-11-17: sem formulário, só e-mail por `mailto:`). Volta a ser

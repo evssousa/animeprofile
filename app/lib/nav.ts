@@ -3,6 +3,7 @@ import {
   Award,
   BookOpen,
   Home,
+  LayoutDashboard,
   MessagesSquare,
   MonitorPlay,
   Newspaper,
@@ -14,21 +15,14 @@ import {
   Tv,
   type LucideIcon,
 } from "lucide-react";
+import { EQUIPE, type Papel } from "./papeis";
 
-/** `soon`: depende de conta; o item continua no menu e leva à página "volta em breve". */
+/** `soon`: a página ainda é a "volta em breve" das contas (só serve de dado para os testes; o menu não mostra selo). */
 /** `also`: outros prefixos que mantêm o item ativo (ex.: News fica ativo em /noticias e em /artigos). */
-/** `auth`: só aparece para quem está logado. Sem contas no ar (LOGGED_IN = false), some do menu; a página continua existindo. */
-export type NavItem = { label: string; to: string; icon: LucideIcon; soon?: true; also?: string[]; auth?: true };
+/** `auth`: só aparece para quem está logado. O HTML é igual para todos (cache da CDN): o CSS (`data-logado`) mostra, e o link só vira link no navegador de quem está logado. */
+/** `papeis`: além de logado, exige algum destes papéis (o admin vê tudo). */
+export type NavItem = { label: string; to: string; icon: LucideIcon; soon?: true; also?: string[]; auth?: true; papeis?: Papel[] };
 export type NavGroup = { label: string; items: NavItem[] };
-
-/** Fase 1 das contas (2026-11-19): só o administrador entra (em /login) e os itens `auth` seguem escondidos também para ele.
- * Na fase 2, `visibleNav` recebe o estado do usuário logado (UserMenu/api/eu). */
-export const LOGGED_IN = false;
-
-/** Menus visíveis: tira os itens `auth` de quem não está logado e some com grupos que ficarem vazios. */
-export function visibleNav<T extends { items: { auth?: true }[] }>(groups: T[], loggedIn = LOGGED_IN): T[] {
-  return groups.map((g) => ({ ...g, items: g.items.filter((i) => loggedIn || !i.auth) })).filter((g) => g.items.length > 0);
-}
 
 export const NAV: NavGroup[] = [
   {
@@ -61,6 +55,10 @@ export const NAV: NavGroup[] = [
       { label: "Figurinhas", to: "/figurinhas", icon: Sparkles, auth: true },
       { label: "Quarto Otaku", to: "/quarto", icon: Sofa, soon: true, auth: true },
     ],
+  },
+  {
+    label: "Equipe",
+    items: [{ label: "Administração", to: "/admin", icon: LayoutDashboard, auth: true, papeis: EQUIPE }],
   },
 ];
 

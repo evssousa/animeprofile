@@ -1,6 +1,7 @@
 // Menu: item ativo, itens únicos e os que dependem de conta apontam para páginas "em breve".
 import { describe, expect, it } from "vitest";
-import { HEADER_LINKS, NAV, isActive, visibleNav } from "~/lib/nav";
+import { HEADER_LINKS, NAV, isActive } from "~/lib/nav";
+import { podeVer } from "~/lib/papeis";
 
 const ACCOUNT_PENDING = ["/feed", "/missoes", "/ranking", "/quarto", "/login"];
 
@@ -22,14 +23,28 @@ describe("nav", () => {
 });
 
 describe("menus só para quem está logado", () => {
-  it("sem login, esconde Feed, Blog, Missões, Ranking, Figurinhas e Quarto Otaku, e os grupos que ficam vazios", () => {
-    const labels = visibleNav(NAV).flatMap((g) => g.items.map((i) => i.label));
-    for (const escondido of ["Feed", "Blog", "Missões", "Ranking", "Figurinhas", "Quarto Otaku"]) expect(labels).not.toContain(escondido);
-    for (const aberto of ["Início", "News", "Animes", "Otaku TV", "Quiz"]) expect(labels).toContain(aberto);
-    expect(visibleNav(NAV).map((g) => g.label)).toEqual(["Descobrir"]);
+  const publicos = NAV.map((g) => ({ ...g, items: g.items.filter((i) => !i.auth) })).filter((g) => g.items.length > 0);
+
+  it("para visitante sobram só os itens de Descobrir (Feed, Blog, Missões, Ranking, Figurinhas, Quarto e Administração são de logado)", () => {
+    expect(publicos.map((g) => g.label)).toEqual(["Descobrir"]);
+    const rotulos = NAV.filter((g) => g.label !== "Descobrir").flatMap((g) => g.items);
+    for (const esperado of ["Feed", "Blog", "Missões", "Ranking", "Figurinhas", "Quarto Otaku", "Administração"]) expect(rotulos.map((i) => i.label)).toContain(esperado);
+    expect(rotulos.every((i) => i.auth)).toBe(true);
   });
 
-  it("logado, mostra tudo", () => {
-    expect(visibleNav(NAV, true).flatMap((g) => g.items).length).toBe(NAV.flatMap((g) => g.items).length);
+  it("o grupo Equipe é o último e só para admin ou moderador", () => {
+    expect(NAV.at(-1)?.label).toBe("Equipe");
+    const adm = NAV.at(-1)!.items[0];
+    expect(adm.to).toBe("/admin");
+    expect(podeVer(adm.papeis, ["admin"])).toBe(true);
+    expect(podeVer(adm.papeis, ["moderator"])).toBe(true);
+    expect(podeVer(adm.papeis, ["author"])).toBe(false);
+    expect(podeVer(adm.papeis, [])).toBe(false);
+  });
+
+  it("podeVer: sem papéis no item vale para qualquer logado; admin vê tudo", () => {
+    expect(podeVer(undefined, [])).toBe(true);
+    expect(podeVer(["author"], ["admin"])).toBe(true);
+    expect(podeVer(["author"], ["moderator"])).toBe(false);
   });
 });

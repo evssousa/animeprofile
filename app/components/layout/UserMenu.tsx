@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Form, Link, useLocation } from "react-router";
 import { ChevronDown, LayoutDashboard, LogOut } from "lucide-react";
-import { clearSessionHint } from "~/lib/session-hint";
+import { clearSessionHint, setPapeisAttr } from "~/lib/session-hint";
 
 type Estado = { fase: "carregando" } | { fase: "pronto"; nome: string; inicial: string; papeis: string[] } | { fase: "erro" };
 
@@ -24,8 +24,10 @@ function consultar() {
   fetch("/api/eu", { credentials: "same-origin" })
     .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
     .then((j: { logado: boolean; nome?: string; inicial?: string; papeis?: string[] }) => {
-      if (j.logado) publicar({ fase: "pronto", nome: j.nome ?? "Conta", inicial: j.inicial ?? "?", papeis: j.papeis ?? [] });
-      else {
+      if (j.logado) {
+        setPapeisAttr(j.papeis ?? []); // confirma os papéis no <html> (o menu lateral acompanha)
+        publicar({ fase: "pronto", nome: j.nome ?? "Conta", inicial: j.inicial ?? "?", papeis: j.papeis ?? [] });
+      } else {
         clearSessionHint(); // sessão vencida: volta ao "Entrar"
         publicar({ fase: "erro" });
       }

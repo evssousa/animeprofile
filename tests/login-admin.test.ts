@@ -55,7 +55,7 @@ describe("cookies", () => {
     expect(sessao).toContain("HttpOnly");
     expect(sessao).toContain("SameSite=Strict");
     expect(sessao).toContain("Path=/");
-    expect(marcador).toContain("ap_logado=1");
+    expect(marcador).toContain("ap_logado=admin;");
     expect(marcador).not.toContain("HttpOnly");
     expect(marcador).toContain("SameSite=Lax");
     expect(marcador).not.toContain("dono@exemplo.com");
@@ -88,5 +88,18 @@ describe("GET /api/eu", () => {
     const corpo = await com.json();
     expect(corpo).toEqual({ logado: true, nome: "Administrador", inicial: "A", papeis: ["admin"] });
     expect(JSON.stringify(corpo)).not.toContain("@");
+  });
+});
+
+describe("/api/eu corrige o marcador", () => {
+  const chamar = (cookie: string) => eu({ request: req("7.7.7.7", cookie) } as never) as Promise<Response>;
+
+  it("marcador antigo (ap_logado=1) é trocado por ap_logado=admin; o certo não é reenviado", async () => {
+    const sessao = cookieHeader(await entrar("7.7.7.7")).split("; ").filter((c) => c.startsWith("__ap_admin")).join("");
+    const antigo = await chamar(`${sessao}; ap_logado=1`);
+    expect(antigo.headers.get("set-cookie")).toContain("ap_logado=admin;");
+    const certo = await chamar(`${sessao}; ap_logado=admin`);
+    expect(certo.headers.get("set-cookie")).toBeNull();
+    expect((await certo.json()).papeis).toEqual(["admin"]);
   });
 });

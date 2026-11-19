@@ -5,7 +5,9 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, NavLink, useLocation } from "react-router";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
-import { NAV, isActive, visibleNav } from "~/lib/nav";
+import { NAV, isActive } from "~/lib/nav";
+import { EQUIPE, podeVer, type Papel } from "~/lib/papeis";
+import { useMarcador } from "~/lib/use-marcador";
 import { ThemeToggle } from "./ThemeToggle";
 
 const KEY = "ap-sidebar";
@@ -15,40 +17,59 @@ export const sidebarBootstrap = `(function(){try{if(localStorage.getItem("${KEY}
 
 type Variant = "rail" | "drawer";
 
+// Quem vê o quê vem do CSS (`data-logado`/`data-papeis` no <html>, postos antes da primeira pintura). As classes ficam escritas
+// por extenso para o Tailwind enxergá-las.
+const VISIVEL_LOGADO = "hidden logado:block";
+const VISIVEL_EQUIPE = "hidden equipe:block";
+const VISIVEL_ADMIN = "hidden papel-admin:block";
+
+function classeVisibilidade(item: { auth?: true; papeis?: Papel[] }) {
+  if (item.papeis) return item.papeis.every((p) => EQUIPE.includes(p)) && item.papeis.length === EQUIPE.length ? VISIVEL_EQUIPE : VISIVEL_ADMIN;
+  return item.auth ? VISIVEL_LOGADO : "";
+}
+
 /** Os grupos do menu. Na lateral, os nomes somem quando recolhida; na gaveta aparecem sempre. */
 export function NavGroups({ variant, onNavigate }: { variant: Variant; onNavigate?: () => void }) {
   const { pathname } = useLocation();
+  const marcador = useMarcador();
   const rail = variant === "rail";
   return (
     <div className="flex flex-col gap-4">
-      {visibleNav(NAV).map((group, gi) => (
-        <div key={group.label}>
+      {NAV.map((group, gi) => (
+        <div key={group.label} className={group.items.every((i) => i.auth) ? classeVisibilidade(group.items[0]) : ""}>
           <p className={`px-3 pb-1.5 text-[0.75rem] font-bold tracking-[0.14em] text-ink-soft uppercase ${rail ? "lg:sr-only xl:not-sr-only xl:mini:sr-only" : ""}`}>{group.label}</p>
           {rail && gi > 0 && <span aria-hidden className="mx-auto my-1 hidden h-px w-8 bg-line lg:block xl:hidden xl:mini:block" />}
           <ul className="flex flex-col gap-0.5">
-            {group.items.map(({ label, to, icon: Icon, soon, also }) => {
+            {group.items.map((item) => {
+              const { label, to, icon: Icon, also } = item;
               const active = isActive(pathname, to, also);
+              const classes = `relative flex h-10 items-center gap-3 rounded-xl px-3 text-[0.95rem] font-semibold ${
+                rail ? "lg:justify-center lg:px-0 xl:justify-start xl:px-3 xl:mini:justify-center xl:mini:px-0" : ""
+              } ${
+                active
+                  ? "bg-brand-soft text-brand before:absolute before:inset-y-2.5 before:left-0 before:w-[3px] before:rounded-full before:bg-brand dark:text-glow"
+                  : "text-ink hover:bg-sunken"
+              }`;
+              const conteudo = (
+                <>
+                  <Icon className={`size-5 shrink-0 ${active ? "" : "text-ink-soft"}`} aria-hidden />
+                  <span className={`min-w-0 truncate ${rail ? "lg:sr-only xl:not-sr-only xl:mini:sr-only" : ""}`}>{label}</span>
+                </>
+              );
+              // Itens só de logado: no HTML público saem como texto (sem href), para o Google não indexar links de páginas
+              // que só o logado usa; viram link no navegador de quem está logado (e tem o papel).
+              const link = !item.auth || (marcador.logado && podeVer(item.papeis, marcador.papeis));
               return (
-                <li key={to}>
-                  <NavLink
-                    to={to}
-                    onClick={onNavigate}
-                    title={soon ? `${label} (em breve)` : label}
-                    aria-current={active ? "page" : undefined}
-                    className={`relative flex h-10 items-center gap-3 rounded-xl px-3 text-[0.95rem] font-semibold ${
-                      rail ? "lg:justify-center lg:px-0 xl:justify-start xl:px-3 xl:mini:justify-center xl:mini:px-0" : ""
-                    } ${
-                      active
-                        ? "bg-brand-soft text-brand before:absolute before:inset-y-2.5 before:left-0 before:w-[3px] before:rounded-full before:bg-brand dark:text-glow"
-                        : "text-ink hover:bg-sunken"
-                    }`}
-                  >
-                    <Icon className={`size-5 shrink-0 ${active ? "" : "text-ink-soft"}`} aria-hidden />
-                    <span className={`min-w-0 truncate ${rail ? "lg:sr-only xl:not-sr-only xl:mini:sr-only" : ""}`}>{label}</span>
-                    {soon && (
-                      <span className={`ml-auto shrink-0 rounded-full bg-sunken px-1.5 py-0.5 text-[0.65rem] font-bold whitespace-nowrap text-ink-soft ${rail ? "lg:hidden xl:inline xl:mini:hidden" : ""}`}>em breve</span>
-                    )}
-                  </NavLink>
+                <li key={to} className={classeVisibilidade(item)}>
+                  {link ? (
+                    <NavLink to={to} onClick={onNavigate} title={label} aria-current={active ? "page" : undefined} className={classes}>
+                      {conteudo}
+                    </NavLink>
+                  ) : (
+                    <span aria-hidden="true" className={classes}>
+                      {conteudo}
+                    </span>
+                  )}
                 </li>
               );
             })}

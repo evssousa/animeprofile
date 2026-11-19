@@ -2,6 +2,30 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-19 (plano) — Menus de logado no formato do antigo, sem mudar o HTML público
+
+Detalhes em [plano-menus-logado.md](plano-menus-logado.md).
+
+- **Decisão (proposta; 5 perguntas ao dono, nenhuma bloqueia):**
+  - Os itens só de logado saem sempre no HTML, escondidos por CSS (`hidden logado:block`); o marcador `ap_logado` passa a
+    levar os papéis (`ap_logado=admin`) e o script do `<head>` põe `data-papeis`, com as variantes `papel-admin:` e
+    `equipe:`. Os itens de logado viram link só no navegador e só para quem está logado: o HTML público (e o Googlebot)
+    não tem `href` para páginas "em breve". Saem `LOGGED_IN` e `visibleNav()`. Supera a pergunta 3 do plano de login
+    (itens `auth` escondidos também para o admin).
+  - Papéis sem tabela: tipo `Papel` em `app/lib/papeis.ts` e `podeVer()`; no painel o filtro é no servidor (loader do
+    `/admin`), nos menus públicos pelo marcador, confirmado por `/api/eu`.
+  - Regra por item: real se a página existe; "em breve" (com selo) se volta com contas/economia/chat e já tem endereço
+    pendente; de fora se o sistema saiu, se é atalho pessoal do antigo ou se mostraria saldo falso (AP Coins, Rubis,
+    nível, sequência nunca aparecem com "0").
+  - Topo logado: só o sino, com estado vazio; Check-in e Mensagens ficam desligados em `HEADER_ACOES`. Menu do usuário
+    com os blocos do antigo (`USER_MENU`), mais "Premium"; "Reportar um problema" vai para `/contato`.
+  - Painel: barra lateral com os grupos do antigo (`app/lib/admin-nav.ts`), Visitas real, 8 itens "em breve" sem link, os
+    que dependem de contas/economia guardados como "depois" e os sistemas que saíram de fora; mesma pele e mesmo
+    "recolher" do menu do site; específico do animeprofile (fora do módulo `app/visitas/`).
+- **Por quê:** o dono quer os menus montados agora no formato do antigo; o CSS antes da pintura evita o menu pular e o
+  erro de hidratação, e mantém o cache de 60 s da CDN; sem links para "em breve" no HTML, o Google não gasta rastreio em
+  páginas `noindex`.
+
 ## 2026-11-19 (plano) — `/login` só para o administrador; contas de todos depois
 
 Detalhes em [plano-contas-login.md](plano-contas-login.md).
