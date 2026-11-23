@@ -1,4 +1,5 @@
 // Ficha do personagem: /animes/personagem/<id do AniList>, o mesmo endereço do site antigo.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { data, Link } from "react-router";
 import type { Route } from "./+types/personagem";
 import { seo } from "~/lib/seo";
@@ -151,6 +152,7 @@ export default function Personagem({ loaderData }: Route.ComponentProps) {
           <a href={`https://anilist.co/character/${c.id}`} target="_blank" rel="noreferrer" className="text-[0.85rem] font-semibold text-link underline">
             Ver no AniList
           </a>
+          <AdSlot slot="sidebar" className="hidden lg:block" />
         </aside>
       </div>
     </article>

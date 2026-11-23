@@ -12,15 +12,27 @@ O animeprofile já foi aprovado no AdSense (conta do editor `pub-412484515486601
 
 ## Onde ficam os anúncios
 
-| Bloco (AdSense) | Espaço | Onde |
-|---|---|---|
-| `inArticle` (5547770253) | meio do texto | notícia: depois do 1º parágrafo (se houver 2+); artigo: a cada 4 parágrafos, sem cortar spoiler, lista ou citação e sem ficar entre um título e a imagem dele (`app/lib/anuncios-no-texto.ts`) |
-| `endOfArticle` (2921606913) | fim da matéria | depois do texto e do card do anime |
-| `sidebar` (8491740203) | barra lateral | fim da barra, só no computador, na matéria e na Central de notícias/artigos |
-| `multiplex` (6209677860) | "Leia também" | depois da lista de matérias relacionadas |
-| `list` (9193924697) | listas | Central de notícias/artigos (depois da grade), home (antes do Otaku TV) e lista de quizzes (depois da grade) |
+Regra: dentro do conteúdo ou na barra lateral, nunca em cima de botões, do player, do formulário ou de qualquer coisa que a pessoa clique para usar o site (o Google proíbe anúncio que induz clique sem querer). Máximo de 1 a 4 por página.
 
-Fora de propósito: login, painel, páginas legais, contato, "Contas em breve", erros, página do anime e Otaku TV (player de vídeo). Dá para ligar mais depois com `<AdSlot slot="list" />`.
+| Página | Anúncios |
+|---|---|
+| **Matéria** (notícia, artigo) | meio do texto (notícia: depois do 1º parágrafo; artigo: a cada 4, sem cortar spoiler, lista, citação nem ficar entre um título e a imagem dele), fim da matéria (depois do card do anime), barra lateral (computador), multiplex depois de "Leia também" |
+| **Home** | depois do Top 10, entre as notícias e o Otaku TV, e multiplex antes de "O diferencial" |
+| **Central de notícias/artigos, categoria e tag** | depois da grade e na barra lateral (computador) |
+| **Animes** (lista) | depois da grade da temporada |
+| **Ficha do anime** | depois dos personagens |
+| **Personagem** | fim da barra lateral (computador) |
+| **Calendário** | depois dos dias |
+| **Quiz** (lista) | depois da grade |
+| **Quiz** (jogo) | só na lateral ("Continue jogando", computador) ou abaixo dela (celular), longe dos botões do jogo |
+| **Figurinhas** (lista e álbum) | depois da grade |
+| **Blog** (lista, autor, categoria/tag) | depois da lista e na barra lateral |
+| **Blog** (post) | meio do texto, fim do post e barra lateral |
+| **Otaku TV** (matérias, trailers, músicas) | depois da grade de vídeos (a Otaku TV passou a ter a mesma largura e margens laterais das outras páginas, 1328 px) |
+
+Blocos do AdSense usados: `inArticle` 5547770253, `endOfArticle` 2921606913, `sidebar` 8491740203, `multiplex` 6209677860, `list` 9193924697 (`app/lib/ads.ts`).
+
+**Sem anúncio, de propósito:** login, painel, busca, páginas legais, contato, "Contas em breve", erros, sobre e "como instalar" (poucas informações; o Google pede conteúdo substancial na página que tem anúncio).
 
 ## Para desligar tudo
 

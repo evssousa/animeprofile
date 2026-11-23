@@ -1,4 +1,5 @@
 // Catálogo de figurinhas (/figurinhas): álbuns e raridades. Só ver; abrir pacotes chega com as contas.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Search } from "lucide-react";
@@ -111,6 +112,7 @@ export default function Figurinhas({ loaderData }: Route.ComponentProps) {
             <p className="rounded-2xl border border-line bg-surface p-8 text-center text-ink-soft">{albums.length ? "Nenhum álbum com esse nome." : "Os álbuns estão chegando. Volte em breve!"}</p>
           )}
         </section>
+        <AdSlot slot="list" />
       </div>
     </>
   );

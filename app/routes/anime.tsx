@@ -1,4 +1,5 @@
 // Ficha do anime: /animes/<id do AniList>, o mesmo endereço do site antigo.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { useState } from "react";
 import { data, Link } from "react-router";
 import { Play } from "lucide-react";
@@ -332,6 +333,7 @@ export default function Anime({ loaderData }: Route.ComponentProps) {
             </ul>
           </section>
         )}
+        <AdSlot slot="list" />
       </div>
     </article>
   );

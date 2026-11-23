@@ -1,4 +1,5 @@
 // Um quiz (/quiz/:slug). O gabarito nunca vai à página: a action confere cada resposta e calcula o resultado.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { data } from "react-router";
 import { isbot } from "isbot";
 import type { Route } from "./+types/quiz";
@@ -94,6 +95,8 @@ export default function QuizPage({ loaderData }: Route.ComponentProps) {
             <QuizCard key={q.id} quiz={q} />
           ))}
         </div>
+        <AdSlot slot="sidebar" className="hidden lg:block" />
+        <AdSlot slot="list" className="lg:hidden" />
       </aside>
     </div>
   );

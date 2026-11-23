@@ -83,6 +83,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           </section>
         )}
 
+        {trending.length > 0 && <AdSlot slot="list" />}
+
         {season.items.length > 0 && (
           <section aria-labelledby="temporada" className="flex flex-col gap-6">
             <SectionHead
@@ -176,6 +178,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </MobileRow>
           </section>
         )}
+
+        <AdSlot slot="multiplex" />
 
         <section aria-labelledby="diferencial" className="flex flex-col gap-6">
           <div className="text-center">

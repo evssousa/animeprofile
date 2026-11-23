@@ -1,4 +1,5 @@
 // Um álbum de figurinhas (/figurinhas/:slug). Filtros por raridade e ordem no navegador.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { useMemo, useState } from "react";
 import { data, Link } from "react-router";
 import type { Route } from "./+types/figurinha-album";
@@ -103,6 +104,7 @@ export default function Album({ loaderData }: Route.ComponentProps) {
                 <StickerCard key={s.id} sticker={s} onOpen={setOpen} />
               ))}
             </div>
+            <AdSlot slot="list" />
           </>
         )}
       </div>

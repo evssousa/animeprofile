@@ -64,7 +64,7 @@ export function Stage({ children }: { children: ReactNode }) {
   return (
     <section aria-labelledby="otaku-tv-titulo" className="relative overflow-hidden rounded-b-3xl bg-night text-night-ink shadow-[0_24px_50px_rgba(60,20,20,.16)] sm:rounded-b-[28px]">
       <div aria-hidden className="pointer-events-none absolute inset-0 bg-[radial-gradient(620px_320px_at_85%_0%,rgba(194,53,43,.38),rgba(13,13,16,0)_70%)]" />
-      <div className="relative mx-auto max-w-[1600px] px-4 pt-5 pb-7 sm:px-6 lg:px-8 lg:pt-7 lg:pb-10">{children}</div>
+      <div className="relative mx-auto max-w-[1328px] px-4 pt-5 pb-7 sm:px-8 lg:px-14 lg:pt-7 lg:pb-10">{children}</div>
     </section>
   );
 }

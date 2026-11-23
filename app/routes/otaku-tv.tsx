@@ -1,6 +1,7 @@
 // Otaku TV (/otaku-tv): vídeos de anime num lugar só, com cara de "YouTube" (docs/plano-otaku-tv.md).
 // Palco escuro em cima (player + "A seguir"), grade e fileiras "Veja também" embaixo. Abas: das matérias, trailers da
 // temporada e aberturas/encerramentos. `/otaku-tv?v=<id do YouTube>` abre o vídeo (parado: só toca depois de um clique).
+import { AdSlot } from "~/components/ads/AdSlot";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useSearchParams, type ShouldRevalidateFunctionArgs } from "react-router";
 import { Clapperboard, Music, Newspaper } from "lucide-react";
@@ -179,7 +180,7 @@ function VideoPage({ data }: { data: Route.ComponentProps["loaderData"] }) {
       </Stage>
 
       {items.length > 0 && (
-        <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+        <div className="mx-auto max-w-[1328px] px-4 py-8 sm:px-8 lg:px-14 lg:py-10">
           <div className="flex items-end justify-between gap-4">
             <h2 id="lista" className="scroll-mt-24 text-[1.35rem] font-extrabold tracking-[-0.025em] sm:text-[1.6rem]">
               {title}
@@ -199,6 +200,7 @@ function VideoPage({ data }: { data: Route.ComponentProps["loaderData"] }) {
               ),
             )}
           </div>
+          <AdSlot slot="list" className="mt-8" />
           <div className="mt-10">{list && <Pagination page={list.page} pages={list.pages} basePath="/otaku-tv" query={{ ...(tab !== "materias" ? { tab } : {}), ...(q ? { q } : {}) }} />}</div>
         </div>
       )}
@@ -258,7 +260,7 @@ function MusicPage() {
       </Stage>
 
       {all.length > 0 && (
-        <div className="mx-auto max-w-[1600px] px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+        <div className="mx-auto max-w-[1328px] px-4 py-8 sm:px-8 lg:px-14 lg:py-10">
           <h2 id="lista" className="scroll-mt-24 text-[1.35rem] font-extrabold tracking-[-0.025em] sm:text-[1.6rem]">
             {t.term.length >= 2 ? `Músicas de “${t.term}”` : `Aberturas e encerramentos de ${t.label}`}
           </h2>
@@ -267,6 +269,7 @@ function MusicPage() {
               <VideoCard key={it.key} item={it} href={null} onPick={onPick} active={current?.key === it.key} cover />
             ))}
           </div>
+          <AdSlot slot="list" className="mt-8" />
           {t.hasMore && (
             <div className="mt-10 text-center">
               <button type="button" onClick={t.loadMore} className="rounded-[9px] border border-line bg-surface px-6 py-3 font-semibold hover:bg-sunken">

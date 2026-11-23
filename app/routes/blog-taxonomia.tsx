@@ -1,4 +1,5 @@
 // Categoria ou tag do blog (/blog/categoria/:slug e /blog/tag/:slug). O id da rota diz qual.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { data } from "react-router";
 import type { Route } from "./+types/blog-taxonomia";
 import { BlogRow } from "~/components/blog";
@@ -52,9 +53,10 @@ export default function BlogTaxonomy({ loaderData }: Route.ComponentProps) {
           {list.items.map((p) => (
             <BlogRow key={p.id} post={p} now={now} />
           ))}
+          {list.items.length > 0 && <AdSlot slot="list" />}
           <Pagination page={list.page} pages={list.pages} basePath={`/blog/${kind}/${slug}`} />
         </section>
-        <Sidebar blocks={side} label="Mais do blog" />
+        <Sidebar blocks={side} label="Mais do blog" anuncio />
       </div>
     </>
   );

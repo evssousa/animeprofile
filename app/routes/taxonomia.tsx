@@ -1,4 +1,5 @@
 // /categoria/<slug>, /tag/<slug> e /autores/<slug> (autores de IA): a mesma página de lista, com filtro.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { data, redirect } from "react-router";
 import type { Route } from "./+types/taxonomia";
 import { PageHeader } from "~/components/PageHeader";
@@ -66,9 +67,10 @@ export default function Taxonomia({ loaderData }: Route.ComponentProps) {
       <div className={`mx-auto max-w-[1328px] px-4 py-10 sm:px-8 sm:py-12 lg:px-14 ${sidebar.length ? "grid gap-12 lg:grid-cols-[minmax(0,1fr)_340px]" : "flex flex-col gap-12"}`}>
         <div className="flex min-w-0 flex-col gap-12">
           {list.items.length ? <PostGrid posts={list.items} cols={sidebar.length ? 3 : 4} /> : <p className="text-ink-soft">Ainda não há matérias aqui.</p>}
+          {list.items.length > 0 && <AdSlot slot="list" />}
           <Pagination page={list.page} pages={list.pages} basePath={path} />
         </div>
-        <Sidebar blocks={sidebar} label="Mais do Anime Profile" />
+        <Sidebar blocks={sidebar} label="Mais do Anime Profile" anuncio />
       </div>
     </>
   );

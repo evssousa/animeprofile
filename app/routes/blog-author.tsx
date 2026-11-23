@@ -1,4 +1,5 @@
 // Blog de um autor (/blog/u/:username). Filtros ?categoria= e ?tag= no servidor.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { data, Link } from "react-router";
 import type { Route } from "./+types/blog-author";
 import { BlogAvatar, BlogTile } from "~/components/blog";
@@ -72,6 +73,7 @@ export default function BlogAuthor({ loaderData }: Route.ComponentProps) {
             <p className="rounded-2xl border border-line bg-surface p-8 text-center text-ink-soft">{categoria || tag ? "Nenhum post nesse filtro." : "Este autor ainda não publicou nada no blog."}</p>
           )}
           <div className="mt-8">
+            {list.items.length > 0 && <AdSlot slot="list" />}
             <Pagination page={list.page} pages={list.pages} basePath={base} query={{ ...(categoria ? { categoria } : {}), ...(tag ? { tag } : {}) }} />
           </div>
         </section>

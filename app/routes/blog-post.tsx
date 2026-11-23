@@ -1,9 +1,11 @@
 // Post do blog (/blog/:username/:slug). Só leitura: reagir e comentar chegam com as contas.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { data, Link, redirect } from "react-router";
 import { Eye, Heart, Sparkles } from "lucide-react";
 import type { Route } from "./+types/blog-post";
 import { BlogAvatar, BlogTile } from "~/components/blog";
 import { Sidebar } from "~/components/sidebar";
+import { textoComAnuncios } from "~/lib/anuncios-no-texto";
 import { Comments, ShareBar } from "~/components/post-extras";
 import { blogAuthorUrl, stripMarkdown } from "~/lib/blog";
 import { formatDateLong, formatDateTime, readingLabel, timeAgo } from "~/lib/format";
@@ -128,7 +130,11 @@ export default function BlogPost({ loaderData }: Route.ComponentProps) {
                 </Link>
               </p>
             )}
-            <div className="prose-ap max-w-none" dangerouslySetInnerHTML={{ __html: post.html }} />
+            {/* anúncio no meio do texto, cortando só entre parágrafos de primeiro nível */}
+            {textoComAnuncios(post.html, "article").map((p, i) =>
+              "anuncio" in p ? <AdSlot key={`ad-${i}`} slot="inArticle" /> : <div key={i} className="prose-ap max-w-none" dangerouslySetInnerHTML={{ __html: p.html }} />,
+            )}
+            <AdSlot slot="endOfArticle" />
 
             {post.tags.length > 0 && (
               <div className="mt-12 flex flex-wrap gap-2" aria-label="Assuntos">
@@ -171,7 +177,7 @@ export default function BlogPost({ loaderData }: Route.ComponentProps) {
 
             <Comments items={comments} />
           </div>
-          <Sidebar blocks={side} label="Mais do blog" />
+          <Sidebar blocks={side} label="Mais do blog" anuncio />
         </div>
 
         {related.length > 0 && (

@@ -1,4 +1,5 @@
 // Lista do blog da comunidade (/blog). Busca ?q=, ordem ?ordem=populares|comentados, paginação ?pagina=N.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { Form, Link } from "react-router";
 import { Rss, Search } from "lucide-react";
 import type { Route } from "./+types/blog-list";
@@ -79,9 +80,10 @@ export default function BlogList({ loaderData }: Route.ComponentProps) {
           ) : (
             <p className="rounded-2xl border border-line bg-surface p-8 text-center text-ink-soft">{q ? `Nenhum post encontrado para “${q}”.` : "Ainda não há posts publicados."}</p>
           )}
+          {list.items.length > 0 && <AdSlot slot="list" />}
           <Pagination page={list.page} pages={list.pages} basePath="/blog" query={{ ...(order !== "recentes" ? { ordem: order } : {}), ...(q ? { q } : {}) }} />
         </section>
-        <Sidebar blocks={side} label="Mais do blog" />
+        <Sidebar blocks={side} label="Mais do blog" anuncio />
       </div>
     </>
   );

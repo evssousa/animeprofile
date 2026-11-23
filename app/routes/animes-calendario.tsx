@@ -1,4 +1,5 @@
 // /animes/calendario: episódios dos próximos 7 dias, por dia, no horário de Brasília.
+import { AdSlot } from "~/components/ads/AdSlot";
 import type { Route } from "./+types/animes-calendario";
 import { AiringPoster, PosterGrid } from "~/components/anime";
 import { AnimeTabs } from "~/components/AnimeTabs";
@@ -52,6 +53,7 @@ export default function Calendario({ loaderData }: Route.ComponentProps) {
             )}
           </section>
         ))}
+        <AdSlot slot="list" />
       </div>
     </>
   );

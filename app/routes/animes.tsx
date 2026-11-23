@@ -1,4 +1,5 @@
 // /animes: busca, no ar hoje, em alta nesta semana e a temporada atual (dados do AniList guardados no MySQL).
+import { AdSlot } from "~/components/ads/AdSlot";
 import { Form } from "react-router";
 import { Search } from "lucide-react";
 import type { Route } from "./+types/animes";
@@ -121,6 +122,7 @@ export default function Animes({ loaderData: d }: Route.ComponentProps) {
               ) : (
                 <p className="text-ink-soft">A lista da temporada está sendo atualizada. Volte em alguns minutos.</p>
               )}
+              <AdSlot slot="list" />
               <Pagination page={d.page} pages={d.pages} basePath="/animes" />
             </section>
 
