@@ -1,4 +1,5 @@
 // Lista de quizzes (/quiz). Abas por tipo (?tipo=), ordem (?ordem=jogados). O canonical é sempre /quiz.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { Link } from "react-router";
 import type { Route } from "./+types/quiz-list";
 import { PageHeader } from "~/components/PageHeader";
@@ -84,6 +85,7 @@ export default function QuizList({ loaderData }: Route.ComponentProps) {
         ) : (
           <p className="rounded-2xl border border-line bg-surface p-8 text-center text-ink-soft">Os primeiros quizzes estão chegando. Volte em breve!</p>
         )}
+        {quizzes.length > 0 && <AdSlot slot="list" />}
       </div>
     </>
   );

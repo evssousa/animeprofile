@@ -14,6 +14,8 @@ import { getAnime } from "~/server/anime/anime.server";
 import { getPost, postComments, relatedPosts, withToc } from "~/server/content/posts.server";
 import { acharAnimePorNomes, type AnimeFull } from "~/server/anime/anime.server";
 import { animeCardHtml, animeParaCard, injetarCardsAnime } from "~/server/anime/card-html.server";
+import { AdSlot } from "~/components/ads/AdSlot";
+import { textoComAnuncios } from "~/lib/anuncios-no-texto";
 import { loadSidebar } from "~/server/sidebar.server";
 import { splitLongParagraphs } from "~/server/robot/html";
 
@@ -167,8 +169,12 @@ export default function Post({ loaderData }: Route.ComponentProps) {
           </div>
           {video && <div className="prose-ap mb-8 max-w-none" dangerouslySetInnerHTML={{ __html: video }} />}
           {showCover && post.image && <img src={post.image} alt="" className="mb-10 -mx-4 aspect-video w-[calc(100%+2rem)] max-w-none rounded-none object-cover sm:mx-0 sm:w-full sm:rounded-[18px] sm:shadow-[0_20px_40px_rgba(60,20,20,.16)]" />}
-          <div className="prose-ap max-w-none" dangerouslySetInnerHTML={{ __html: post.html }} />
+          {/* o texto é cortado em parágrafos de primeiro nível para o anúncio do meio entrar sem quebrar o HTML (spoiler, lista, citação) */}
+          {textoComAnuncios(post.html, post.type).map((p, i) =>
+            "anuncio" in p ? <AdSlot key={`ad-${i}`} slot="inArticle" /> : <div key={i} className="prose-ap max-w-none" dangerouslySetInnerHTML={{ __html: p.html }} />,
+          )}
           {animeCard && <div className="prose-ap mt-8 max-w-none" dangerouslySetInnerHTML={{ __html: animeCard }} />}
+          <AdSlot slot="endOfArticle" />
 
           {post.tags.length > 0 && (
             <div className="mt-12 flex flex-wrap gap-2" aria-label="Assuntos">
@@ -209,7 +215,7 @@ export default function Post({ loaderData }: Route.ComponentProps) {
           <Comments items={comments} />
         </div>
 
-        <Sidebar blocks={sidebar} label="Mais do Anime Profile" />
+        <Sidebar blocks={sidebar} label="Mais do Anime Profile" anuncio />
         </div>
 
         {related.length > 0 && (
@@ -224,6 +230,7 @@ export default function Post({ loaderData }: Route.ComponentProps) {
             </div>
           </section>
         )}
+        <AdSlot slot="multiplex" className="mt-10" />
       </div>
     </article>
   );

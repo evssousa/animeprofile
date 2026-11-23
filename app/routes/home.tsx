@@ -1,5 +1,6 @@
 // Página inicial, na divisão de seções do site atual (docs/design.md). As seções que dependem de dados
 // ainda não migrados (ranking do mês, Otaku TV, quiz, blog, comentários e feed) entram quando cada área for construída.
+import { AdSlot } from "~/components/ads/AdSlot";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { Award, MessagesSquare, Play, Sofa, Sparkles } from "lucide-react";
@@ -143,6 +144,8 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </MobileRow>
           </section>
         )}
+
+        <AdSlot slot="list" />
 
         {tv.length > 0 && <OtakuTvPanel videos={tv} />}
 

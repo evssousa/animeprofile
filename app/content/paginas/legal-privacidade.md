@@ -67,7 +67,7 @@ Compartilhamos dados apenas com os operadores listados abaixo, todos vinculados 
 | Cloudflare (Turnstile) | Verificação contra robôs no cadastro, no login e nos formulários | IP e dados técnicos do navegador | Global |
 | Mercado Pago | Processamento das compras de Rubi por PIX | Identificação do pagador e dados da transação | Brasil |
 | Google Analytics 4 (Google LLC) | Medição de audiência e desempenho (apenas com consentimento de cookies analíticos) | Identificador anônimo de cliente, IP truncado, eventos de navegação | EUA |
-| Google AdSense (Google LLC) | Exibição de anúncios em notícias e artigos; com consentimento de cookies de marketing, personalização de anúncios. Não exibido para assinantes premium. | IP, identificadores de anúncio e, com consentimento, dados de navegação para personalização | EUA |
+| Google AdSense (Google LLC) | Exibição de anúncios em notícias e artigos; com consentimento de cookies de marketing, personalização de anúncios. Não exibido para quem está logado na equipe do site. | IP, identificadores de anúncio e, com consentimento, dados de navegação para personalização | EUA |
 
 Esta lista pode ser atualizada. Alterações materiais serão anunciadas nesta página.
 

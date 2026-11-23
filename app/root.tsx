@@ -13,11 +13,13 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { Footer } from "./components/layout/Footer";
 import { AvisoContas } from "./components/layout/AvisoContas";
+import { CookieConsent } from "./components/layout/CookieConsent";
 import { BottomNav } from "./components/layout/BottomNav";
 import { Header } from "./components/layout/Header";
 import { SideNav, sidebarBootstrap } from "./components/layout/SideNav";
 import { themeBootstrap } from "./components/layout/ThemeToggle";
 import { PageHeader } from "./components/PageHeader";
+import { ADS_ENABLED, consentBootstrap } from "./lib/ads";
 import { sessionHintBootstrap } from "./lib/session-hint";
 import { SITE } from "./lib/site";
 import { VisitBeacon } from "./visitas/client/VisitBeacon";
@@ -59,6 +61,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: sidebarBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: sessionHintBootstrap }} />
+        {ADS_ENABLED && !inAdmin && <script dangerouslySetInnerHTML={{ __html: consentBootstrap() }} />}
         <Meta />
         <Links />
       </head>
@@ -98,6 +101,7 @@ export default function App() {
   return (
     <>
       <Outlet />
+      <CookieConsent />
       <VisitBeacon />
     </>
   );

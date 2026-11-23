@@ -30,11 +30,12 @@ Armazenam **parâmetros de campanha** (UTM) e medições de origem (*referrer*) 
 
 | Nome | Tipo | Categoria | Finalidade | Duração |
 |---|---|---|---|---|
-| ap_session | Cookie (HttpOnly) | Essencial | Manter sua sessão autenticada | 60 dias, renovado a cada uso |
+| __ap_admin | Cookie (HttpOnly) | Essencial | Manter a sessão da equipe do site (login do painel) | 7 dias |
+| ap_logado | Cookie | Essencial | Avisar ao navegador que há uma sessão da equipe (não guarda dados pessoais) | 7 dias |
 | ap-theme | localStorage | Essencial | Preferência de tema claro/escuro | Persistente |
 | ap-cookie-consent | localStorage | Essencial | Registrar suas escolhas de cookies | 12 meses |
 | _ga, _ga_* | Cookie (Google Analytics 4) | Analítico | Medição de audiência (visualizações, sessões e dispositivos) — provedor Google LLC. Só ativado após consentimento; usamos *Consent Mode v2*, IP anonimizado e retenção de 14 meses. | Até 2 anos |
-| __gads, __gpi, IDE | Cookie (Google AdSense) | Marketing | Exibição e, com consentimento, personalização de anúncios em notícias e artigos — provedor Google LLC. Assinantes premium não veem anúncios. | Até 13 meses |
+| __gads, __gpi, IDE | Cookie (Google AdSense) | Marketing | Exibição e, com consentimento, personalização de anúncios em notícias e artigos — provedor Google LLC. Quem está logado na equipe do site não vê anúncios. | Até 13 meses |
 
 ## 4. Gerenciar preferências
 

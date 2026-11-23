@@ -4,6 +4,7 @@ import { data } from "react-router";
 import type { Route } from "./+types/posts-list";
 import { PageHeader } from "~/components/PageHeader";
 import { Chips, Pagination, PostGrid, PostOverlay } from "~/components/posts";
+import { AdSlot } from "~/components/ads/AdSlot";
 import { Sidebar } from "~/components/sidebar";
 import { routePath } from "~/lib/route-path";
 import { seo } from "~/lib/seo";
@@ -92,11 +93,12 @@ export default function PostsList({ loaderData }: Route.ComponentProps) {
               <>
                 {first && lead && <PostOverlay post={lead} className="min-h-[420px]" titleClass="text-[1.7rem] sm:text-[2.1rem]" />}
                 <PostGrid posts={first ? rest : list.items} cols={3} />
+                <AdSlot slot="list" />
               </>
             )}
             <Pagination page={list.page} pages={list.pages} basePath={path.split("?")[0]} query={path.includes("?") ? { tipo: "noticias" } : {}} />
           </div>
-          <Sidebar blocks={sidebar} label="Mais do Anime Profile" />
+          <Sidebar blocks={sidebar} label="Mais do Anime Profile" anuncio />
         </div>
       </div>
     </>

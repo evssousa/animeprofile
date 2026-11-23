@@ -1,5 +1,6 @@
 // Barras laterais (docs/plano-sidebars.md): cartões brancos com borda fina, título curto, listas de matérias.
 // Tudo renderizado no servidor, com dados prontos do loader. Bloco sem itens nem chega aqui (loadSidebar tira).
+import { AdSlot } from "~/components/ads/AdSlot";
 import { Link } from "react-router";
 import { ArrowRight, BookOpen, Newspaper } from "lucide-react";
 import { STATUS_PT, STREAMERS, airTime, brDayLabel } from "~/lib/anime";
@@ -229,7 +230,7 @@ function Block({ b }: { b: SideBlockData }) {
 }
 
 /** A lateral inteira: os blocos na ordem; os "fixos" ficam juntos no fim e acompanham a leitura no computador. */
-export function Sidebar({ blocks, label }: { blocks: SideBlockData[]; label: string }) {
+export function Sidebar({ blocks, label, anuncio = false }: { blocks: SideBlockData[]; label: string; /** Espaço de anúncio no fim da barra (só nas páginas de conteúdo). */ anuncio?: boolean }) {
   const free = blocks.filter((b) => !b.sticky);
   const fixed = blocks.filter((b) => b.sticky);
   const wrap = (b: SideBlockData) => (
@@ -242,6 +243,7 @@ export function Sidebar({ blocks, label }: { blocks: SideBlockData[]; label: str
     <aside aria-label={label} className="flex flex-col gap-6">
       {free.map(wrap)}
       {fixed.length > 0 && <div className="flex flex-col gap-6 lg:sticky lg:top-[92px]">{fixed.map(wrap)}</div>}
+      {anuncio && <AdSlot slot="sidebar" className="hidden lg:block" />}
     </aside>
   );
 }

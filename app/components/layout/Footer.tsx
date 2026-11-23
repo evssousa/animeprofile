@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { FOOTER_LINKS, INSTITUTIONAL, LEGAL_LINKS, SOCIAL } from "~/lib/nav";
 import { SITE } from "~/lib/site";
+import { CookiePrefsButton } from "./CookieConsent";
 import { Logo } from "./Logo";
 
 function Column({ title, links }: { title: string; links: { label: string; to: string }[] }) {
@@ -50,9 +51,12 @@ export function Footer() {
       <div className="border-t border-line">
         <div className="mx-auto flex max-w-[1328px] flex-col gap-1 px-4 py-5 text-[0.85rem] text-ink-soft sm:flex-row sm:justify-between sm:px-8 lg:px-14">
           <p>© {new Date().getFullYear()} Anime Profile. Imagens de animes pertencem aos seus detentores.</p>
-          <a href={`mailto:${SITE.email}`} className="hover:text-ink hover:underline">
-            {SITE.email}
-          </a>
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <CookiePrefsButton className="hover:text-ink hover:underline" />
+            <a href={`mailto:${SITE.email}`} className="hover:text-ink hover:underline">
+              {SITE.email}
+            </a>
+          </p>
         </div>
       </div>
     </footer>

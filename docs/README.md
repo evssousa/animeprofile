@@ -183,6 +183,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     Autores IA; Configurações com modelo, imagens, limites e guia editorial). Código em `app/server/robot/painel.server.ts` (o `/api/robo/*` passou a usar `statusRobo` e `previewHtml` de lá, sem mudar o
     comportamento). O painel nunca expõe o `CRON_TOKEN` nem valores de variáveis de ambiente. Fora desta entrega (como no plano): Desempenho, Tendências e Títulos alternativos. Falta o dono conferir logado
     (trocar o modo, "Ensaio agora" e ver a rodada aparecer).
+    **AdSense (2026-11-22, [adsense.md](adsense.md)):** ligado no padrão do respawnou, com o ID do editor já aprovado (`/ads.txt` já estava certo): Modo de Consentimento v2 (negado por padrão), banner de cookies com
+    "Preferências de cookies" no rodapé, espaços de anúncio (meio do texto, fim da matéria, barra lateral, multiplex e listas) e textos legais de cookies conferidos. Falta o dono conferir no painel do AdSense
+    (site "Pronto" e a mensagem "Regulamentos europeus") e ver os anúncios aparecerem.
     **Métricas (`/admin/retention`): feita em 2026-11-19** (migration 014 `metrics_snapshots` + `metrics_decisions` (esta ficou sem uso: o dono dispensou "Decisões" e o botão de gravar retrato manual, 2026-11-19), tarefa `metricas-semanal` segunda 9h30,
     `app/server/admin/metricas.server.ts`, kit `app/components/admin/ui.tsx` e tokens ok/warn/info). Mostra só audiência e conteúdo com dado real; o funil das contas
     é um bloco "começa quando o cadastro abrir". Falta o dono conferir logado. A Etapa 0 do plano está feita (segurança dos loaders, kit visual); o
