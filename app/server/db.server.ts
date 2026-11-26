@@ -1,7 +1,7 @@
 // Conexão com o MySQL. Só roda no servidor.
 //
-// Na Hostinger o banco fica no mesmo servidor do site: conectar em 127.0.0.1:3306
-// (não em "localhost", que pode resolver para IPv6, nem no host srvNNNN.hstgr.io).
+// Na VPS o banco é o MariaDB compartilhado (DB_HOST = nome interno do serviço). Com banco local, usar 127.0.0.1
+// (não "localhost", que pode resolver para IPv6).
 import { randomBytes } from "node:crypto";
 import mysql, { type Pool, type PoolConnection, type PoolOptions, type ResultSetHeader, type RowDataPacket } from "mysql2/promise";
 

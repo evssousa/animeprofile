@@ -2,7 +2,7 @@
 import { createHash } from "node:crypto";
 import { SITE } from "~/lib/site";
 
-/** IP de quem fez o pedido (atrás do proxy da Hostinger, vem em x-forwarded-for). */
+/** IP de quem fez o pedido (atrás do proxy (Traefik na VPS), vem em x-forwarded-for). */
 export function clientIp(request: Request) {
   return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "";
 }

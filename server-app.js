@@ -11,7 +11,7 @@ const PORT = Number(process.env.PORT || 3000);
 const NOINDEX = process.env.SITE_NOINDEX === "1";
 
 async function prepareDatabase() {
-  // O MySQL da Hostinger só aceita conexão local, então as migrations rodam daqui.
+  // As migrations rodam a cada início do app (o banco não tem porta pública).
   const db = dbConfigFromEnv();
   if (!db) {
     console.log("[db] sem DB_NAME/DB_USER: o site sobe sem banco");

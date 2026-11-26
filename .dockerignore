@@ -1,0 +1,13 @@
+node_modules
+build
+.git
+.github
+.env
+.env.*
+!.env.example
+docs
+*.log
+.react-router
+.import
+tests
+export-temp

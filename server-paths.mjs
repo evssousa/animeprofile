@@ -4,7 +4,7 @@ import { join } from "node:path";
 
 /**
  * Pasta dos arquivos enviados (fotos, capas, imagens das matérias). Fica FORA da pasta do app:
- * a cada deploy a Hostinger cria uma versão nova do app e a anterior some. Servida em /media
+ * na VPS é o volume /srv/sites/animeprofile/media montado em /data/media (MEDIA_DIR no Dockerfile). Servida em /media
  * com cache de 1 ano (o nome de um arquivo nunca é reaproveitado).
  */
 export function mediaDir() {
