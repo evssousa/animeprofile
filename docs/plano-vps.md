@@ -1,6 +1,6 @@
 # Plano (temporário): migração do animeprofile para a VPS
 
-Status: ⏳ plano pronto em 2026-11-26, esperando as respostas do dono (fim do documento). Base: o criasite, que está no ar na
+Status: ✅ **feito em 2026-11-26** (virada 19:18–19:30 UTC; site antigo apagado). Como roda agora: [deploy-vps.md](deploy-vps.md). Falta o passo 19. Base: o criasite, que está no ar na
 VPS desde 2026-11-26 ([migracao-vps.md](../../criasite/docs/migracao-vps.md), [deploy-vps.md](../../criasite/docs/deploy-vps.md)).
 Fora do escopo: o `animeprofile-old` (Lovable) e o subdomínio `comunidade.` (continua no Lovable, não mexer).
 
@@ -75,8 +75,7 @@ com uma janela curta e um caminho de volta até o site antigo ser apagado.
 - Variáveis na Hostinger (11): `SESSION_SECRET`, `ADMIN_PASSWORD_HASH`, `ADMIN_EMAIL`, `GEMINI_API_KEY`, `VITE_SITE_URL`, `DB_HOST/PORT/NAME/USER/PASSWORD`, `CRON_TOKEN` (sem SMTP/MAIL, sem `MEDIA_DIR`: padrão `~/animeprofile-media`).
 - Cron Job atual: uid `YRNxn4t7nm`, `*/5 * * * *`, `curl -s -m 50 -o /dev/null "https://animeprofile.com.br/api/cron/tick?token=<antigo>"`.
 - Zona DNS salva (2026-11-26): `@` ALIAS `animeprofile.com.br.cdn.hstgr.net.` (TTL 300); `www` CNAME **`www.animeprofile.com.br.cdn.hstgr.net.`** (TTL 300); MX 5 mx1/10 mx2.hostinger.com; TXT `@` (2× google-site-verification, SPF); DKIM `hostingermail-a/b/c._domainkey`; `_dmarc`; `autodiscover`, `autoconfig`; `comunidade` A 185.158.133.1 + 2 AAAA; TXT `_lovable`, `_lovable.www`, `_lovable.comunidade`, `_lovable-email`. Sem CAA. `ftp.novo` apagado em 2026-11-26 (era o único registro do `novo.` que restava).
-- Versão do MariaDB de origem: …
-- Arquivos/tamanho da mídia: … · Build (tempo, pico de RAM): … · Contagens do ensaio e da final: …
+- Versão de origem: `11.8.9-MariaDB-log` (igual ao alvo). Mídia: 3.307 arquivos, 301 MB. Final: 1.040 posts, 9.428 animes, 36.527 personagens, 14 quizzes, 13 blog, 224 figurinhas; migration 015.
 
 ## Perguntas em aberto (com recomendação)
 1. **Mídia por SSH da hospedagem ou por HTTP?** → **SSH** (ligar no hPanel e colar a chave pública): copia tudo, inclusive arquivos sem referência no banco, e a virada só leva os novos.
@@ -100,3 +99,26 @@ com uma janela curta e um caminho de volta até o site antigo ser apagado.
 - 8: projeto `animeprofile` (uuid `tmztf7cm03hse0xiunvgiirl`), app **`5yepytlhxqhfz9wsi4beomjb`**, 1024 MB, temporário com
   noindex, pasta de mídia, rótulos 301 antes do 1º deploy. 1º deploy: healthy, 15 migrations no banco vazio, 85 MB de RAM;
   http dos outros 3 sites segue 301.
+
+**2026-11-26, virada (Claude; dono preencheu o `.env` e fez o dump)**
+- 19:18 UTC: snapshot da VPS; Cron Job do animeprofile **apagado** (a conta ficou sem nenhum). 11 variáveis no app (formatos conferidos).
+- O banco na Hostinger é `u218539700_animeprofile`, "sem domínio atribuído": não aparece na lista do site no hPanel, só na lista geral.
+- Dump de 92 MB (sem `USE`/`DEFINER`/`uca1400`/`DROP TABLE`), `DROP`+`CREATE DATABASE`, importado em 9 s: 1.040 posts (o mais novo
+  de 17:21 UTC), migration 015.
+- Mídia por HTTP: **cuidado** com o padrão `/media/`: 22 mil caminhos `/media/anime/...` eram do CDN do AniList
+  (`s4.anilist.co/file/anilistcdn/media/anime/...`). Lista certa: só caminhos sem domínio ou com `animeprofile.com.br`, mais a
+  miniatura `-640.webp` de cada imagem de `robo/` e `painel/`. 3.307 arquivos (post-images 2.438, figurinhas 438, robo 416,
+  profile-media 15), 0 falhas, 1 min 47 s com 12 em paralelo.
+- Ensaio no temporário: 24 caminhos com 200 e 404 certo; títulos da home iguais; `ads.txt` idêntico; canonical certo; os 9
+  sitemaps com o mesmo nº de `<loc>` (5.000 animes, 1.040 matérias); 40/40 imagens com `immutable`; `/admin` noindex/no-store;
+  AniList ok a partir do IP da VPS.
+- DNS: `@` ALIAS e `www` CNAME apagados, `A 189.24.17.85` nos dois (TTL 300); propagou na hora no 8.8.8.8 e no 1.1.1.1.
+- Coolify: domínios real, `www` e temporário (noindex), rótulos 301 antes do deploy; Let's Encrypt para os dois; http e www →
+  `https://animeprofile.com.br` com 301; sem `X-Robots-Tag` no domínio real; http de criasite, respawnou e vibecoin seguem 301.
+- Tarefa `tick` criada às 19:29 UTC; às 19:30 rodou `publicar-agendados` e o `robo-noticias` atrasado: 60 coletados, 29 novos,
+  **1 publicada** com imagem em `/media/robo` servida da VPS (fonte "Anime New" falhou, igual a antes): **robô confirmado na VPS**.
+- Logo depois da troca, navegadores com HTML antigo pediram `/assets/root-*.js` do build da Hostinger (404 no log): some sozinho.
+- `CRON_TOKEN` novo no `sites.json` do escritório (`/api/escritorio/visitas` 200). O `exportar-conteudo-antigo.mjs` lê do ambiente.
+- E-mail: pedido "Free Business Email" separado (até 2027-11-14); MX intacto.
+- RAM: app 112 MB; VPS 2,3 GB usados, 1,5 GB disponíveis.
+- ~19:40 UTC: com o ok prévio do dono, **site antigo apagado do Cloud Startup** (`hosting_websites_delete`).
