@@ -67,12 +67,15 @@ com uma janela curta e um caminho de volta até o site antigo ser apagado.
 - `npm run build` antes de cada push; migration nova (016) vai colada no chat e só depois da virada.
 
 ## Volta (rollback; vale enquanto o site antigo existir)
-1. 🤖 DNS como antes: `@` ALIAS `animeprofile.com.br.cdn.hstgr.net`, `www` CNAME `animeprofile.com.br.`, TTL 300 (conferir com a zona salva no passo 1); apagar os A.
+1. 🤖 DNS como antes: `@` ALIAS `animeprofile.com.br.cdn.hstgr.net`, `www` CNAME `www.animeprofile.com.br.cdn.hstgr.net.`, TTL 300 (conferir com a zona salva no passo 1); apagar os A.
 2. 🤖 Pausar/apagar a tarefa `tick` do Coolify. 3. 👤 Recriar no hPanel o Cron Job `*/5` do `tick` (o token antigo continua no app antigo).
 4. 🤖 Listar `posts` criados/editados na VPS depois do dump final e exportar só essas linhas para o banco antigo. 5. Anotar a causa em `decisoes.md`.
 
 ## Específico (preencher na execução)
-- Variáveis na Hostinger: … · `MEDIA_DIR`: … · Cron Job atual: … · Zona DNS salva: … · Versão do MariaDB de origem: …
+- Variáveis na Hostinger (11): `SESSION_SECRET`, `ADMIN_PASSWORD_HASH`, `ADMIN_EMAIL`, `GEMINI_API_KEY`, `VITE_SITE_URL`, `DB_HOST/PORT/NAME/USER/PASSWORD`, `CRON_TOKEN` (sem SMTP/MAIL, sem `MEDIA_DIR`: padrão `~/animeprofile-media`).
+- Cron Job atual: uid `YRNxn4t7nm`, `*/5 * * * *`, `curl -s -m 50 -o /dev/null "https://animeprofile.com.br/api/cron/tick?token=<antigo>"`.
+- Zona DNS salva (2026-11-26): `@` ALIAS `animeprofile.com.br.cdn.hstgr.net.` (TTL 300); `www` CNAME **`www.animeprofile.com.br.cdn.hstgr.net.`** (TTL 300); MX 5 mx1/10 mx2.hostinger.com; TXT `@` (2× google-site-verification, SPF); DKIM `hostingermail-a/b/c._domainkey`; `_dmarc`; `autodiscover`, `autoconfig`; `comunidade` A 185.158.133.1 + 2 AAAA; TXT `_lovable`, `_lovable.www`, `_lovable.comunidade`, `_lovable-email`. Sem CAA. `ftp.novo` apagado em 2026-11-26 (era o único registro do `novo.` que restava).
+- Versão do MariaDB de origem: …
 - Arquivos/tamanho da mídia: … · Build (tempo, pico de RAM): … · Contagens do ensaio e da final: …
 
 ## Perguntas em aberto (com recomendação)
@@ -83,3 +86,17 @@ com uma janela curta e um caminho de volta até o site antigo ser apagado.
 5. **Site antigo na Hostinger:** → manter **14 dias** parado como volta (o criasite foi apagado na hora; aqui há mais dados).
 6. **Subdomínio `novo.` (ALIAS/`www.novo`/`ftp.novo` na zona):** → apagar os registros depois dos 7 dias.
 7. **Quando:** → pelo menos **2 dias depois do respawnou** (a partir de 2026-11-28), olhando a RAM da VPS antes.
+
+## Andamento
+
+**2026-11-26 (Claude)**
+- Respostas do dono: mídia como achar melhor, CDN só se valer a pena, virada já, 016 depois, apagar o site antigo logo após a
+  transferência, apagar o `novo.` já, sem esperar. Decisões de execução: **um dump só** (o robô fica parado entre o dump e o
+  DNS; sem ensaio separado) e **mídia por HTTP** a partir do dump (lição 6, sem precisar ligar SSH na hospedagem). Sem CDN.
+- 1: levantamento (acima). `ftp.novo` apagado.
+- 2: `Dockerfile`/`.dockerignore` e comentários (commit `198e085`), 292 testes ok, build ok.
+- 3: `projetos\_segredosnimeprofile-vps.env` gerado (DB, `CRON_TOKEN`, `SESSION_SECRET` novos); faltam 3 linhas do dono.
+- 4: banco e usuário `animeprofile` (grants só em `animeprofile.*`); pasta `/srv/sites/animeprofile/media`.
+- 8: projeto `animeprofile` (uuid `tmztf7cm03hse0xiunvgiirl`), app **`5yepytlhxqhfz9wsi4beomjb`**, 1024 MB, temporário com
+  noindex, pasta de mídia, rótulos 301 antes do 1º deploy. 1º deploy: healthy, 15 migrations no banco vazio, 85 MB de RAM;
+  http dos outros 3 sites segue 301.
