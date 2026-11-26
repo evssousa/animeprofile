@@ -67,6 +67,8 @@ export default [
   route("api/public/payments/webhook", "routes/api.mp-webhook.ts", { id: "mp-webhook" }),
   route("api/public/payments/mercado-pago", "routes/api.mp-webhook.ts", { id: "mp-webhook-2" }),
   route("api/health", "routes/api.health.ts"),
+  // Resumo das visitas para o Escritório Claude (protegido pelo CRON_TOKEN).
+  route("api/escritorio/:what", "routes/api.escritorio.ts"),
   route("api/eu", "routes/api.eu.ts"),
   route("api/sugestoes", "routes/api.sugestoes.ts"),
   route("api/agora", "routes/api.agora.ts"),
