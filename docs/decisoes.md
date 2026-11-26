@@ -438,3 +438,12 @@ Detalhes em [plano-quiz-blog-figurinhas.md](plano-quiz-blog-figurinhas.md).
 - Barra do painel mostra os itens do antigo (26, sem "Ver escritório" e sem WhatsApp); telas feitas na ordem listada no README (3b3), primeiro o que o recebimento de usuários exige.
 - Quarto otaku do painel será refeito com three.js; Títulos no Google, Sistemas e Agendamentos a reavaliar.
 - Menu WhatsApp removido do painel (não será mais usado, 2026-11-19). "Níveis e recompensas" virou "Níveis" e "Custos e recompensas" virou "Custos".
+
+## 2026-11-26: sem dump final; contas a partir do dump de 15/11
+- O dono decidiu não fazer o dump final do Lovable: a importação das contas, saldos, figurinhas e senhas usará
+  `C:\Users\evsli\animeprofile-backup\animeprofile_261115.backup` (validado em 2026-11-15: 171 usuários, 64 com hash bcrypt,
+  114 identidades do Google, 2.235 `user_stickers`). O que mudou no site antigo entre 15/11 e o fim dele (check-ins, coins, compras)
+  não vem; a lacuna conta a partir de 15/11 (ver pergunta 4 do [plano-virada-parcial.md](plano-virada-parcial.md), Premium).
+- Exportação de conteúdo encerrada: a final rodou em 17/11 (970 matérias) e o Supabase antigo, conferido em 26/11, segue com as
+  mesmas 970, sem matéria nem comentário novos. O `scripts/exportar-conteudo-antigo.mjs` não precisa rodar de novo.
+- O subdomínio `comunidade.` não existe mais; a zona DNS ficou sem nenhum registro do Lovable (DMARC agora para o contato).

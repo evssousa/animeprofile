@@ -74,7 +74,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 5 | Painel admin e robôs (notícias por IA, redes sociais) | 💤 |
 | 5 | Painel `/admin` de visitas sem contas (contador próprio sem cookie, base para os outros 3 sites) ([plano](plano-painel-visitas.md)) | ⏳ feito em 2026-11-19 (passos 1 a 12): login do admin, migration 013, coleta `/api/v`, `views_count` voltando a andar, limpeza e a tela. Falta conferir em produção, textos legais (13), país/idioma (14) e docs (15). Dono respondeu com as recomendadas |
 | 6 | **Virada parcial (sem contas) em 4 dias:** backup completo do Lovable Cloud, imagens no `/media`, páginas das contas honestas, ensaio e DNS ([plano](plano-virada-parcial.md)) | 🔄 urgente. **Dia 1 (15/11) feito:** backup do banco validado, storage inteiro baixado (6.757 arquivos), 2.436 imagens no `/media`, páginas das contas, faixa, `/site-novo`, redirects, arquivos públicos, Mercado Pago/descadastro guardados, conferência de 1.898 endereços com zero falhas, cache de 60 s para a CDN. Faltam o ensaio e a DNS (dias 2 e 3). Site antigo sai do ar no fim do dia 4 (18/11) |
-| 6 | Importação das contas e da economia a partir do dump final, em fases (A robô, B contas, C perfil e comentar, D economia, E figurinhas e missões, F resto) | 💤 depois da virada |
+| 6 | Importação das contas e da economia a partir do dump de **15/11** (`animeprofile_261115.backup`; o dump final foi dispensado), em fases (A robô, B contas, C perfil e comentar, D economia, E figurinhas e missões, F resto) | 💤 depois da virada |
 | 6 | Migração da Hostinger (Cloud Startup) para a VPS com Coolify, no módulo do criasite ([plano](plano-vps.md)) | ✅ no ar na VPS desde 2026-11-26 ([deploy-vps.md](deploy-vps.md)); site antigo apagado; falta o acompanhamento de 24 h e 7 dias |
 
 ## Onde paramos
@@ -136,8 +136,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
      Menus Feed, Blog, Missões, Ranking, Figurinhas e Quarto Otaku só para logados (`auth` em `app/lib/nav.ts`; escondidos por CSS, sem `LOGGED_IN`).
      **Logs do dia (22h, 17/11):** cron rodando, `/api/health` ok, 15 páginas sem 5xx, robô com as 6 matérias do teto (8h às 13h,
      0 falhas, 13 chamadas ao Gemini sem erro; 398 a 730 palavras, parágrafos curtos, fonte no fim, canonical e RSS certos).
-     Teto do robô subido para 10 às 22h25 (vale a partir das 8h de 18/11). **Falta:** (18/11) dump final e a exportação final;
-   - dia 4 (18/11): dump final.
+     Teto do robô subido para 10 às 22h25 (vale a partir das 8h de 18/11). **Dump final dispensado (2026-11-26):** as contas usam o dump de 15/11; a exportação final de 17/11 já tinha tudo (conferido em 26/11);
 
    Tudo o que não estiver nesse plano espera.
 1. Conferir no navegador `/quiz`, `/blog`, `/figurinhas`, a home e a ficha de um anime com álbum (exportação feita em 2026-11-15).
@@ -203,7 +202,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
     hoje, em alta) + registrar o `sw.js` e arrumar o manifesto + "Instalar app"; (3) pílulas da equipe (robô e visitas de hoje, via
     `/api/eu`) e conferência de larguras. Celular (375 px) sem botão novo no topo.
 3c. **Contas de todos e Google (fases 2 e 3 do mesmo plano): não agora** (decisão do dono em 2026-11-19). Quando voltar: importação dos
-    171 usuários do dump final (64 com senha, 114 identidades do Google) com todos os dados, login para todos, SMTP, Turnstile, Google OAuth.
+    171 usuários do dump de 15/11 (64 com senha, 114 identidades do Google) com todos os dados, login para todos, SMTP, Turnstile, Google OAuth.
 4. Chaves externas (Google OAuth, Mercado Pago, Gemini, Turnstile, Firebase, Klipy) e a virada do domínio:
    [deploy-hostinger.md](deploy-hostinger.md).
 5. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
@@ -247,9 +246,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
   - **Dia 2:** SMTP no hPanel (opcional). **UptimeRobot adiado** e **aviso nas redes dispensado** (decisões do dono em 2026-11-17). O dono decidiu em 2026-11-16 **não fechar o `.7z` cifrado** (a pasta `animeprofile-backup` fica só no PC).
   - **Dia 3:** hora H às 7h (desativar os workflows antigos, trocar `VITE_SITE_URL` e apagar `SITE_NOINDEX`, ligar o
     domínio, trocar o cron, enviar o sitemap).
-  - **Dia 4:** dump final.
   - **Responder as 5 perguntas do fim do plano.**
-- Exportação feita em 2026-11-15 (950 matérias, 14 quizzes, 13 posts do blog, 224 figurinhas). Na virada, rodar de novo. O `CRON_TOKEN` apareceu no chat; o dono decidiu não trocar.
+- Exportação de conteúdo encerrada: a final rodou na virada de 17/11 (970 matérias); em 2026-11-26 o Supabase antigo seguia com 970, sem matéria nem comentário novos (só a agenda 16–22/11 editada pelo robô antigo, irrelevante). Não rodar mais.
 - Conferir a Otaku TV no navegador (`/otaku-tv`, `?tab=trailers`, `?tab=musicas`, `?v=<id>`). As 4 perguntas do plano foram respondidas com as recomendadas.
 - Se quiser as figurinhas abertas em vez de silhueta: trocar `MOSTRAR_ABERTAS` para `true` em `app/lib/stickers.ts`.
 
