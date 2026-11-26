@@ -2,7 +2,7 @@
 
 Status: ✅ **feito em 2026-11-26** (virada 19:18–19:30 UTC; site antigo apagado). Como roda agora: [deploy-vps.md](deploy-vps.md). Falta o passo 19. Base: o criasite, que está no ar na
 VPS desde 2026-11-26 ([migracao-vps.md](../../criasite/docs/migracao-vps.md), [deploy-vps.md](../../criasite/docs/deploy-vps.md)).
-Fora do escopo: o `animeprofile-old` (Lovable) e o subdomínio `comunidade.` (continua no Lovable, não mexer).
+Fora do escopo: o `animeprofile-old` (Lovable) e o subdomínio `comunidade.` (não existe mais; registros apagados da zona em 2026-11-26 a pedido do dono).
 
 ## Objetivo
 Levar `animeprofile.com.br` do Cloud Startup para a VPS (Coolify) sem perder banco, imagens, robô, visitas, AdSense e SEO,
@@ -29,7 +29,7 @@ com uma janela curta e um caminho de volta até o site antigo ser apagado.
 | País das visitas | O passo 14 do painel de visitas contava com cabeçalho de país da CDN: na VPS não existe. Fica para depois |
 | www | O `server-app.js` já faz 301 de `www` para o apex; o Coolify recebe os dois domínios e os rótulos `permanent=true` (lição 4) |
 | AdSense | Nada muda no painel do AdSense (mesmo domínio). Conferir `/ads.txt` (vem de `public/ads.txt`) byte a byte |
-| DNS a preservar | MX, SPF, DKIM, DMARC, TXT do Google, `autodiscover`, `autoconfig`, **`comunidade`** |
+| DNS a preservar | MX, SPF, DKIM, DMARC, TXT do Google, `autodiscover`, `autoconfig` (o `comunidade` saiu em 2026-11-26) |
 
 ## Passos (🤖 Claude · 👤 dono · tamanho P/M/G)
 **Preparação (o site atual não é afetado)**
@@ -122,3 +122,4 @@ com uma janela curta e um caminho de volta até o site antigo ser apagado.
 - E-mail: pedido "Free Business Email" separado (até 2027-11-14); MX intacto.
 - RAM: app 112 MB; VPS 2,3 GB usados, 1,5 GB disponíveis.
 - ~19:40 UTC: com o ok prévio do dono, **site antigo apagado do Cloud Startup** (`hosting_websites_delete`).
+- Depois da virada, a pedido do dono: registros do `comunidade` apagados da zona (A, 2 AAAA e TXT `_lovable.comunidade`); o subdomínio não existe mais.
