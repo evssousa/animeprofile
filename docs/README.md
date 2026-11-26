@@ -31,6 +31,7 @@ Lovable Cloud. Por isso, o domínio animeprofile.com.br passa para cá numa **vi
 | [plano-menus-logado.md](plano-menus-logado.md) | Plano (temporário): menus de quem está logado no formato do antigo, em 4 entregas: menu lateral, navbar (sino), menu do usuário e barra lateral do painel `/admin`, sem quebrar o cache da CDN (itens por CSS `logado:`/papéis no marcador, sem links para "em breve" no HTML público) |
 | [plano-telas-painel.md](plano-telas-painel.md) | Plano (temporário): as próximas telas reais do `/admin` na ordem do dono (Painel, Métricas, Posts, Notícias IA, Artigos com IA, Quizzes) com desenho, migrations 014–016 e passos; fichas curtas dos outros 21 itens da barra; correção de segurança dos loaders do painel (etapa 0) |
 | [plano-navbar.md](plano-navbar.md) | Plano (temporário): topo mais rico para visitante e logado: busca com sugestões e atalho `/`/Ctrl+K (diálogo no celular), botão "Agora" (última hora, no ar hoje, em alta), instalar o app (PWA) e pílulas da equipe (robô e visitas de hoje), sem mudar o HTML público |
+| [plano-vps.md](plano-vps.md) | Plano (temporário): migração da Hostinger para a VPS (Coolify), com base no criasite: o que muda no animeprofile, 20 passos, volta e 7 perguntas |
 | [plano-sidebars.md](plano-sidebars.md) | Plano (temporário): inventário das barras laterais do site antigo e o sistema único de lateral (blocos por página, cache curto) para a matéria, Central, categoria/tag, blog, Otaku TV e quiz |
 
 ## Status
@@ -73,6 +74,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 5 | Painel `/admin` de visitas sem contas (contador próprio sem cookie, base para os outros 3 sites) ([plano](plano-painel-visitas.md)) | ⏳ feito em 2026-11-19 (passos 1 a 12): login do admin, migration 013, coleta `/api/v`, `views_count` voltando a andar, limpeza e a tela. Falta conferir em produção, textos legais (13), país/idioma (14) e docs (15). Dono respondeu com as recomendadas |
 | 6 | **Virada parcial (sem contas) em 4 dias:** backup completo do Lovable Cloud, imagens no `/media`, páginas das contas honestas, ensaio e DNS ([plano](plano-virada-parcial.md)) | 🔄 urgente. **Dia 1 (15/11) feito:** backup do banco validado, storage inteiro baixado (6.757 arquivos), 2.436 imagens no `/media`, páginas das contas, faixa, `/site-novo`, redirects, arquivos públicos, Mercado Pago/descadastro guardados, conferência de 1.898 endereços com zero falhas, cache de 60 s para a CDN. Faltam o ensaio e a DNS (dias 2 e 3). Site antigo sai do ar no fim do dia 4 (18/11) |
 | 6 | Importação das contas e da economia a partir do dump final, em fases (A robô, B contas, C perfil e comentar, D economia, E figurinhas e missões, F resto) | 💤 depois da virada |
+| 6 | Migração da Hostinger (Cloud Startup) para a VPS com Coolify, no módulo do criasite ([plano](plano-vps.md)) | ❓ plano pronto em 2026-11-26; 7 perguntas ao dono (1, mídia por SSH, e 3, janela, são as que travam) |
 
 ## Onde paramos
 
@@ -206,9 +208,15 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 5. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
    regras de conteúdo patrocinado, versão para baixar/imprimir e contato. Outra fonte de renda, vale para todos os sites.
    Fica para depois da virada do domínio; reaproveitar o que o criasite (piloto) fizer.
+6. **Migração para a VPS ([plano-vps.md](plano-vps.md)):** depois das respostas do dono, passos 1 a 10 (preparação e ensaio em
+   `animeprofile.189-24-17-85.sslip.io`, sem afetar o site), virada (11 a 18) na janela marcada e acompanhamento (19 e 20).
+   Não antes de 2026-11-28 (2 dias depois do respawnou). A migration 016 só depois da virada.
 
 ## Pendências suas
 
+- **Migração para a VPS ([plano-vps.md](plano-vps.md)):** responder as 7 perguntas do fim do plano (todas com recomendação);
+  ligar o SSH da hospedagem no hPanel e colar a chave pública (se aprovar a pergunta 1); preencher as linhas vazias de
+  `projetos\_segredos\animeprofile-vps.env`; tirar os 2 dumps pelo phpMyAdmin (ensaio e final); marcar a janela de ~1 h.
 - **Painel de visitas:** as variáveis `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` e `SESSION_SECRET` já estão no hPanel (2026-11-19). Depois do deploy,
   entrar em `/admin` e conferir; aprovar o texto novo da Privacidade e dos Cookies (passo 13).
 - **`/login` do administrador ([plano-contas-login.md](plano-contas-login.md)):** nada bloqueia. Se quiser, responda as 3 perguntas do

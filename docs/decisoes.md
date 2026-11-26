@@ -2,6 +2,19 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-26 (plano) — Migração para a VPS no módulo do criasite
+
+Detalhes em [plano-vps.md](plano-vps.md).
+
+- **Decisão (proposta; 7 perguntas ao dono):** mesmo caminho do criasite (Coolify, `mariadb-sites`, Dockerfile, ensaio em
+  endereço `sslip.io` com noindex, dump pelo phpMyAdmin, DNS só A e sem AAAA, lições 1 a 13). Próprio do animeprofile:
+  dump com gzip; mídia copiada por SSH da hospedagem em tar (recomendado) em vez da lista do dump; uma tarefa `tick` a cada
+  5 min no lugar do Cron Job (os horários continuam no código); app com 1 GB; sem CDN na VPS por enquanto; migration 016
+  só depois da virada; site antigo mantido 14 dias como volta; `comunidade.` (Lovable) e o `animeprofile-old` fora.
+- **Por quê:** o criasite já provou o caminho na mesma VPS; o animeprofile tem banco e mídia muito maiores (milhares de
+  arquivos, inclusive alguns sem referência no banco) e o robô publica todo dia, então a cópia por SSH, a janela fora dos
+  horários do robô e uma volta disponível reduzem o risco.
+
 ## 2026-11-19 (plano) — Topo (navbar) mais rico, sem mudar o HTML público
 
 Detalhes em [plano-navbar.md](plano-navbar.md).
