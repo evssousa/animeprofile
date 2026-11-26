@@ -123,3 +123,4 @@ com uma janela curta e um caminho de volta até o site antigo ser apagado.
 - RAM: app 112 MB; VPS 2,3 GB usados, 1,5 GB disponíveis.
 - ~19:40 UTC: com o ok prévio do dono, **site antigo apagado do Cloud Startup** (`hosting_websites_delete`).
 - Depois da virada, a pedido do dono: registros do `comunidade` apagados da zona (A, 2 AAAA e TXT `_lovable.comunidade`); o subdomínio não existe mais.
+- Também a pedido do dono: TXT `_lovable`, `_lovable.www` e `_lovable-email` apagados; DMARC agora manda os relatórios para `contato@animeprofile.com.br` (antes `dmarcreports@lovable.dev`). A zona não tem mais nada do Lovable.
