@@ -237,6 +237,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
   depois da virada (17/11); no dia 18 sobe para 10.
 - **SMTP:** não é mais necessário para o Contato (decisão do dono em 2026-11-17: sem formulário, só e-mail por `mailto:`). Volta a ser
   necessário na fase das contas (recuperar senha e avisos por e-mail): `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e `MAIL_FROM`.
+  **Desde 2026-11-26 o e-mail é o Zoho Mail** (caixa `admin@animeprofile.com.br`, com os apelidos `contato@` dos 4 sites):
+  `SMTP_HOST=smtppro.zoho.com`, `SMTP_PORT=465`, `SMTP_USER=admin@animeprofile.com.br`, `SMTP_PASSWORD` = uma senha de
+  aplicativo do Zoho (gerar uma só para o site), `MAIL_FROM="Anime Profile <contato@animeprofile.com.br>"`. Login SMTP testado.
 
 - **URGENTE (virada parcial, [plano](plano-virada-parcial.md)):**
   - **Dia 1 (feito até aqui):** banco e storage guardados em `C:\Users\evsli\animeprofile-backup\`. TTL do DNS já em 300 s (feito).
