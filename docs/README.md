@@ -215,6 +215,10 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 
 ## Pendências suas
 
+- **AdSense ([adsense.md](adsense.md)):** não precisa de pedido novo (o editor `pub-4124845154866017` já é aprovado e o `/ads.txt`,
+  o consentimento e os textos legais seguem no ar na VPS, conferido em 2026-11-26). No painel do AdSense: ver `animeprofile.com.br`
+  como "Pronto" em Sites, ativar a mensagem "Regulamentos europeus" em Privacidade e mensagens e, numa janela anônima, aceitar
+  os cookies e ver se aparece anúncio numa matéria.
 - **Depois da VPS:** abrir o site e o `/admin` no celular (4G) e no PC (a sessão antiga caiu porque o `SESSION_SECRET` é novo;
   a senha é a mesma); no Search Console, "Testar URL publicada" na home e ver os sitemaps "Sucesso". Guardar
   `projetos\_segredos\animeprofile-vps.env` no gerenciador de senhas (ou apagar) e apagar `projetos\_migracao\animeprofile-final.sql`
