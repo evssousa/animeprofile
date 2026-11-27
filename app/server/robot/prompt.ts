@@ -18,7 +18,7 @@ export const NEUTRAL_EDITOR_PROMPT =
 
 /** Regra de leitura: o guia antigo não limitava o tamanho do parágrafo e os textos saíam em blocos grandes. */
 export const PARAGRAPH_RULE =
-  "REGRA DE LEITURA (vale mais que qualquer exemplo acima): parágrafos CURTOS, de 3 a 4 frases e no máximo 60 palavras (até 5 linhas). " +
+  "REGRA DE LEITURA (vale mais que qualquer exemplo acima): parágrafos CURTOS, de 3 a 5 frases e no máximo 80 palavras (até 5 linhas no computador). " +
   "Uma ideia por parágrafo. Quebre o texto em vários <p> em vez de escrever blocos longos; o leitor está no celular.";
 
 /** A categoria Games é só para jogos ligados a anime e mangá; os demais são do Respawnou (outro site do dono). */

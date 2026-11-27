@@ -2,6 +2,13 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+
+## 2026-11-27 — Parágrafos das matérias de até ~80 palavras
+
+- **O quê:** `splitLongParagraphs` só divide parágrafos com mais de 80 palavras (antes 65; em 17/11, 40), em pedaços de ~48 ou mais;
+  a regra do prompt do robô passou a "3 a 5 frases, no máximo 80 palavras" (antes 60).
+- **Por quê:** pedido do dono: os parágrafos estavam curtos demais; até 5 linhas no computador está bom.
+
 ## 2026-11-26 (plano) — Google Analytics 4 com consentimento por categoria
 
 Detalhes em [plano-google-analytics.md](plano-google-analytics.md).
