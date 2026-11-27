@@ -2,6 +2,27 @@
 
 Mais recente no topo. Cada decisão diz o que foi decidido, quando e por quê.
 
+## 2026-11-26 (plano) — Google Analytics 4 com consentimento por categoria
+
+Detalhes em [plano-google-analytics.md](plano-google-analytics.md).
+
+- **Decisão (proposta; o dono pode mudar, nenhuma bloqueia):**
+  - GA4 por gtag.js reaproveitando o `dataLayer` do `consentBootstrap`; script só no navegador, depois do `load` e ocioso, fora de
+    `/admin`, `/login`, `/sair`, `/api`, nunca para quem está logado e com a marca `?nao-medir=1` para o dono.
+  - Banner ganha **"Personalizar"** com Estatística (GA) e Anúncios personalizados (AdSense) separados; aceitar e recusar continuam
+    do mesmo tamanho. `CONSENT_VERSION` 1 → 2 (`{ v, analytics, ads, at }`); v1 "essenciais" migra sem banner; v1 "aceitar todos"
+    vale só para anúncios e vê o banner de novo uma vez.
+  - Modo de Consentimento **básico** (o GA nem carrega sem permissão), não o avançado.
+  - page_view manual por troca de rota (`send_page_view: false`) e "eventos do histórico" desligados no painel do GA.
+  - ID como constante pública em `app/analytics/config.ts` (vazio = desligado); nos irmãos, variável `GA_MEASUREMENT_ID` pelo loader da raiz.
+  - Eventos: busca pela medição otimizada, `quiz_complete` e `select_content` ("Leia também"). Sinais do Google e personalização de
+    anúncios pelo GA desligados; retenção de 14 meses.
+  - O `googleCmpApplies()` do respawnou entra no módulo (visitante europeu vê só o aviso do Google; o GA não carrega para ele).
+  - A contagem própria (`/api/v`) segue como número oficial; o GA é para comportamento.
+- **Por quê:** LGPD e o guia de cookies da ANPD pedem finalidades separadas e recusar tão fácil quanto aceitar; a Política de Cookies
+  já promete "só após consentimento"; o volume do site não ativa a modelagem do modo avançado; o dono não pode sujar os dados; e tudo
+  num módulo para copiar nos outros 3 sites (decisão de 2026-11, "tudo como módulo").
+
 ## 2026-11-26 (plano) — Migração para a VPS no módulo do criasite
 
 Detalhes em [plano-vps.md](plano-vps.md).
