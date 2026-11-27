@@ -38,6 +38,9 @@ export function carregarGa(id: string) {
   estado = "carregando";
   idAtual = id;
   depurar = gaDebug();
+  // Só o send_page_view do config não basta: o gtag.js manda um page_view sozinho ao carregar (conferido em 2026-11-26).
+  // Com o "set" antes, o único page_view é o nosso (um por troca de rota).
+  gtag("set", { send_page_view: false });
   gtag("js", new Date());
   gtag("config", id, {
     send_page_view: false,
