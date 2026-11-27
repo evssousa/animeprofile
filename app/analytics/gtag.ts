@@ -4,6 +4,8 @@
 type Estado = "parado" | "carregando" | "ativo" | "falhou";
 let estado: Estado = "parado";
 let idAtual: string | null = null;
+// O debug_mode no config não chega aos eventos (conferido em 2026-11-26): vai em cada evento.
+let depurar = false;
 
 function gtag(...args: unknown[]) {
   if (typeof window.gtag !== "function") {
@@ -35,12 +37,12 @@ export function carregarGa(id: string) {
   if (estado !== "parado") return;
   estado = "carregando";
   idAtual = id;
+  depurar = gaDebug();
   gtag("js", new Date());
   gtag("config", id, {
     send_page_view: false,
     allow_google_signals: false,
     allow_ad_personalization_signals: false,
-    ...(gaDebug() ? { debug_mode: true } : {}),
   });
   const inserir = () => {
     const s = document.createElement("script");
@@ -78,13 +80,13 @@ function pronto(): boolean {
 
 export function enviarPageView(href: string, referrer?: string) {
   if (!pronto()) return;
-  gtag("event", "page_view", { page_location: href, page_title: document.title, ...(referrer ? { page_referrer: referrer } : {}) });
+  gtag("event", "page_view", { page_location: href, page_title: document.title, ...(referrer ? { page_referrer: referrer } : {}), ...(depurar ? { debug_mode: true } : {}) });
 }
 
 /** Evento personalizado. Sem GA ativo (sem consentimento, painel, logado), não faz nada e não enfileira. */
 export function medir(nome: string, params: Record<string, unknown> = {}) {
   if (!pronto()) return;
-  gtag("event", nome, params);
+  gtag("event", nome, depurar ? { ...params, debug_mode: true } : params);
 }
 
 /** Apaga os cookies _ga e _ga_* (no host e no domínio do site). */
