@@ -275,22 +275,25 @@ function Hero({ slides }: { slides: Card[] }) {
       aria-label="Destaques"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
-      className="relative flex min-h-[560px] flex-col overflow-hidden rounded-b-[32px] bg-night text-night-ink shadow-[0_30px_60px_rgba(60,20,20,.18)] sm:min-h-[640px]"
+      className="relative flex flex-col overflow-hidden rounded-b-[32px] bg-night text-night-ink shadow-[0_30px_60px_rgba(60,20,20,.18)] md:min-h-[640px]"
     >
-      {slides.map((sl, n) => (
-        <img
-          key={sl.id}
-          src={sl.image!}
-          alt=""
-          loading={n === 0 ? "eager" : "lazy"}
-          className={`absolute inset-0 size-full object-cover transition-opacity duration-700 ${isWideImage(sl) ? "" : "scale-110 blur-2xl"} ${n === i ? "opacity-100" : "opacity-0"}`}
+      {/* Celular: a imagem (16:9) inteira em cima e o texto embaixo, sem ampliar nem cortar. A partir de md: imagem na faixa toda. */}
+      <div className="relative aspect-video w-full overflow-hidden md:absolute md:inset-0 md:aspect-auto">
+        {slides.map((sl, n) => (
+          <img
+            key={sl.id}
+            src={sl.image!}
+            alt=""
+            loading={n === 0 ? "eager" : "lazy"}
+            className={`absolute inset-0 size-full object-cover transition-opacity duration-700 ${isWideImage(sl) ? "" : "scale-110 blur-2xl"} ${n === i ? "opacity-100" : "opacity-0"}`}
+          />
+        ))}
+        <div
+          className="absolute inset-0 bg-[linear-gradient(0deg,rgba(13,13,16,1)_0%,rgba(13,13,16,0)_35%)] md:bg-[linear-gradient(90deg,rgba(13,13,16,.97)_0%,rgba(13,13,16,.78)_38%,rgba(13,13,16,.1)_75%),linear-gradient(0deg,rgba(13,13,16,.92)_0%,rgba(13,13,16,0)_42%)]"
+          aria-hidden
         />
-      ))}
-      <div
-        className="absolute inset-0 bg-[linear-gradient(90deg,rgba(13,13,16,.97)_0%,rgba(13,13,16,.78)_38%,rgba(13,13,16,.1)_75%),linear-gradient(0deg,rgba(13,13,16,.92)_0%,rgba(13,13,16,0)_42%)]"
-        aria-hidden
-      />
-      <div className="relative mx-auto mt-auto flex w-full max-w-[1328px] flex-wrap items-end gap-8 px-4 pt-16 pb-10 sm:px-8 lg:px-14">
+      </div>
+      <div className="relative mx-auto mt-auto flex w-full max-w-[1328px] flex-wrap items-end gap-8 px-4 pt-3 pb-8 sm:px-8 md:pt-16 md:pb-10 lg:px-14">
         <div className="flex w-full max-w-[660px] min-w-0 flex-col gap-4 md:w-auto md:flex-[1_1_480px]" aria-live="polite">
           <div className="flex flex-wrap gap-2 text-[0.75rem] font-bold">
             <span className="rounded-[7px] bg-brand px-2.5 py-1.5">Destaque</span>
