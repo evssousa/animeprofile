@@ -224,11 +224,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
   o consentimento e os textos legais seguem no ar na VPS, conferido em 2026-11-26). No painel do AdSense: ver `animeprofile.com.br`
   como "Pronto" em Sites, ativar a mensagem "Regulamentos europeus" em Privacidade e mensagens e, numa janela anônima, aceitar
   os cookies e ver se aparece anúncio numa matéria.
-- **Google Analytics (no ar, ID `G-GFBZ97L4WX`):** no fluxo Web do GA, desligar "Mudanças de página com base em eventos do
-  histórico do navegador" (Medição otimizada → engrenagem → Visualizações de página → Configurações avançadas; senão cada página
-  conta duas vezes); Administrador → Retenção de dados em 14 meses; Coleta de dados com os sinais do Google desligados; opcional
-  vincular Search Console e AdSense. Abrir o site uma vez com `?nao-medir=1` em cada navegador seu sem login (celular). Ler e
-  aprovar os textos novos de `/legal/cookies` e `/legal/privacidade`. O contêiner do Tag Manager (`GTM-T4V9938Z`) não é usado.
+- **Google Analytics (no ar, ID `G-GFBZ97L4WX`):** configurações do GA feitas pelo dono em 2026-11-26 (histórico desligado, retenção 14 meses,
+  sinais do Google desligados) e textos de Cookies/Privacidade publicados. Falta só abrir o site uma vez com `?nao-medir=1` nos navegadores
+  seus sem login (celular). O contêiner do Tag Manager (`GTM-T4V9938Z`) não é usado (carregaria antes do consentimento).
 - **Depois da VPS:** abrir o site e o `/admin` no celular (4G) e no PC (a sessão antiga caiu porque o `SESSION_SECRET` é novo;
   a senha é a mesma); no Search Console, "Testar URL publicada" na home e ver os sitemaps "Sucesso". Guardar
   `projetos\_segredos\animeprofile-vps.env` no gerenciador de senhas (ou apagar) e apagar `projetos\_migracao\animeprofile-final.sql`
