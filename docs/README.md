@@ -77,7 +77,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 6 | **Virada parcial (sem contas) em 4 dias:** backup completo do Lovable Cloud, imagens no `/media`, páginas das contas honestas, ensaio e DNS ([plano](plano-virada-parcial.md)) | 🔄 urgente. **Dia 1 (15/11) feito:** backup do banco validado, storage inteiro baixado (6.757 arquivos), 2.436 imagens no `/media`, páginas das contas, faixa, `/site-novo`, redirects, arquivos públicos, Mercado Pago/descadastro guardados, conferência de 1.898 endereços com zero falhas, cache de 60 s para a CDN. Faltam o ensaio e a DNS (dias 2 e 3). Site antigo sai do ar no fim do dia 4 (18/11) |
 | 6 | Importação das contas e da economia a partir do dump de **15/11** (`animeprofile_261115.backup`; o dump final foi dispensado), em fases (A robô, B contas, C perfil e comentar, D economia, E figurinhas e missões, F resto) | 💤 depois da virada |
 | 5 | Google Analytics 4 com banner de consentimento por categoria (Estatística x Anúncios), módulo `app/analytics/` para os outros 3 sites ([plano](plano-google-analytics.md)) | ✅ no ar em 2026-11-26 (ID `G-GFBZ97L4WX`, módulo `app/analytics/`, banner em 2 camadas, textos legais novos); falta conferir no DebugView e levar para os outros 3 sites |
-| 6 | Migração da Hostinger (Cloud Startup) para a VPS com Coolify, no módulo do criasite ([plano](plano-vps.md)) | ✅ no ar na VPS desde 2026-11-26 ([deploy-vps.md](deploy-vps.md)); site antigo apagado; falta o acompanhamento de 24 h e 7 dias |
+| 6 | Migração da Hostinger (Cloud Startup) para a VPS com Coolify, no módulo do criasite ([plano](plano-vps.md)) | ✅ no ar na VPS desde 2026-11-26 ([deploy-vps.md](deploy-vps.md)); site antigo apagado; 24 h conferidas em 2026-11-27; falta o de 7 dias |
 
 ## Onde paramos
 
@@ -210,8 +210,8 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 5. **Mídia kit** em uma página "Anuncie" (o site recriado ainda não tem): público e números reais, formatos e pacotes,
    regras de conteúdo patrocinado, versão para baixar/imprimir e contato. Outra fonte de renda, vale para todos os sites.
    Fica para depois da virada do domínio; reaproveitar o que o criasite (piloto) fizer.
-6. **Depois da VPS ([plano-vps.md](plano-vps.md), passo 19):** em 24 h, conferir robô (matéria com imagem em `/media/robo`),
-   `publicar-agendados`, `limpeza`, backup diário com o banco `animeprofile` e `/admin/visitas`; na 1ª segunda, `agenda-semanal` e
+6. **Depois da VPS ([plano-vps.md](plano-vps.md), passo 19):** 24 h ✅ conferidas em 2026-11-27 (8 matérias em 24 h com imagem em
+   `/media/robo`, `publicar-agendados` e `limpeza` ok, backup das 06:30 UTC com o banco, visitas contando). Na 1ª segunda (30/11), `agenda-semanal` e
    `metricas-semanal`; aos 7 dias (2026-12-03), TTL 3600, tirar o domínio temporário e apagar o dump e o `.env` de `/root/migracao`.
    Depois, a tela Artigos com IA (migration 016, colada no chat).
 7. **Google Analytics:** no ar desde 2026-11-26 ([app/analytics/README.md](../app/analytics/README.md)). Conferir no DebugView
