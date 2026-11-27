@@ -1,5 +1,6 @@
 // Página da matéria: /noticias/<slug> e /artigos/<slug>, os mesmos endereços do site antigo.
 // Se o tipo do endereço não bater (artigo aberto em /noticias), redireciona para o certo.
+import { medir } from "~/analytics/gtag";
 import { data, Link, redirect } from "react-router";
 import type { Route } from "./+types/post";
 import { Comments, ShareBar } from "~/components/post-extras";
@@ -219,7 +220,14 @@ export default function Post({ loaderData }: Route.ComponentProps) {
         </div>
 
         {related.length > 0 && (
-          <section aria-labelledby="relacionadas" className="mt-16 border-t border-line pt-12">
+          <section
+            aria-labelledby="relacionadas"
+            className="mt-16 border-t border-line pt-12"
+            onClickCapture={(e) => {
+              const href = (e.target as HTMLElement).closest("a")?.getAttribute("href");
+              if (href) medir("select_content", { content_type: "leia_tambem", item_id: href });
+            }}
+          >
             <h2 id="relacionadas" className="text-[1.6rem] font-extrabold tracking-[-0.02em]">
               Leia também
             </h2>

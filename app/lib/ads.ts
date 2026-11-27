@@ -16,18 +16,6 @@ export const AD_SLOTS = {
 } as const;
 export type AdSlotName = keyof typeof AD_SLOTS;
 
-/** Mesma chave que a Política de Cookies cita. */
-export const CONSENT_KEY = "ap-cookie-consent";
-/** Mude a versão quando a política mudar de forma relevante: todo mundo vê o banner de novo. */
-export const CONSENT_VERSION = 1;
-export type ConsentChoice = "all" | "essential";
-
-/**
- * Script que roda no <head> antes de qualquer anúncio: cria o gtag, nega tudo por padrão (Modo de Consentimento v2) e, se a pessoa
- * já escolheu "aceitar todos", libera na hora (sem esperar o React).
- */
-export function consentBootstrap() {
-  return `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}
-gtag('consent','default',{ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',analytics_storage:'denied',wait_for_update:500});
-try{var c=JSON.parse(localStorage.getItem('${CONSENT_KEY}')||'null');if(c&&c.v===${CONSENT_VERSION}&&c.choice==='all')gtag('consent','update',{ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted',analytics_storage:'granted'});}catch(e){}`;
-}
+// O consentimento (chave, versão e script do <head>) mora no módulo ~/analytics; reexportado aqui para quem já importava daqui.
+export { CONSENT_KEY, CONSENT_VERSION } from "~/analytics/config";
+export { consentBootstrap } from "~/analytics/consent";

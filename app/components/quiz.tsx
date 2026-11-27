@@ -5,6 +5,7 @@ import { Link, useFetcher } from "react-router";
 import { Check, Link2, RotateCcw, Share2, X } from "lucide-react";
 import { QUIZ_KIND_INFO, quizPath, quizShareText, type PublicQuiz, type QuizCardData, type QuizFinish } from "~/lib/quiz";
 import { SITE, absoluteUrl } from "~/lib/site";
+import { medir } from "~/analytics/gtag";
 
 /** Imagem que, se quebrar, vira um quadrado com a inicial (o servidor de origem pode sumir). */
 function SafeImg({ src, label, className }: { src?: string | null; label: string; className: string }) {
@@ -60,6 +61,16 @@ export function QuizPlayer({ quiz, challenge, next }: { quiz: PublicQuiz; challe
   const total = quiz.questions.length;
   const knowledge = quiz.kind === "conhecimento";
   const finish = done.data?.finish ?? null;
+  const medido = useRef<QuizFinish | null>(null);
+  useEffect(() => {
+    if (!finish || medido.current === finish) return;
+    medido.current = finish;
+    medir("quiz_complete", {
+      quiz_slug: quiz.slug,
+      quiz_tipo: knowledge ? "conhecimento" : "personalidade",
+      ...(knowledge && finish.score != null ? { acertos: finish.score, total: finish.total } : {}),
+    });
+  }, [finish, quiz.slug, knowledge]);
 
   const advance = (answer: string, soFar: string[]) => {
     const all = [...soFar, answer];

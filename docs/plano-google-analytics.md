@@ -1,5 +1,7 @@
 # Plano: Google Analytics 4 com banner de consentimento (módulo copiável)
 
+**Status: ✅ executado em 2026-11-26** (passos 1 a 16, ID `G-GFBZ97L4WX`; passo 1: sem CSP em produção; 12b só se o DebugView pedir).
+
 Plano temporário, escrito em 2026-11-26. O animeprofile é o piloto; respawnou, vibecoin e criasite copiam o módulo depois
 (seção final).
 

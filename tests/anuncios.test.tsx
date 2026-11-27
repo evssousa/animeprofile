@@ -28,7 +28,7 @@ describe("AdSense: configuração", () => {
     expect(b).toContain("gtag('consent','default'");
     for (const k of ["ad_storage", "ad_user_data", "ad_personalization", "analytics_storage"]) expect(b).toMatch(new RegExp(`${k}:'denied'`));
     expect(b).toContain(CONSENT_KEY);
-    expect(b).toContain("choice==='all'"); // só libera quem aceitou tudo
+    expect(b).toContain("c.v===2"); // libera por categoria (v2); a escolha antiga "aceitar todos" libera só os anúncios
   });
 });
 

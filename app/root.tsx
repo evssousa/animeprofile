@@ -19,10 +19,15 @@ import { Header } from "./components/layout/Header";
 import { SideNav, sidebarBootstrap } from "./components/layout/SideNav";
 import { themeBootstrap } from "./components/layout/ThemeToggle";
 import { PageHeader } from "./components/PageHeader";
-import { ADS_ENABLED, consentBootstrap } from "./lib/ads";
+import { ADS_ENABLED } from "./lib/ads";
+import { GA_MEASUREMENT_ID, gaIdValido } from "./analytics/config";
+import { consentBootstrap } from "./analytics/consent";
+import { GoogleAnalytics } from "./analytics/GoogleAnalytics";
 import { sessionHintBootstrap } from "./lib/session-hint";
 import { SITE } from "./lib/site";
 import { VisitBeacon } from "./visitas/client/VisitBeacon";
+
+const TEM_GA = Boolean(gaIdValido(GA_MEASUREMENT_ID));
 
 export const links: Route.LinksFunction = () => [
   { rel: "icon", href: "/favicon.png", type: "image/png" },
@@ -61,7 +66,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: themeBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: sidebarBootstrap }} />
         <script dangerouslySetInnerHTML={{ __html: sessionHintBootstrap }} />
-        {ADS_ENABLED && !inAdmin && <script dangerouslySetInnerHTML={{ __html: consentBootstrap() }} />}
+        {(ADS_ENABLED || TEM_GA) && !inAdmin && <script dangerouslySetInnerHTML={{ __html: consentBootstrap() }} />}
         <Meta />
         <Links />
       </head>
@@ -103,6 +108,7 @@ export default function App() {
       <Outlet />
       <CookieConsent />
       <VisitBeacon />
+      {TEM_GA && <GoogleAnalytics id={GA_MEASUREMENT_ID} />}
     </>
   );
 }

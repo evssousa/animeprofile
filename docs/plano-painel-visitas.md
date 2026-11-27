@@ -661,7 +661,7 @@ Tamanho: P (até 1 h), M (meio dia), G (um dia). "Claude" = executor; "Dono" = s
 12. **(G, Claude) Tela do painel** (`app/visitas/ui/*`, `visitas.css` importado pela rota, `AdminShell`) exatamente
     como em "Decisões de design (visual)", com todos os estados.
     **Verificar:** o "Critério de pronto (visual)" acima, com os 4 prints anexados na resposta ao dono.
-13. **(P, Claude; Dono aprova o texto) Textos legais.** Em `legal-privacidade.md`, trocar o 2.5 (título "2.5 Contagem de
+13. ✅ (2026-11-26, junto com o Google Analytics) **(P, Claude; Dono aprova o texto) Textos legais.** Em `legal-privacidade.md`, trocar o 2.5 (título "2.5 Contagem de
     visitas (sem cookies)") pelo texto: "Contamos as visitas de forma agregada, **sem cookies e sem guardar o seu IP**.
     Quando uma página termina de abrir, o navegador avisa o nosso servidor qual página foi aberta, de onde você veio
     (o site anterior ou os parâmetros UTM do link) e o tipo de aparelho, navegador e idioma. Para não contar a mesma

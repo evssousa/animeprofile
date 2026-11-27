@@ -76,7 +76,7 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
 | 5 | Painel `/admin` de visitas sem contas (contador próprio sem cookie, base para os outros 3 sites) ([plano](plano-painel-visitas.md)) | ⏳ feito em 2026-11-19 (passos 1 a 12): login do admin, migration 013, coleta `/api/v`, `views_count` voltando a andar, limpeza e a tela. Falta conferir em produção, textos legais (13), país/idioma (14) e docs (15). Dono respondeu com as recomendadas |
 | 6 | **Virada parcial (sem contas) em 4 dias:** backup completo do Lovable Cloud, imagens no `/media`, páginas das contas honestas, ensaio e DNS ([plano](plano-virada-parcial.md)) | 🔄 urgente. **Dia 1 (15/11) feito:** backup do banco validado, storage inteiro baixado (6.757 arquivos), 2.436 imagens no `/media`, páginas das contas, faixa, `/site-novo`, redirects, arquivos públicos, Mercado Pago/descadastro guardados, conferência de 1.898 endereços com zero falhas, cache de 60 s para a CDN. Faltam o ensaio e a DNS (dias 2 e 3). Site antigo sai do ar no fim do dia 4 (18/11) |
 | 6 | Importação das contas e da economia a partir do dump de **15/11** (`animeprofile_261115.backup`; o dump final foi dispensado), em fases (A robô, B contas, C perfil e comentar, D economia, E figurinhas e missões, F resto) | 💤 depois da virada |
-| 5 | Google Analytics 4 com banner de consentimento por categoria (Estatística x Anúncios), módulo `app/analytics/` para os outros 3 sites ([plano](plano-google-analytics.md)) | ⏳ plano pronto em 2026-11-26: 16 passos, sem migration; pode subir antes do ID (GA vazio = desligado); falta o dono criar a propriedade e mandar o `G-...` |
+| 5 | Google Analytics 4 com banner de consentimento por categoria (Estatística x Anúncios), módulo `app/analytics/` para os outros 3 sites ([plano](plano-google-analytics.md)) | ✅ no ar em 2026-11-26 (ID `G-GFBZ97L4WX`, módulo `app/analytics/`, banner em 2 camadas, textos legais novos); falta conferir no DebugView e levar para os outros 3 sites |
 | 6 | Migração da Hostinger (Cloud Startup) para a VPS com Coolify, no módulo do criasite ([plano](plano-vps.md)) | ✅ no ar na VPS desde 2026-11-26 ([deploy-vps.md](deploy-vps.md)); site antigo apagado; falta o acompanhamento de 24 h e 7 dias |
 
 ## Onde paramos
@@ -214,9 +214,9 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
    `publicar-agendados`, `limpeza`, backup diário com o banco `animeprofile` e `/admin/visitas`; na 1ª segunda, `agenda-semanal` e
    `metricas-semanal`; aos 7 dias (2026-12-03), TTL 3600, tirar o domínio temporário e apagar o dump e o `.env` de `/root/migracao`.
    Depois, a tela Artigos com IA (migration 016, colada no chat).
-7. **Google Analytics ([plano-google-analytics.md](plano-google-analytics.md)):** passos 1 a 15 (módulo `app/analytics/`, banner com
-   "Personalizar", consentimento v2, eventos, textos legais junto com o passo 13 do plano de visitas, testes) podem subir com o ID vazio;
-   o passo 16 liga o GA quando o dono mandar o `G-...`. Depois, levar o módulo para respawnou → vibecoin → criasite (seção final do plano).
+7. **Google Analytics:** no ar desde 2026-11-26 ([app/analytics/README.md](../app/analytics/README.md)). Conferir no DebugView
+   (`?ga_debug=1`) 1 page_view por página, a busca (`view_search_results`; se não vier, passo 12b do plano), `quiz_complete` e
+   `select_content`. Depois, levar o módulo para respawnou → vibecoin → criasite (seção final de [plano-google-analytics.md](plano-google-analytics.md)).
 
 ## Pendências suas
 
@@ -224,10 +224,11 @@ Legenda: ✅ feito · 🔄 em andamento · ⏳ próximo · 💤 depois · ❓ es
   o consentimento e os textos legais seguem no ar na VPS, conferido em 2026-11-26). No painel do AdSense: ver `animeprofile.com.br`
   como "Pronto" em Sites, ativar a mensagem "Regulamentos europeus" em Privacidade e mensagens e, numa janela anônima, aceitar
   os cookies e ver se aparece anúncio numa matéria.
-- **Google Analytics ([plano-google-analytics.md](plano-google-analytics.md), "Pendências do dono"):** criar a propriedade GA4 do
-  animeprofile (uma por site, fluxo Web), mandar o ID `G-...` no chat, desligar no fluxo "Mudanças de página com base em eventos do
-  histórico do navegador", retenção de 14 meses, sinais do Google desligados; opcional vincular Search Console e AdSense. Aprovar os
-  textos novos de Cookies e Privacidade (passo 14). Se discordar de alguma das 9 decisões do plano, dizer antes da execução.
+- **Google Analytics (no ar, ID `G-GFBZ97L4WX`):** no fluxo Web do GA, desligar "Mudanças de página com base em eventos do
+  histórico do navegador" (Medição otimizada → engrenagem → Visualizações de página → Configurações avançadas; senão cada página
+  conta duas vezes); Administrador → Retenção de dados em 14 meses; Coleta de dados com os sinais do Google desligados; opcional
+  vincular Search Console e AdSense. Abrir o site uma vez com `?nao-medir=1` em cada navegador seu sem login (celular). Ler e
+  aprovar os textos novos de `/legal/cookies` e `/legal/privacidade`. O contêiner do Tag Manager (`GTM-T4V9938Z`) não é usado.
 - **Depois da VPS:** abrir o site e o `/admin` no celular (4G) e no PC (a sessão antiga caiu porque o `SESSION_SECRET` é novo;
   a senha é a mesma); no Search Console, "Testar URL publicada" na home e ver os sitemaps "Sucesso". Guardar
   `projetos\_segredos\animeprofile-vps.env` no gerenciador de senhas (ou apagar) e apagar `projetos\_migracao\animeprofile-final.sql`

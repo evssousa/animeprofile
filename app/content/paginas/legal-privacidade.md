@@ -2,7 +2,7 @@
 title: Política de Privacidade
 description: Política de Privacidade do Anime Profile, de acordo com a LGPD: quais dados coletamos, bases legais, operadores, prazos e como exercer seus direitos.
 intro: Como tratamos seus dados pessoais de acordo com a Lei Geral de Proteção de Dados (Lei 13.709/2018).
-updated: 2026-11-12
+updated: 2026-11-26
 toc: true
 ---
 
@@ -30,11 +30,15 @@ Inclui **posts**, **comentários**, **mensagens**, **reações**, *favoritos* e 
 
 Registramos **leituras** de notícias e artigos, **tempo de leitura**, *recompensas recebidas*, *check-ins*, *conquistas* desbloqueadas e **transações** envolvendo AP Coins, Rubis e trocas de figurinhas.
 
-### 2.5 Telemetria (somente com consentimento)
+### 2.5 Contagem de visitas (sem cookies)
 
-Após você aceitar os cookies opcionais, coletamos **visualizações de página**, um *identificador anônimo de sessão*, o *referrer* da visita e **parâmetros UTM** para analisar desempenho e atribuir origem de tráfego.
+Contamos as visitas de forma agregada, **sem cookies e sem guardar o seu IP**. Quando uma página termina de abrir, o navegador avisa o nosso servidor qual página foi aberta, de onde você veio (o site anterior ou os parâmetros UTM do link) e o tipo de aparelho, navegador e idioma. Para não contar a mesma pessoa duas vezes no mesmo dia, o servidor calcula um código a partir do IP e do navegador com uma chave que é trocada e apagada todos os dias; esse código só vale naquele dia e não permite identificar ninguém. Robôs não são contados.
 
-### 2.6 Dados técnicos
+### 2.6 Google Analytics (somente com permissão)
+
+Se você aceitar "Estatística" nas preferências de cookies, o **Google Analytics 4** recebe as páginas que você abre, o tempo de engajamento, o tipo de aparelho e navegador, a região aproximada e eventos como busca interna e quiz concluído, ligados a um identificador aleatório guardado no cookie `_ga`. Não enviamos nome, e-mail nem conta. Sem essa permissão, o Google Analytics não é carregado.
+
+### 2.7 Dados técnicos
 
 Para fins de segurança e cumprimento legal, registramos o **endereço IP** e o *user-agent* associados aos logs de acesso.
 
@@ -66,7 +70,7 @@ Compartilhamos dados apenas com os operadores listados abaixo, todos vinculados 
 | Google (Gemini) | Geração de conteúdo pelos autores de IA | Pautas editoriais (sem dados pessoais) | EUA |
 | Cloudflare (Turnstile) | Verificação contra robôs no cadastro, no login e nos formulários | IP e dados técnicos do navegador | Global |
 | Mercado Pago | Processamento das compras de Rubi por PIX | Identificação do pagador e dados da transação | Brasil |
-| Google Analytics 4 (Google LLC) | Medição de audiência e desempenho (apenas com consentimento de cookies analíticos) | Identificador anônimo de cliente, IP truncado, eventos de navegação | EUA |
+| Google Analytics 4 (Google LLC) | Medição de audiência e desempenho (apenas com consentimento de Estatística) | Identificador aleatório do navegador, páginas vistas e eventos; o IP só é usado para estimar a região e não é guardado | EUA |
 | Google AdSense (Google LLC) | Exibição de anúncios em notícias e artigos; com consentimento de cookies de marketing, personalização de anúncios. Não exibido para quem está logado na equipe do site. | IP, identificadores de anúncio e, com consentimento, dados de navegação para personalização | EUA |
 
 Esta lista pode ser atualizada. Alterações materiais serão anunciadas nesta página.
@@ -82,7 +86,8 @@ Alguns provedores de infraestrutura podem armazenar dados fora do Brasil. Nesses
 | Dados de cadastro | Enquanto a conta estiver ativa | Execução de contrato |
 | Conteúdo público (posts, comentários) | Enquanto a conta estiver ativa; após exclusão, é removido ou anonimizado | Execução de contrato |
 | Logs de acesso (IP, user-agent) | 6 meses | Marco Civil, art. 15 |
-| Visualizações de página (analytics) | 24 meses | Legítimo interesse / consentimento |
+| Contagem de visitas (números por dia, página, origem e aparelho, sem dado pessoal) | 13 meses; os totais por dia ficam sem prazo | Legítimo interesse |
+| Google Analytics (estatística com permissão) | 14 meses | Consentimento |
 | Notificações lidas | 6 meses | Operacional |
 | Prints anexados a reports de bug | 90 dias após o report ser encerrado | Operacional |
 | Denúncias e pedidos LGPD encerrados | 24 meses | Defesa em processo |
