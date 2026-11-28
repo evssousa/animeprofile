@@ -404,5 +404,5 @@ Diferenças comuns aos três (o animeprofile é o único com constante; eles usa
 | **vibecoin** | `vibecoin_consent` | `vibecoin:cookies` | **desligado** (sem `ADSENSE_CLIENT`) | Com GA e sem AdSense, o banner mostra só Estatística (texto "só GA"); o `Footer adsOn` vira `prefsOn = adsOn || gaOn`. Visual "Dia e Noite" (`rounded-xl`, `border-night-line-2`, acento `violet`/`glow`): chave ligada em `bg-violet`. O `/admin` ainda é da fase 3 (regra de caminho já cobre). |
 | **criasite** | `criasite_consent` | `criasite:cookies` | **desligado** (conferir no README dele) | Igual ao vibecoin no código (mesma estrutura de `root.tsx`, `Footer adsOn` e páginas TSX). Visual próprio (`violet`, `glow`, `rounded-xl`). Sem CMP ainda: o módulo traz. |
 
-Ordem recomendada: respawnou (já tem AdSense e CMP, mais parecido com o piloto) → vibecoin → criasite. Em cada um: copiar a pasta,
+Ordem recomendada: respawnou (já tem AdSense e CMP, mais parecido com o piloto) → vibecoin → criasite. **respawnou ✅ 2026-11-28** (`G-SDG7DBP241`; teste em `respawnou/app/analytics/analytics.teste.tsx`, formato `node:assert` porque o respawnou não usa Vitest). Em cada um: copiar a pasta,
 ajustar `config.ts`, `root.tsx`, banner, rodapé e textos, rodar o roteiro de "Como verificar" trocando o domínio.
